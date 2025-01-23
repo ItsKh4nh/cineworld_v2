@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
-import { API_KEY, imageUrl } from "../../constants/Constance";
+import { API_KEY, imageUrl } from "../../constants/constance";
 import axios from "../services/axios";
 import { PopUpContext } from "../../contexts/PopUpContext";
 import { Fade } from "react-reveal";
 import { Rating } from "@smastrom/react-rating";
-import "@smastrom/react-rating/style.css";
 import MoviePopUp from "../PopUp/MoviePopUp";
 import usePlayMovie from "../../hooks/usePlayMovie";
 
