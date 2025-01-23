@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { Rating } from "@smastrom/react-rating";
-import { imageUrl } from "../../constants/constance";
+import { imageUrl } from "../../../backend/constants/constance";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
 import usePlayMovie from "../../hooks/usePlayMovie";

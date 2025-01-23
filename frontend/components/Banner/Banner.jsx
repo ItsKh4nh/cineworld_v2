@@ -2,13 +2,13 @@ import React, { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { Rating } from "@smastrom/react-rating";
 
-import { API_KEY, imageUrl } from "../../constants/constance";
-import axios from "../services/axios";
+import { API_KEY, imageUrl } from "../../backend/constants/constants";
+import axios from "../../services/axios";
 
 import { PopUpContext } from "../../contexts/PopUpContext";
 import usePlayMovie from "../../hooks/usePlayMovie";
 
-import MoviePopUp from "../PopUp/MoviePopUp";
+import MoviePopUp from "../../components/PopUp/MoviePopUp";
 
 function Banner(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);

@@ -23,8 +23,8 @@ function Footer() {
             <li>Android</li>
           </ul>
           <div className={styles.security}>
-            <div>Engligh</div>
-            <span>© 1997-2024 Netflix, Inc.</span>
+            <div>English</div>
+            <span>©2024 CineWorld, Inc.</span>
           </div>
         </div>
       </footer>

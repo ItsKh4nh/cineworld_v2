@@ -29,7 +29,7 @@ function NavbarWithoutUser() {
           <img
             className="h-8 sm:h-10 sm:w-18 ml-8 cursor-pointer"
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/1920px-Netflix_2015_logo.svg.png"
-            alt="NETFLIX"
+            alt="CineWorld"
           />
         </div>
 
