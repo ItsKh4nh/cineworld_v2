@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
+import { motion } from "framer-motion";
+import { Rating } from "@smastrom/react-rating";
+
 import { API_KEY, imageUrl } from "../../constants/constance";
 import axios from "../services/axios";
+
 import { PopUpContext } from "../../contexts/PopUpContext";
-import { Fade } from "react-reveal";
-import { Rating } from "@smastrom/react-rating";
-import MoviePopUp from "../PopUp/MoviePopUp";
 import usePlayMovie from "../../hooks/usePlayMovie";
+
+import MoviePopUp from "../PopUp/MoviePopUp";
 
 function Banner(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);
@@ -68,7 +71,11 @@ function Banner(props) {
         className="h-[50rem] md:h-[55rem] 3xl:h-[63rem] bg-cover bg-center object-contain grid items-center"
       >
         <div className="ml-2  mr-2 sm:mr-0 sm:ml-12 mt-[75%] sm:mt-52">
-          <Fade bottom>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+          >
             {movie.title || movie.name ? (
               <>
                 <h1 className="text-white text-3xl font-semibold text-center mb-5 py-2 sm:text-left sm:text-5xl sm:border-l-8 pl-4 border-red-700 md:text-6xl lg:w-2/3 xl:w-1/2 sm:font-bold drop-shadow-lg">
@@ -215,7 +222,7 @@ function Banner(props) {
                 </>
               )}
             </div>
-          </Fade>
+          </motion.div>
         </div>
         <div
           style={{
