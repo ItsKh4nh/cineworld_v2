@@ -5,11 +5,11 @@ import { imageUrl, imageUrl2, API_KEY } from "../../constants/constance";
 import { motion } from "framer-motion";
 import { Rating } from "@smastrom/react-rating";
 import YouTube from "react-youtube";
-import useUpdateMyList from "../../hooks/useUpdateMyList";
-import usePlayMovie from "../../hooks/usePlayMovie";
-import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
-import useUpdateLikedMovies from "../../hooks/useUpdateLikedMovies";
-import useGenresConverter from "../../hooks/useGenresConverter";
+import useUpdateMyList from "../../../hooks/useUpdateMyList";
+import usePlayMovie from "../../../hooks/usePlayMovie";
+import useUpdateWatchedMovies from "../../../hooks/useUpdateWatchedMovies";
+import useUpdateLikedMovies from "../../../hooks/useUpdateLikedMovies";
+import useGenresConverter from "../../../hooks/useGenresConverter";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper";
 
