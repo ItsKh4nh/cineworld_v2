@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const ENV_VARS = {
+  PORT: process.env.PORT || 5000,
   TMDB_API_KEY: process.env.TMDB_API_KEY,
   FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
   AUTH_DOMAIN: process.env.FIREBASE_AUTH_DOMAIN,
