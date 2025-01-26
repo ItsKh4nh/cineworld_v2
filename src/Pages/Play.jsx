@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import StarRatings from "react-star-ratings";
 import axios from "../axios";
-import { API_KEY, imageUrl, imageUrl2 } from "../Constants/Constance";
+import { API_KEY, imageUrl, imageUrl2 } from "../config/constants";
 
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";

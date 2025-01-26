@@ -15,7 +15,7 @@ const LikedMovies = lazy(() => import("./Pages/LikedMovies"));
 const History = lazy(() => import("./Pages/History"));
 
 import { Routes, Route, Navigate } from "react-router-dom";
-import { AuthContext } from "./Context/UserContext";
+import { AuthContext } from "./contexts/UserContext";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import Loading from "./components/Loading/Loading";
 import Navbar from "./components/Header/Navbar";

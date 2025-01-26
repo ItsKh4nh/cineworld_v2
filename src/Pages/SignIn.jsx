@@ -10,8 +10,8 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { setDoc, doc, getDoc } from "firebase/firestore";
-import { db } from "../Firebase/FirebaseConfig";
-import { AuthContext } from "../Context/UserContext";
+import { db } from "../config/FirebaseConfig";
+import { AuthContext } from "../contexts/UserContext";
 
 import GoogleLogo from "../images/GoogleLogo.png";
 import WelcomePageBanner from "../images/WelcomePageBanner.jpg";

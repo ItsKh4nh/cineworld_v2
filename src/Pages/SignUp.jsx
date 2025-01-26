@@ -9,8 +9,8 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
-import { db } from "../Firebase/FirebaseConfig";
-import { AuthContext } from "../Context/UserContext";
+import { db } from "../config/FirebaseConfig";
+import { AuthContext } from "../contexts/UserContext";
 import { ClipLoader } from "react-spinners";
 import WelcomePageBanner from "../images/WelcomePageBanner.jpg";
 

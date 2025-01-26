@@ -4,7 +4,7 @@ import { Transition } from "@headlessui/react";
 import { Fade } from "react-awesome-reveal";
 import { Link, useNavigate } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
-import { AuthContext } from "../../Context/UserContext";
+import { AuthContext } from "../../contexts/UserContext";
 
 function Navbar(props) {
   const { User } = useContext(AuthContext);

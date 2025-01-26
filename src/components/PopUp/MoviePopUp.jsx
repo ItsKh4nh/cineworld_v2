@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Fade } from "react-awesome-reveal";
 import StarRatings from "react-star-ratings";
-import { imageUrl } from "../../Constants/Constance";
-import { PopUpContext } from "../../Context/moviePopUpContext";
+import { imageUrl } from "../../config/constants";
+import { PopUpContext } from "../../contexts/moviePopUpContext";
 import useUpdateMylist from "../../CustomHooks/useUpdateMylist";
 import usePlayMovie from "../../CustomHooks/usePlayMovie";
 import useGenereConverter from "../../CustomHooks/useGenereConverter";
