@@ -27,7 +27,7 @@ function Series() {
         ></RowPost>
         <RowPost title="Animated" url={Animated} key={Animated}></RowPost>
         <RowPost
-          title="Netflix Originals"
+          title="Cineworld Originals"
           islarge
           url={originals}
           key={originals}

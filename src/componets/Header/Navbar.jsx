@@ -71,8 +71,8 @@ function Navbar(props) {
                 <div className="flex-shrink-0">
                   <img
                     className="h-6 cursor-pointer w-18"
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/1920px-Netflix_2015_logo.svg.png"
-                    alt="NETFLIX"
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Cineworld_2015_logo.svg/1920px-Cineworld_2015_logo.svg.png"
+                    alt="CINEWORLD"
                   />
                 </div>
                 <div className="hidden md:block">
@@ -166,7 +166,7 @@ function Navbar(props) {
                             ? `${User.photoURL}`
                             : `https://www.citypng.com/public/uploads/preview/profile-user-round-red-icon-symbol-download-png-11639594337tco5j3n0ix.png`
                         }
-                        alt="NETFLIX"
+                        alt="CINEWORLD"
                       />
                     </Link>
                     <ul className="absolute hidden text-white pt-1 -ml-32 group-hover:block transition ease-in-out delay-150">
