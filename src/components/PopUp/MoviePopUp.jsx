@@ -3,11 +3,11 @@ import { Fade } from "react-awesome-reveal";
 import StarRatings from "react-star-ratings";
 import { imageUrl } from "../../config/constants";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
-import useUpdateMylist from "../../CustomHooks/useUpdateMylist";
-import usePlayMovie from "../../CustomHooks/usePlayMovie";
-import useGenereConverter from "../../CustomHooks/useGenereConverter";
-import useUpdateLikedMovies from "../../CustomHooks/useUpdateLikedMovies";
-import useUpdateWatchedMovies from "../../CustomHooks/useUpdateWatchedMovies";
+import useUpdateMylist from "../../hooks/useUpdateMylist";
+import usePlayMovie from "../../hooks/usePlayMovie";
+import useGenereConverter from "../../hooks/useGenereConverter";
+import useUpdateLikedMovies from "../../hooks/useUpdateLikedMovies";
+import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
 
 function MoviePopUp(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);

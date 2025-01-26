@@ -2,12 +2,12 @@ import React from "react";
 import { useState, useContext } from "react";
 import { API_KEY, imageUrl2 } from "../config/constants";
 import { PopUpContext } from "../contexts/moviePopUpContext";
-import useUpdateMylist from "../CustomHooks/useUpdateMylist";
+import useUpdateMylist from "../hooks/useUpdateMylist";
 import axios from "../axios";
 import MoviePopUp from "../components/PopUp/MoviePopUp";
-import usePlayMovie from "../CustomHooks/usePlayMovie";
-import useUpdateLikedMovies from "../CustomHooks/useUpdateLikedMovies";
-import useGenereConverter from "../CustomHooks/useGenereConverter";
+import usePlayMovie from "../hooks/usePlayMovie";
+import useUpdateLikedMovies from "../hooks/useUpdateLikedMovies";
+import useGenereConverter from "../hooks/useGenereConverter";
 import StarRatings from "react-star-ratings";
 
 function Search() {

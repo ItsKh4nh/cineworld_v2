@@ -5,7 +5,7 @@ import { PopUpContext } from "../../contexts/moviePopUpContext";
 import { Fade } from "react-awesome-reveal";
 import StarRatings from "react-star-ratings";
 import MoviePopUp from "../PopUp/MoviePopUp";
-import usePlayMovie from "../../CustomHooks/usePlayMovie";
+import usePlayMovie from "../../hooks/usePlayMovie";
 
 function Banner(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);

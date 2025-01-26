@@ -6,14 +6,14 @@ import { API_KEY, imageUrl, imageUrl2 } from "../config/constants";
 
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
-import useUpdateMylist from "../CustomHooks/useUpdateMylist";
-import useUpdateLikedMovies from "../CustomHooks/useUpdateLikedMovies";
+import useUpdateMylist from "../hooks/useUpdateMylist";
+import useUpdateLikedMovies from "../hooks/useUpdateLikedMovies";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import usePlayMovie from "../CustomHooks/usePlayMovie";
-import useUpdateWatchedMovies from "../CustomHooks/useUpdateWatchedMovies";
+import usePlayMovie from "../hooks/usePlayMovie";
+import useUpdateWatchedMovies from "../hooks/useUpdateWatchedMovies";
 
 function Play() {
   const [urlId, setUrlId] = useState("");

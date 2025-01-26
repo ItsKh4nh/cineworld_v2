@@ -3,15 +3,15 @@ import { useEffect, useState } from "react";
 
 import axios from "../../axios";
 import { imageUrl, imageUrl2, API_KEY } from "../../config/constants";
-import useUpdateMylist from "../../CustomHooks/useUpdateMylist";
+import useUpdateMylist from "../../hooks/useUpdateMylist";
 import { Fade } from "react-awesome-reveal";
 import YouTube from "react-youtube";
 import StarRatings from "react-star-ratings";
 
-import usePlayMovie from "../../CustomHooks/usePlayMovie";
-import useUpdateWatchedMovies from "../../CustomHooks/useUpdateWatchedMovies";
-import useUpdateLikedMovies from "../../CustomHooks/useUpdateLikedMovies";
-import useGenereConverter from "../../CustomHooks/useGenereConverter";
+import usePlayMovie from "../../hooks/usePlayMovie";
+import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
+import useUpdateLikedMovies from "../../hooks/useUpdateLikedMovies";
+import useGenereConverter from "../../hooks/useGenereConverter";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
