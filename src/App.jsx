@@ -1,18 +1,18 @@
 import { useEffect, useContext, lazy, Suspense } from "react";
 import "./App.css";
 
-const Home = lazy(() => import("./Pages/Home"));
-const Series = lazy(() => import("./Pages/Series"));
-const Search = lazy(() => import("./Pages/Search"));
-const Profile = lazy(() => import("./Pages/Profile"));
-const MyList = lazy(() => import("./Pages/MyList"));
-const SignIn = lazy(() => import("./Pages/SignIn"));
-const SignUp = lazy(() => import("./Pages/SignUp"));
-const Welcome = lazy(() => import("./Pages/Welcome"));
-const ErrorPage = lazy(() => import("./Pages/ErrorPage"));
-const Play = lazy(() => import("./Pages/Play"));
-const LikedMovies = lazy(() => import("./Pages/LikedMovies"));
-const History = lazy(() => import("./Pages/History"));
+const Home = lazy(() => import("./pages/Home"));
+const Series = lazy(() => import("./pages/Series"));
+const Search = lazy(() => import("./pages/Search"));
+const Profile = lazy(() => import("./pages/Profile"));
+const MyList = lazy(() => import("./pages/MyList"));
+const SignIn = lazy(() => import("./pages/SignIn"));
+const SignUp = lazy(() => import("./pages/SignUp"));
+const Welcome = lazy(() => import("./pages/Welcome"));
+const ErrorPage = lazy(() => import("./pages/ErrorPage"));
+const Play = lazy(() => import("./pages/Play"));
+const LikedMovies = lazy(() => import("./pages/LikedMovies"));
+const History = lazy(() => import("./pages/History"));
 
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthContext } from "./contexts/UserContext";

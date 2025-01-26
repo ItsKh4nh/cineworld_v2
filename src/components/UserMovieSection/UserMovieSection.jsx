@@ -3,11 +3,11 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import MoviePopUp from "../PopUp/MoviePopUp";
 import { imageUrl2, API_KEY } from "../../config/constants";
-import useUpdateMylist from "../../hooks/useUpdateMylist";
+import useUpdateMyList from "../../hooks/useUpdateMyList";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
 import useUpdateLikedMovies from "../../hooks/useUpdateLikedMovies";
-import useGenereConverter from "../../hooks/useGenereConverter";
+import useGenresConverter from "../../hooks/useGenresConverter";
 import { db } from "../../config/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { AuthContext } from "../../contexts/UserContext";
@@ -20,13 +20,13 @@ function UserMovieSection(props) {
   const { User } = useContext(AuthContext);
   const { showModal, setShowModal } = useContext(PopUpContext);
 
-  const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMylist();
+  const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
   const { removeFromWatchedMovies, removePopupMessage } =
     useUpdateWatchedMovies();
   const { addToLikedMovies, removeFromLikedMovies, LikedMoviePopupMessage } =
     useUpdateLikedMovies();
   const { playMovie } = usePlayMovie();
-  const { convertGenere } = useGenereConverter();
+  const { convertGenere } = useGenresConverter();
 
   const [myMovies, setMyMovies] = useState([]);
   const [moviePopupInfo, setMoviePopupInfo] = useState({});

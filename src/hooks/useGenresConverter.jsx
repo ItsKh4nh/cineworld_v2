@@ -1,6 +1,6 @@
 import { genresList } from "../config/constants";
 
-const useGenereConverter = () => {
+const useGenresConverter = () => {
   const convertGenere = (genreIds) => {
     const genresConvertedList = [];
     genreIds
@@ -17,4 +17,4 @@ const useGenereConverter = () => {
   return { convertGenere };
 };
 
-export default useGenereConverter;
+export default useGenresConverter;

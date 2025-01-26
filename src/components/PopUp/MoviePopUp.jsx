@@ -3,21 +3,21 @@ import { Fade } from "react-awesome-reveal";
 import StarRatings from "react-star-ratings";
 import { imageUrl } from "../../config/constants";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
-import useUpdateMylist from "../../hooks/useUpdateMylist";
+import useUpdateMyList from "../../hooks/useUpdateMyList";
 import usePlayMovie from "../../hooks/usePlayMovie";
-import useGenereConverter from "../../hooks/useGenereConverter";
+import useGenresConverter from "../../hooks/useGenresConverter";
 import useUpdateLikedMovies from "../../hooks/useUpdateLikedMovies";
 import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
 
 function MoviePopUp(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);
-  const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMylist();
+  const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
   const { addToLikedMovies, removeFromLikedMovies, LikedMoviePopupMessage } =
     useUpdateLikedMovies();
   const { removeFromWatchedMovies, removePopupMessage } =
     useUpdateWatchedMovies();
   const { playMovie } = usePlayMovie();
-  const { convertGenere } = useGenereConverter();
+  const { convertGenere } = useGenresConverter();
 
   const [PopupInfo, setPopupInfo] = useState({});
 
@@ -178,12 +178,12 @@ function MoviePopUp(props) {
                         </h1>
 
                         <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                          Genere :
+                          Genre :
                           {PopupInfo.genre_ids &&
-                            convertGenere(PopupInfo.genre_ids).map((genere) => {
+                            convertGenere(PopupInfo.genre_ids).map((genre) => {
                               return (
                                 <span className="text-white ml-2 font-medium">
-                                  {genere}
+                                  {genre}
                                 </span>
                               );
                             })}

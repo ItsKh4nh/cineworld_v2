@@ -4,7 +4,7 @@ import { db } from "../config/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 import toast, { Toaster } from "react-hot-toast";
 
-function useUpdateMylist() {
+function useUpdateMyList() {
   const { User } = useContext(AuthContext);
   const [isMyListUpdates, setisMyListUpdates] = useState(false);
 
@@ -56,4 +56,4 @@ function useUpdateMylist() {
   return { addToMyList, removeFromMyList, PopupMessage, isMyListUpdates };
 }
 
-export default useUpdateMylist;
+export default useUpdateMyList;

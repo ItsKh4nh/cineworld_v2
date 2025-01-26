@@ -12,7 +12,7 @@ import { setDoc, doc } from "firebase/firestore";
 import { db } from "../config/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 import { ClipLoader } from "react-spinners";
-import WelcomePageBanner from "../images/WelcomePageBanner.jpg";
+import WelcomePageBanner from "../public/WelcomePageBanner.jpg";
 
 function SignUp() {
   const { User, setUser } = useContext(AuthContext);

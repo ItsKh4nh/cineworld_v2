@@ -3,11 +3,11 @@ import { useEffect } from "react";
 
 import Footer from "../components/Footer/Footer";
 
-import WelcomePageImage1 from "../images/WelcomePageImage1.png";
-import WelcomePageImage2 from "../images/WelcomePageImage2.png";
-import WelcomePageImage3 from "../images/WelcomePageImage3.png";
-import WelcomePageImage4 from "../images/WelcomePageImage4.png";
-import WelcomePageBanner from "../images/WelcomePageBanner.jpg";
+import WelcomePageImage1 from "../public/WelcomePageImage1.png";
+import WelcomePageImage2 from "../public/WelcomePageImage2.png";
+import WelcomePageImage3 from "../public/WelcomePageImage3.png";
+import WelcomePageImage4 from "../public/WelcomePageImage4.png";
+import WelcomePageBanner from "../public/WelcomePageBanner.jpg";
 
 import { Fade } from "react-awesome-reveal";
 import { Link } from "react-router-dom";

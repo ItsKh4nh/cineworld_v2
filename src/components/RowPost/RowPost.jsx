@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import axios from "../../axios";
 import { imageUrl, imageUrl2, API_KEY } from "../../config/constants";
-import useUpdateMylist from "../../hooks/useUpdateMylist";
+import useUpdateMyList from "../../hooks/useUpdateMyList";
 import { Fade } from "react-awesome-reveal";
 import YouTube from "react-youtube";
 import StarRatings from "react-star-ratings";
@@ -11,7 +11,7 @@ import StarRatings from "react-star-ratings";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
 import useUpdateLikedMovies from "../../hooks/useUpdateLikedMovies";
-import useGenereConverter from "../../hooks/useGenereConverter";
+import useGenresConverter from "../../hooks/useGenresConverter";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -22,12 +22,12 @@ import "swiper/css/pagination";
 import "./RowPostStyles.scss";
 
 function RowPost(props) {
-  const { addToMyList, PopupMessage } = useUpdateMylist();
+  const { addToMyList, PopupMessage } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { removeFromWatchedMovies, removePopupMessage } =
     useUpdateWatchedMovies();
   const { addToLikedMovies, LikedMoviePopupMessage } = useUpdateLikedMovies();
-  const { convertGenere } = useGenereConverter();
+  const { convertGenere } = useGenresConverter();
 
   const [movies, setMovies] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -464,13 +464,13 @@ function RowPost(props) {
                           </h1>
 
                           <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                            Genere :
+                            Genre :
                             {convertGenere(moviePopupInfo.genre_ids)
                               .slice(0, 2)
-                              .map((genere) => {
+                              .map((genre) => {
                                 return (
                                   <span className="text-white ml-2 font-medium">
-                                    {genere}
+                                    {genre}
                                   </span>
                                 );
                               })}

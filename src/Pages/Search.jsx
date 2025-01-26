@@ -2,20 +2,20 @@ import React from "react";
 import { useState, useContext } from "react";
 import { API_KEY, imageUrl2 } from "../config/constants";
 import { PopUpContext } from "../contexts/moviePopUpContext";
-import useUpdateMylist from "../hooks/useUpdateMylist";
+import useUpdateMyList from "../hooks/useUpdateMyList";
 import axios from "../axios";
 import MoviePopUp from "../components/PopUp/MoviePopUp";
 import usePlayMovie from "../hooks/usePlayMovie";
 import useUpdateLikedMovies from "../hooks/useUpdateLikedMovies";
-import useGenereConverter from "../hooks/useGenereConverter";
+import useGenresConverter from "../hooks/useGenresConverter";
 import StarRatings from "react-star-ratings";
 
 function Search() {
   const { showModal, setShowModal } = useContext(PopUpContext);
-  const { addToMyList, PopupMessage } = useUpdateMylist();
+  const { addToMyList, PopupMessage } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { addToLikedMovies } = useUpdateLikedMovies();
-  const { convertGenere } = useGenereConverter();
+  const { convertGenere } = useGenresConverter();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState([]);

@@ -6,7 +6,7 @@ import { API_KEY, imageUrl, imageUrl2 } from "../config/constants";
 
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
-import useUpdateMylist from "../hooks/useUpdateMylist";
+import useUpdateMyList from "../hooks/useUpdateMyList";
 import useUpdateLikedMovies from "../hooks/useUpdateLikedMovies";
 
 import "swiper/css";
@@ -24,7 +24,7 @@ function Play() {
   const [moreTrailerVideos, setMoreTrailerVideos] = useState([]);
   const [similarMovies, setSimilarMovies] = useState([]);
 
-  const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMylist();
+  const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
   const { addToLikedMovies, removeFromLikedMovies, LikedMoviePopupMessage } =
     useUpdateLikedMovies();
   const { removeFromWatchedMovies, removePopupMessage } =
