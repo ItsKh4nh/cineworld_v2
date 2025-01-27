@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Link } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
@@ -6,6 +6,8 @@ import { Fade } from "react-awesome-reveal";
 import Footer from "../components/Footer/Footer";
 
 function Welcome() {
+  const [email, setEmail] = useState("");
+
   return (
     <div>
       {/*Hero Section*/}
@@ -34,8 +36,13 @@ function Welcome() {
                     type="email"
                     placeholder="Email Address"
                     className="w-full p-2 py-3 rounded-sm sm:py-4 md:py-5 md:w-2/3"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
-                  <Link to={"/signup"} className="md:w-1/3">
+                  <Link
+                    to={email ? `/signup?email=${email}` : "/signup"}
+                    className="md:w-1/3"
+                  >
                     <button className="w-full px-4 py-2 mt-3 font-medium text-white bg-cineworldYellow rounded-sm sm:py-4 md:mt-0 md:py-5 md:text-xl">
                       Get Started
                     </button>
