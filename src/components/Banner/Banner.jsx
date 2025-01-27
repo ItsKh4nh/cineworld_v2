@@ -3,7 +3,7 @@ import StarRatings from "react-star-ratings";
 import { Fade } from "react-awesome-reveal";
 
 import axios from "../../axios";
-import { API_KEY, imageUrl } from "../../config/constants";
+import { API_KEY, imageURL } from "../../config/constants";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
 import MoviePopUp from "../PopUp/MoviePopUp";
 import usePlayMovie from "../../hooks/usePlayMovie";
@@ -64,7 +64,7 @@ function Banner(props) {
       <div
         style={{
           backgroundImage: `linear-gradient(90deg, hsl(0deg 0% 7% / 91%) 0%, hsl(0deg 0% 0% / 0%) 35%, hsl(220deg 26% 44% / 0%) 100%), url(${
-            movie ? imageUrl + movie.backdrop_path : ""
+            movie ? imageURL + movie.backdrop_path : ""
           })`,
         }}
         className="h-[50rem] md:h-[55rem] 3xl:h-[63rem] bg-cover bg-center object-contain grid items-center"

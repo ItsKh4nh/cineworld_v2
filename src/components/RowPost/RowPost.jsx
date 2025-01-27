@@ -4,7 +4,7 @@ import { Fade } from "react-awesome-reveal";
 import StarRatings from "react-star-ratings";
 import YouTube from "react-youtube";
 import axios from "../../axios";
-import { API_KEY, imageUrl, imageUrl2 } from "../../config/constants";
+import { API_KEY, imageURL, imageURL2 } from "../../config/constants";
 
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
@@ -125,7 +125,7 @@ function RowPost(props) {
                     <>
                       <img
                         className="rounded-sm"
-                        src={`${imageUrl + obj.poster_path}`}
+                        src={`${imageURL + obj.poster_path}`}
                       />
                     </>
                   ) : (
@@ -139,7 +139,7 @@ function RowPost(props) {
                         }
                         src={
                           obj.backdrop_path
-                            ? `${imageUrl2 + obj.backdrop_path}`
+                            ? `${imageURL2 + obj.backdrop_path}`
                             : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
                         }
                         onClick={() => handleMoviePopup(obj)}
@@ -345,7 +345,7 @@ function RowPost(props) {
                         className="YouTubeVid"
                       />
                     ) : (
-                      <img src={`${imageUrl + moviePopupInfo.backdrop_path}`} />
+                      <img src={`${imageURL + moviePopupInfo.backdrop_path}`} />
                     )}
 
                     <div className="flex ml-4 items-center -mt-14">

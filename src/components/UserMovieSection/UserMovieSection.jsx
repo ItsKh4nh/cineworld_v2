@@ -5,7 +5,7 @@ import { ClipLoader } from "react-spinners";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
-import { API_KEY, imageUrl2 } from "../../config/constants";
+import { API_KEY, imageURL2 } from "../../config/constants";
 import { db } from "../../config/FirebaseConfig";
 import { AuthContext } from "../../contexts/UserContext";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
@@ -102,7 +102,7 @@ function UserMovieSection(props) {
                     <img
                       onClick={() => handleMoviePopup(movie)}
                       className=""
-                      src={imageUrl2 + movie.backdrop_path}
+                      src={imageURL2 + movie.backdrop_path}
                     />
 
                     <div

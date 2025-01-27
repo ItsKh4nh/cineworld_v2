@@ -4,7 +4,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import StarRatings from "react-star-ratings";
 
 import axios from "../axios";
-import { API_KEY, imageUrl, imageUrl2 } from "../config/constants";
+import { API_KEY, imageURL, imageURL2 } from "../config/constants";
 
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
@@ -113,7 +113,7 @@ function Play() {
             allowFullScreen
           ></iframe>
         ) : (
-          <img src={`${imageUrl + movieDetails.backdrop_path}`} />
+          <img src={`${imageURL + movieDetails.backdrop_path}`} />
         )}
       </div>
 
@@ -123,7 +123,7 @@ function Play() {
           <section
             style={{
               backgroundImage: `linear-gradient(90deg, #000000f0 0%, #000000e6 35%, #000000c3 100%), url(${
-                imageUrl + movieDetails.backdrop_path
+                imageURL + movieDetails.backdrop_path
               })`,
             }}
             className="bg-cover bg-center object-contain flex flex-col p-5 sm:p-14 lg:flex-row lg:items-center lg:justify-center lg:gap-8 2xl:py-24"
@@ -353,7 +353,7 @@ function Play() {
                 src={
                   movieDetails.poster_path &&
                   `${
-                    imageUrl +
+                    imageURL +
                     (window.innerWidth > 1024
                       ? movieDetails.backdrop_path
                         ? movieDetails.backdrop_path
@@ -383,7 +383,7 @@ function Play() {
                             <img
                               src={
                                 similarMovie.backdrop_path
-                                  ? imageUrl2 + similarMovie.backdrop_path
+                                  ? imageURL2 + similarMovie.backdrop_path
                                   : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
                               }
                               alt=""

@@ -5,11 +5,11 @@ import { Fade } from "react-awesome-reveal";
 
 import Footer from "../components/Footer/Footer";
 
-import WelcomePageBanner from "../public/WelcomePageBanner.jpg";
-import WelcomePageImage1 from "../public/WelcomePageImage1.png";
-import WelcomePageImage2 from "../public/WelcomePageImage2.png";
-import WelcomePageImage3 from "../public/WelcomePageImage3.png";
-import WelcomePageImage4 from "../public/WelcomePageImage4.png";
+import WelcomePageBanner from "../assets/WelcomePageBanner.jpg";
+import WelcomePageImage1 from "../assets/WelcomePageImage1.png";
+import WelcomePageImage2 from "../assets/WelcomePageImage2.png";
+import WelcomePageImage3 from "../assets/WelcomePageImage3.png";
+import WelcomePageImage4 from "../assets/WelcomePageImage4.png";
 
 function Welcome() {
   useEffect(() => {

@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react";
 import StarRatings from "react-star-ratings";
 
 import axios from "../axios";
-import { API_KEY, imageUrl2 } from "../config/constants";
+import { API_KEY, imageURL2 } from "../config/constants";
 
 import MoviePopUp from "../components/PopUp/MoviePopUp";
 
@@ -100,7 +100,7 @@ function Search() {
                       className=""
                       src={
                         movie.backdrop_path
-                          ? imageUrl2 + movie.backdrop_path
+                          ? imageURL2 + movie.backdrop_path
                           : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
                       }
                     />

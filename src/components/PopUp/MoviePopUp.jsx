@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Fade } from "react-awesome-reveal";
 import StarRatings from "react-star-ratings";
 
-import { imageUrl } from "../../config/constants";
+import { imageURL } from "../../config/constants";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
@@ -59,7 +59,7 @@ function MoviePopUp(props) {
                   </button>
                   {/*Movie Trailer or Image*/}
                   {PopupInfo.backdrop_path ? (
-                    <img src={`${imageUrl + PopupInfo.backdrop_path}`} />
+                    <img src={`${imageURL + PopupInfo.backdrop_path}`} />
                   ) : null}
 
                   <div className="flex ml-4 items-center -mt-14">

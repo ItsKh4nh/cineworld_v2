@@ -15,8 +15,8 @@ import { setDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../config/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 
-import GoogleLogo from "../public/GoogleLogo.png";
-import WelcomePageBanner from "../public/WelcomePageBanner.jpg";
+import GoogleLogo from "../assets/GoogleLogo.png";
+import WelcomePageBanner from "../assets/WelcomePageBanner.jpg";
 
 function SignIn() {
   const { User, setUser } = useContext(AuthContext);

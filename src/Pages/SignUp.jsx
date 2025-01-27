@@ -14,7 +14,7 @@ import { setDoc, doc } from "firebase/firestore";
 import { db } from "../config/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 
-import WelcomePageBanner from "../public/WelcomePageBanner.jpg";
+import WelcomePageBanner from "../assets/WelcomePageBanner.jpg";
 
 function SignUp() {
   const { User, setUser } = useContext(AuthContext);
