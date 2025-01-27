@@ -15,7 +15,7 @@ function Search() {
   const { addToMyList, PopupMessage } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { addToLikedMovies } = useUpdateLikedMovies();
-  const { convertGenere } = useGenresConverter();
+  const { convertGenre } = useGenresConverter();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState([]);
@@ -83,7 +83,7 @@ function Search() {
       <div className="grid-cols-2 grid p-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5 md:p-5 space-y-1 lg:space-y-0 lg:grid lg:gap-3 lg:grid-rows-3">
         {movies.length !== 0 ? (
           movies.map((movie) => {
-            const converted = convertGenere(movie.genre_ids);
+            const converted = convertGenre(movie.genre_ids);
             return (
               <div className="p-1 mt-2 mb-5">
                 <div className="hover:scale-105 hover:border-2 group relative block overflow-hidden rounded-sm transition-all duration-500">

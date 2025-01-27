@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
-import { API_KEY, imageUrl } from "../../config/constants";
-import axios from "../../axios";
-import { PopUpContext } from "../../contexts/moviePopUpContext";
-import { Fade } from "react-awesome-reveal";
 import StarRatings from "react-star-ratings";
+import { Fade } from "react-awesome-reveal";
+
+import axios from "../../axios";
+import { API_KEY, imageUrl } from "../../config/constants";
+import { PopUpContext } from "../../contexts/moviePopUpContext";
 import MoviePopUp from "../PopUp/MoviePopUp";
 import usePlayMovie from "../../hooks/usePlayMovie";
 

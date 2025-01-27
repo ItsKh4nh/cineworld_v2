@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./styles.module.scss";
 
-function Footer2() {
+function Footer() {
   return (
     <div className="bg-black p-2">
       <footer className={styles.footer}>
@@ -23,7 +23,7 @@ function Footer2() {
             <li>Android</li>
           </ul>
           <div className={styles.security}>
-            <div>Engligh</div>
+            <div>English</div>
             <span>© 1997-2024 Cineworld, Inc.</span>
           </div>
         </div>
@@ -32,4 +32,4 @@ function Footer2() {
   );
 }
 
-export default Footer2;
+export default Footer;

@@ -48,11 +48,11 @@ function Play() {
 
     axios
       .get(`/movie/${id}/videos?api_key=${API_KEY}&language=en-US`)
-      .then((responce) => {
-        console.log(responce.data, "This is the data");
-        if (responce.data.results.length !== 0) {
-          setUrlId(responce.data.results[0]);
-          setMoreTrailerVideos(responce.data.results);
+      .then((response) => {
+        console.log(response.data, "This is the data");
+        if (response.data.results.length !== 0) {
+          setUrlId(response.data.results[0]);
+          setMoreTrailerVideos(response.data.results);
         } else {
           console.log("Array Emptey");
         }
@@ -61,11 +61,11 @@ function Play() {
     if (urlId === "") {
       axios
         .get(`/tv/${id}/videos?api_key=${API_KEY}&language=en-US`)
-        .then((responce) => {
-          if (responce.data.results.length !== 0) {
-            console.log(responce.data.results[0], "This is using find ");
-            setUrlId(responce.data.results[0]);
-            setMoreTrailerVideos(responce.data.results);
+        .then((response) => {
+          if (response.data.results.length !== 0) {
+            console.log(response.data.results[0], "This is using find ");
+            setUrlId(response.data.results[0]);
+            setMoreTrailerVideos(response.data.results);
             console.log(moreTrailerVideos);
           } else {
             console.log("Array Emptey");
@@ -74,10 +74,10 @@ function Play() {
     }
     axios
       .get(`/movie/${id}?api_key=${API_KEY}&language=en-US`)
-      .then((responce) => {
-        console.log(responce.data, "Movie deatils");
-        setMovieDetails(responce.data);
-        console.log(responce.data.genres[0]);
+      .then((response) => {
+        console.log(response.data, "Movie deatils");
+        setMovieDetails(response.data);
+        console.log(response.data.genres[0]);
 
         axios
           .get(

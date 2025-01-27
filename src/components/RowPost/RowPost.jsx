@@ -1,17 +1,16 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import axios from "../../axios";
-import { imageUrl, imageUrl2, API_KEY } from "../../config/constants";
-import useUpdateMyList from "../../hooks/useUpdateMyList";
 import { Fade } from "react-awesome-reveal";
-import YouTube from "react-youtube";
 import StarRatings from "react-star-ratings";
+import YouTube from "react-youtube";
+import axios from "../../axios";
+import { API_KEY, imageUrl, imageUrl2 } from "../../config/constants";
 
-import usePlayMovie from "../../hooks/usePlayMovie";
-import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
-import useUpdateLikedMovies from "../../hooks/useUpdateLikedMovies";
 import useGenresConverter from "../../hooks/useGenresConverter";
+import usePlayMovie from "../../hooks/usePlayMovie";
+import useUpdateLikedMovies from "../../hooks/useUpdateLikedMovies";
+import useUpdateMyList from "../../hooks/useUpdateMyList";
+import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -27,7 +26,7 @@ function RowPost(props) {
   const { removeFromWatchedMovies, removePopupMessage } =
     useUpdateWatchedMovies();
   const { addToLikedMovies, LikedMoviePopupMessage } = useUpdateLikedMovies();
-  const { convertGenere } = useGenresConverter();
+  const { convertGenre } = useGenresConverter();
 
   const [movies, setMovies] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -78,12 +77,12 @@ function RowPost(props) {
       setShowModal(true);
       axios
         .get(`/movie/${movieInfo.id}/videos?api_key=${API_KEY}&language=en-US`)
-        .then((responce) => {
-          console.log(responce.data);
-          if (responce.data.results.length !== 0) {
-            setUrlId(responce.data.results[0]);
+        .then((response) => {
+          console.log(response.data);
+          if (response.data.results.length !== 0) {
+            setUrlId(response.data.results[0]);
           } else {
-            console.log("Array Emptey");
+            console.log("Array Empty");
           }
         });
     }
@@ -115,7 +114,7 @@ function RowPost(props) {
             className="SwiperStyle"
           >
             {movies.map((obj, index) => {
-              const converted = convertGenere(obj.genre_ids);
+              const converted = convertGenre(obj.genre_ids);
               return (
                 <SwiperSlide
                   key={obj.id}
@@ -465,7 +464,7 @@ function RowPost(props) {
 
                           <h1 className="flex text-neutral-400 text-sm leading-relaxed">
                             Genre :
-                            {convertGenere(moviePopupInfo.genre_ids)
+                            {convertGenre(moviePopupInfo.genre_ids)
                               .slice(0, 2)
                               .map((genre) => {
                                 return (

@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
+
 import { Fade } from "react-awesome-reveal";
 import StarRatings from "react-star-ratings";
+
 import { imageUrl } from "../../config/constants";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
-import useUpdateMyList from "../../hooks/useUpdateMyList";
-import usePlayMovie from "../../hooks/usePlayMovie";
 import useGenresConverter from "../../hooks/useGenresConverter";
+import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateLikedMovies from "../../hooks/useUpdateLikedMovies";
+import useUpdateMyList from "../../hooks/useUpdateMyList";
 import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
 
 function MoviePopUp(props) {
@@ -17,7 +19,7 @@ function MoviePopUp(props) {
   const { removeFromWatchedMovies, removePopupMessage } =
     useUpdateWatchedMovies();
   const { playMovie } = usePlayMovie();
-  const { convertGenere } = useGenresConverter();
+  const { convertGenre } = useGenresConverter();
 
   const [PopupInfo, setPopupInfo] = useState({});
 
@@ -180,7 +182,7 @@ function MoviePopUp(props) {
                         <h1 className="flex text-neutral-400 text-sm leading-relaxed">
                           Genre :
                           {PopupInfo.genre_ids &&
-                            convertGenere(PopupInfo.genre_ids).map((genre) => {
+                            convertGenre(PopupInfo.genre_ids).map((genre) => {
                               return (
                                 <span className="text-white ml-2 font-medium">
                                   {genre}

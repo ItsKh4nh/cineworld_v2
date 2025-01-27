@@ -1,20 +1,21 @@
-import React from "react";
-import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import MoviePopUp from "../PopUp/MoviePopUp";
-import { imageUrl2, API_KEY } from "../../config/constants";
-import useUpdateMyList from "../../hooks/useUpdateMyList";
-import usePlayMovie from "../../hooks/usePlayMovie";
-import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
-import useUpdateLikedMovies from "../../hooks/useUpdateLikedMovies";
-import useGenresConverter from "../../hooks/useGenresConverter";
-import { db } from "../../config/FirebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
-import { AuthContext } from "../../contexts/UserContext";
-import { PopUpContext } from "../../contexts/moviePopUpContext";
-import axios from "../../axios";
+import React, { useContext, useEffect, useState } from "react";
+
 import StarRatings from "react-star-ratings";
 import { ClipLoader } from "react-spinners";
+import { doc, getDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+
+import { API_KEY, imageUrl2 } from "../../config/constants";
+import { db } from "../../config/FirebaseConfig";
+import { AuthContext } from "../../contexts/UserContext";
+import { PopUpContext } from "../../contexts/moviePopUpContext";
+import MoviePopUp from "../PopUp/MoviePopUp";
+
+import useGenresConverter from "../../hooks/useGenresConverter";
+import usePlayMovie from "../../hooks/usePlayMovie";
+import useUpdateLikedMovies from "../../hooks/useUpdateLikedMovies";
+import useUpdateMyList from "../../hooks/useUpdateMyList";
+import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
 
 function UserMovieSection(props) {
   const { User } = useContext(AuthContext);
@@ -26,7 +27,7 @@ function UserMovieSection(props) {
   const { addToLikedMovies, removeFromLikedMovies, LikedMoviePopupMessage } =
     useUpdateLikedMovies();
   const { playMovie } = usePlayMovie();
-  const { convertGenere } = useGenresConverter();
+  const { convertGenre } = useGenresConverter();
 
   const [myMovies, setMyMovies] = useState([]);
   const [moviePopupInfo, setMoviePopupInfo] = useState({});
@@ -90,7 +91,7 @@ function UserMovieSection(props) {
             .map((movie) => {
               let converted;
               if (movie.genre_ids) {
-                converted = convertGenere(movie.genre_ids);
+                converted = convertGenre(movie.genre_ids);
               }
               return (
                 <div className="p-1 mt-2 mb-5" key={movie.id}>

@@ -1,7 +1,7 @@
 import { genresList } from "../config/constants";
 
 const useGenresConverter = () => {
-  const convertGenere = (genreIds) => {
+  const convertGenre = (genreIds) => {
     const genresConvertedList = [];
     genreIds
       .slice(0, 3)
@@ -14,7 +14,7 @@ const useGenresConverter = () => {
     return genresConvertedList;
   };
 
-  return { convertGenere };
+  return { convertGenre };
 };
 
 export default useGenresConverter;

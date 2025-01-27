@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 
 import { Transition } from "@headlessui/react";
+import { getAuth, signOut } from "firebase/auth";
 import { Fade } from "react-awesome-reveal";
 import { Link, useNavigate } from "react-router-dom";
-import { getAuth, signOut } from "firebase/auth";
+
 import { AuthContext } from "../../contexts/UserContext";
 
 function Navbar(props) {
