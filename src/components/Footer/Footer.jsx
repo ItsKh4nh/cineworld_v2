@@ -1,35 +1,19 @@
-import React from "react";
-import styles from "./styles.module.scss";
-
-function Footer() {
+const Footer = () => {
   return (
-    <div className="bg-black p-2">
-      <footer className={styles.footer}>
-        <div className={styles.containerFooter}>
-          <div className={styles.icons}></div>
-          <ul className={styles.details}>
-            <li>FAQ</li>
-            <li>Investor Relations</li>
-            <li>Privacy</li>
-            <li>Speed Test</li>
-            <li>Help Center</li>
-            <li>Jobs</li>
-            <li>Cookie Preference</li>
-            <li>Legal Notices</li>
-            <li>Account</li>
-            <li>Ways to Watch</li>
-            <li>Corporate Information</li>
-            <li>iOS</li>
-            <li>Android</li>
-          </ul>
-          <div className={styles.security}>
-            <div>English</div>
-            <span>© 1997-2024 Cineworld, Inc.</span>
-          </div>
-        </div>
-      </footer>
-    </div>
+    <footer className="py-6 md:px-8 md:py-0 bg-black text-white border-t border-gray-800">
+      <div className="flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+        <p className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
+          Built by{" "}
+          <a
+            href="https://github.com/ItsKh4nh"
+            target="_blank"
+            className="font-medium underline underline-offset-4"
+          >
+            ItsKh4nh
+          </a>
+        </p>
+      </div>
+    </footer>
   );
-}
-
+};
 export default Footer;
