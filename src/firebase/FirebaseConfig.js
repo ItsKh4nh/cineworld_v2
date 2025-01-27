@@ -1,19 +1,18 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+//import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
-import { ENV_VARS } from "../config/envVars";
 
 const firebaseConfig = {
-  apiKey: ENV_VARS.TMDB_API_KEY,
-  authDomain: ENV_VARS.FIREBASE_AUTH_DOMAIN,
-  projectId: ENV_VARS.FIREBASE_PROJECT_ID,
-  storageBucket: ENV_VARS.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: ENV_VARS.FIREBASE_MESSAGING_SENDER_ID,
-  appId: ENV_VARS.FIREBASE_APP_ID,
-  measurementId: ENV_VARS.FIREBASE_MEASUREMENT_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
 export const FirebaseApp = initializeApp(firebaseConfig);
 export const db = getFirestore(FirebaseApp);
-export const analytics = getAnalytics(FirebaseApp);
+//export const analytics = getAnalytics(FirebaseApp);

@@ -105,7 +105,7 @@ function SignUp() {
                 >
                   <div>
                     <label
-                      for="email"
+                      htmlFor="email"
                       className="block mb-2 text-sm font-medium text-white dark:text-white"
                     >
                       Your email
@@ -120,13 +120,13 @@ function SignUp() {
                           ? "bg-stone-700 text-white sm:text-sm rounded-sm border-2 border-red-700 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white "
                           : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white "
                       }
-                      placeholder="name@emil.com"
+                      placeholder="name@email.com"
                       required=""
                     ></input>
                   </div>
                   <div>
                     <label
-                      for="password"
+                      htmlFor="password"
                       className="block mb-2 text-sm font-medium text-white dark:text-white"
                     >
                       Password
@@ -179,7 +179,7 @@ function SignUp() {
                         ></input>
                       </div>
                       <div className="ml-3 text-sm">
-                        <label for="remember" className="text-gray-500">
+                        <label htmlFor="remember" className="text-gray-500">
                           Remember me
                         </label>
                       </div>

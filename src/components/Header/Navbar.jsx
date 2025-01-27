@@ -6,6 +6,7 @@ import { Fade } from "react-awesome-reveal";
 import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../../contexts/UserContext";
+import cineworldLogo from "../../assets/cineworld-logo.png";
 
 function Navbar(props) {
   const { User } = useContext(AuthContext);
@@ -72,7 +73,7 @@ function Navbar(props) {
                 <div className="flex-shrink-0">
                   <img
                     className="h-6 cursor-pointer w-18"
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Cineworld_2015_logo.svg/1920px-Cineworld_2015_logo.svg.png"
+                    src={cineworldLogo}
                     alt="CINEWORLD"
                   />
                 </div>
@@ -130,7 +131,6 @@ function Navbar(props) {
                     >
                       <path
                         strokeLinecap="round"
-                        strokeLinejoin="round"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                       />
                     </svg>
@@ -167,7 +167,7 @@ function Navbar(props) {
                             ? `${User.photoURL}`
                             : `https://www.citypng.com/public/uploads/preview/profile-user-round-red-icon-symbol-download-png-11639594337tco5j3n0ix.png`
                         }
-                        alt="CINEWORLD"
+                        alt="Profile"
                       />
                     </Link>
                     <ul className="absolute hidden text-white pt-1 -ml-32 group-hover:block transition ease-in-out delay-150">

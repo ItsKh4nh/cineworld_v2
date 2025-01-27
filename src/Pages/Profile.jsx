@@ -170,7 +170,7 @@ function Profile() {
                     ? `${profilePic}`
                     : `https://www.citypng.com/public/uploads/preview/profile-user-round-red-icon-symbol-download-png-11639594337tco5j3n0ix.png`
                 }
-                alt="CINEWORLD"
+                alt="Profile"
               />
               <div>
                 <hr className="mb-2 h-px bg-gray-500 border-0 dark:bg-gray-700"></hr>
