@@ -36,6 +36,7 @@ module.exports = {
           "linear-gradient(90deg, hsl(0deg 77% 42% / 44%) 0%, hsl(0deg 59% 46% / 51%) 35%, hsl(220deg 26% 44% / 0%) 100%) ",
       },
       colors: {
+        cineworldYellow: "#a47504",
         black: "#010511",
         transparentWhite: "#33333380",
         transparentBlack: "#000000bf",
