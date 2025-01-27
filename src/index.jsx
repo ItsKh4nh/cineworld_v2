@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 
 import { BrowserRouter as Router } from "react-router-dom";
 
+import { FirebaseApp } from "./firebase/FirebaseConfig";
 import Context from "./contexts/UserContext";
 import Context2 from "./contexts/moviePopUpContext";
 

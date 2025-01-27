@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../config/FirebaseConfig";
+import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 
 import Banner from "../components/Banner/Banner";

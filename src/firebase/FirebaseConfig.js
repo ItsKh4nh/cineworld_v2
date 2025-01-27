@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
-import { ENV_VARS } from "./envVars";
+import { ENV_VARS } from "../config/envVars";
 
 const firebaseConfig = {
   apiKey: ENV_VARS.TMDB_API_KEY,

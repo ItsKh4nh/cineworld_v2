@@ -12,7 +12,7 @@ import {
 } from "firebase/auth";
 import { setDoc, doc, getDoc } from "firebase/firestore";
 
-import { db } from "../config/FirebaseConfig";
+import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 
 import GoogleLogo from "../assets/GoogleLogo.png";

@@ -11,7 +11,7 @@ import {
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 
-import { db } from "../config/FirebaseConfig";
+import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 
 import WelcomePageBanner from "../assets/WelcomePageBanner.jpg";
