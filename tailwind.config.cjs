@@ -37,7 +37,6 @@ module.exports = {
       },
       colors: {
         cineworldYellow: "#a47504",
-        black: "#010511",
         transparentWhite: "#33333380",
         transparentBlack: "#000000bf",
       },

@@ -5,17 +5,9 @@ import { Fade } from "react-awesome-reveal";
 
 import Footer from "../components/Footer/Footer";
 
-import WelcomePageBanner from "../assets/WelcomePageBanner.jpg";
-import WelcomePageImage1 from "../assets/WelcomePageImage1.png";
-import WelcomePageImage2 from "../assets/WelcomePageImage2.png";
-import WelcomePageImage3 from "../assets/WelcomePageImage3.png";
-import WelcomePageImage4 from "../assets/WelcomePageImage4.png";
+import WelcomePageBanner from "/WelcomePageBanner.jpg";
 
 function Welcome() {
-  useEffect(() => {
-    const image1 = WelcomePageImage1;
-  }, []);
-
   return (
     <div>
       {/*Hero Section*/}
@@ -214,8 +206,9 @@ function Welcome() {
         </div>
       </div>
 
-      {/* Section 6 */}
-      <section></section>
+      {/* separator */}
+
+      <div className="h-2 w-full bg-[#232323]" aria-hidden="true" />
 
       {/* Footer */}
       <Footer></Footer>

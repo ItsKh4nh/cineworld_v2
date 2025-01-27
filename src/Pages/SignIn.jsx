@@ -15,8 +15,7 @@ import { setDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 
-import GoogleLogo from "../assets/GoogleLogo.png";
-import WelcomePageBanner from "../assets/WelcomePageBanner.jpg";
+import WelcomePageBanner from "/WelcomePageBanner.jpg";
 
 function SignIn() {
   const { User, setUser } = useContext(AuthContext);
@@ -246,7 +245,7 @@ function SignIn() {
                       <ClipLoader color="#ff0000" />
                     ) : (
                       <>
-                        <img className="w-8" src={GoogleLogo}></img>{" "}
+                        <img className="w-8" src="/GoogleLogo.png"></img>{" "}
                         <p className="ml-1">Sign in with Google</p>
                       </>
                     )}

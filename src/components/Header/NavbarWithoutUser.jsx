@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import cineworldLogo from "../../assets/cineworld-logo.png";
 
 function NavbarWithoutUser() {
   const [show, handleShow] = useState(false);
@@ -29,7 +28,7 @@ function NavbarWithoutUser() {
         <div className="w-9/12 md:w-11/12">
           <img
             className="h-10 sm:h-12 sm:w-18 ml-8 cursor-pointer"
-            src={cineworldLogo}
+            src="/cineworld-logo.png"
             alt="CINEWORLD"
           />
         </div>

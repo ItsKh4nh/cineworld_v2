@@ -6,7 +6,6 @@ import { Fade } from "react-awesome-reveal";
 import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../../contexts/UserContext";
-import cineworldLogo from "../../assets/cineworld-logo.png";
 
 function Navbar(props) {
   const { User } = useContext(AuthContext);
@@ -73,7 +72,7 @@ function Navbar(props) {
                 <div className="flex-shrink-0">
                   <img
                     className="h-6 cursor-pointer w-18"
-                    src={cineworldLogo}
+                    src="/cineworld-logo.png"
                     alt="CINEWORLD"
                   />
                 </div>

@@ -13,7 +13,7 @@ import { Fade } from "react-awesome-reveal";
 import toast, { Toaster } from "react-hot-toast";
 
 import { AuthContext } from "../contexts/UserContext";
-import WelcomePageBanner from "../assets/WelcomePageBanner.jpg";
+import WelcomePageBanner from "/WelcomePageBanner.jpg";
 
 import "swiper/css";
 import "swiper/css/navigation";
