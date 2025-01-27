@@ -12,7 +12,7 @@ import {
   War,
   trendingSeries,
   UpcomingMovies,
-} from "../Constants/URLs";
+} from "../config/URLs";
 
 function Series() {
   return (

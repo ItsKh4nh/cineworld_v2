@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import StarRatings from "react-star-ratings";
+
 import axios from "../axios";
 import { API_KEY, imageUrl, imageUrl2 } from "../config/constants";
 
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
-import useUpdateMyList from "../hooks/useUpdateMyList";
+
+import usePlayMovie from "../hooks/usePlayMovie";
 import useUpdateLikedMovies from "../hooks/useUpdateLikedMovies";
+import useUpdateMyList from "../hooks/useUpdateMyList";
+import useUpdateWatchedMovies from "../hooks/useUpdateWatchedMovies";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import usePlayMovie from "../hooks/usePlayMovie";
-import useUpdateWatchedMovies from "../hooks/useUpdateWatchedMovies";
 
 function Play() {
   const [urlId, setUrlId] = useState("");
@@ -54,7 +57,7 @@ function Play() {
           setUrlId(response.data.results[0]);
           setMoreTrailerVideos(response.data.results);
         } else {
-          console.log("Array Emptey");
+          console.log("Array Empty");
         }
       });
 
@@ -68,14 +71,14 @@ function Play() {
             setMoreTrailerVideos(response.data.results);
             console.log(moreTrailerVideos);
           } else {
-            console.log("Array Emptey");
+            console.log("Array Empty");
           }
         });
     }
     axios
       .get(`/movie/${id}?api_key=${API_KEY}&language=en-US`)
       .then((response) => {
-        console.log(response.data, "Movie deatils");
+        console.log(response.data, "Movie details");
         setMovieDetails(response.data);
         console.log(response.data.genres[0]);
 
@@ -154,12 +157,12 @@ function Play() {
                   </a>
                 </h1>
                 <h1 className="text-red-700">
-                  Geners :{" "}
+                  Genres :{" "}
                   {movieDetails.genres &&
-                    movieDetails.genres.map((gener) => {
+                    movieDetails.genres.map((genre) => {
                       return (
                         <>
-                          <span className="text-white ml-2">{gener.name}</span>
+                          <span className="text-white ml-2">{genre.name}</span>
                         </>
                       );
                     })}
@@ -290,13 +293,13 @@ function Play() {
                     </a>
                   </h1>
                   <h1 className="text-red-700 text-sm leading-7 sm:text-lg sm:leading-9 lg:text-2xl lg:leading-10">
-                    Geners :{" "}
+                    Genres :{" "}
                     {movieDetails.genres &&
-                      movieDetails.genres.slice(0, 2).map((gener) => {
+                      movieDetails.genres.slice(0, 2).map((genre) => {
                         return (
                           <>
                             <span className="text-white ml-2">
-                              {gener.name}
+                              {genre.name}
                             </span>
                           </>
                         );

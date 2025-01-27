@@ -1,14 +1,18 @@
-import React from "react";
-import { useState, useContext } from "react";
-import { API_KEY, imageUrl2 } from "../config/constants";
-import { PopUpContext } from "../contexts/moviePopUpContext";
-import useUpdateMyList from "../hooks/useUpdateMyList";
+import React, { useContext, useState } from "react";
+
+import StarRatings from "react-star-ratings";
+
 import axios from "../axios";
+import { API_KEY, imageUrl2 } from "../config/constants";
+
 import MoviePopUp from "../components/PopUp/MoviePopUp";
+
+import { PopUpContext } from "../contexts/moviePopUpContext";
+
+import useGenresConverter from "../hooks/useGenresConverter";
 import usePlayMovie from "../hooks/usePlayMovie";
 import useUpdateLikedMovies from "../hooks/useUpdateLikedMovies";
-import useGenresConverter from "../hooks/useGenresConverter";
-import StarRatings from "react-star-ratings";
+import useUpdateMyList from "../hooks/useUpdateMyList";
 
 function Search() {
   const { showModal, setShowModal } = useContext(PopUpContext);
@@ -88,7 +92,7 @@ function Search() {
               <div className="p-1 mt-2 mb-5">
                 <div className="hover:scale-105 hover:border-2 group relative block overflow-hidden rounded-sm transition-all duration-500">
                   <a
-                    className="lightbox transition-all duration-500 group-hover:scale-105 tobii-zoom"
+                    className="lightbox transition-all duration-500 group-hover:scale-105"
                     title=""
                   >
                     <img

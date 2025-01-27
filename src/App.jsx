@@ -1,4 +1,14 @@
-import { useEffect, useContext, lazy, Suspense } from "react";
+import { useContext, useEffect, lazy, Suspense } from "react";
+import { Routes, Route } from "react-router-dom";
+
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+import { AuthContext } from "./contexts/UserContext";
+
+import Loading from "./components/Loading/Loading";
+import Navbar from "./components/Header/Navbar";
+import NavbarWithoutUser from "./components/Header/NavbarWithoutUser";
+
 import "./App.css";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -13,13 +23,6 @@ const ErrorPage = lazy(() => import("./pages/ErrorPage"));
 const Play = lazy(() => import("./pages/Play"));
 const LikedMovies = lazy(() => import("./pages/LikedMovies"));
 const History = lazy(() => import("./pages/History"));
-
-import { Routes, Route, Navigate } from "react-router-dom";
-import { AuthContext } from "./contexts/UserContext";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import Loading from "./components/Loading/Loading";
-import Navbar from "./components/Header/Navbar";
-import NavbarWithoutUser from "./components/Header/NavbarWithoutUser";
 
 function App() {
   const { User, setUser } = useContext(AuthContext);

@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import { updateDoc, doc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { db } from "../config/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
-import toast, { Toaster } from "react-hot-toast";
 
 function useUpdateWatchedMovies() {
   const { User } = useContext(AuthContext);

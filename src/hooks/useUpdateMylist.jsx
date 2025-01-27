@@ -6,7 +6,7 @@ import toast, { Toaster } from "react-hot-toast";
 
 function useUpdateMyList() {
   const { User } = useContext(AuthContext);
-  const [isMyListUpdates, setisMyListUpdates] = useState(false);
+  const [IsMyListUpdates, setIsMyListUpdates] = useState(false);
 
   function notify() {
     toast.success("  Movie added to MyList  ");
@@ -20,7 +20,7 @@ function useUpdateMyList() {
       .then(() => {
         console.log("Data added to my List");
         notify();
-        setisMyListUpdates(true);
+        setIsMyListUpdates(true);
       })
       .catch((error) => {
         console.log(error.code);
@@ -33,7 +33,7 @@ function useUpdateMyList() {
     updateDoc(doc(db, "MyList", User.uid), { movies: arrayRemove(movie) })
       .then(() => {
         toast.success(" Movie removed from MyList  ");
-        setisMyListUpdates(true);
+        setIsMyListUpdates(true);
       })
       .catch((error) => {
         console.log(error.code);
@@ -53,7 +53,7 @@ function useUpdateMyList() {
     />
   );
 
-  return { addToMyList, removeFromMyList, PopupMessage, isMyListUpdates };
+  return { addToMyList, removeFromMyList, PopupMessage, IsMyListUpdates };
 }
 
 export default useUpdateMyList;

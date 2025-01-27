@@ -1,17 +1,19 @@
-import React from "react";
-import { useState, useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import { Link, useNavigate } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
+import { ClipLoader } from "react-spinners";
+
 import {
   getAuth,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
+
 import { db } from "../config/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
-import { ClipLoader } from "react-spinners";
+
 import WelcomePageBanner from "../public/WelcomePageBanner.jpg";
 
 function SignUp() {

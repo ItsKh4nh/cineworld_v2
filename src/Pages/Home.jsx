@@ -1,23 +1,25 @@
-import React from "react";
-import { useEffect, useState, useContext } from "react";
-import Banner from "../components/Banner/Banner";
-import Footer from "../components/Footer/Footer";
-import RowPost from "../components/RowPost/RowPost";
-import {
-  originals,
-  trending,
-  comedy,
-  horror,
-  Adventure,
-  SciFi,
-  Animated,
-  War,
-  trendingSeries,
-  UpcomingMovies,
-} from "../Constants/URLs";
+import React, { useContext, useEffect, useState } from "react";
+
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../config/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
+
+import Banner from "../components/Banner/Banner";
+import Footer from "../components/Footer/Footer";
+import RowPost from "../components/RowPost/RowPost";
+
+import {
+  Adventure,
+  Animated,
+  comedy,
+  horror,
+  originals,
+  SciFi,
+  trending,
+  trendingSeries,
+  UpcomingMovies,
+  War,
+} from "../config/URLs";
 
 function Home() {
   const { User } = useContext(AuthContext);

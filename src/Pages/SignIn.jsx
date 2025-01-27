@@ -1,15 +1,17 @@
-import React from "react";
-import { useState, useContext } from "react";
+import React, { useContext, useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
 import { ClipLoader } from "react-spinners";
+
 import {
   getAuth,
-  signInWithEmailAndPassword,
   GoogleAuthProvider,
+  signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
 import { setDoc, doc, getDoc } from "firebase/firestore";
+
 import { db } from "../config/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 

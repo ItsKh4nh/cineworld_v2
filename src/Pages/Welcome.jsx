@@ -1,16 +1,15 @@
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
+
+import { Link } from "react-router-dom";
+import { Fade } from "react-awesome-reveal";
 
 import Footer from "../components/Footer/Footer";
 
+import WelcomePageBanner from "../public/WelcomePageBanner.jpg";
 import WelcomePageImage1 from "../public/WelcomePageImage1.png";
 import WelcomePageImage2 from "../public/WelcomePageImage2.png";
 import WelcomePageImage3 from "../public/WelcomePageImage3.png";
 import WelcomePageImage4 from "../public/WelcomePageImage4.png";
-import WelcomePageBanner from "../public/WelcomePageBanner.jpg";
-
-import { Fade } from "react-awesome-reveal";
-import { Link } from "react-router-dom";
 
 function Welcome() {
   useEffect(() => {
@@ -34,7 +33,7 @@ function Welcome() {
                 Unlimited movies, TV shows and more.
               </h1>
               <h1 className="mb-4 text-xl text-center text-stone-400 font-light sm:text-2xl">
-                Watch anywahere.Cancel anytime
+                Watch anywhere. Cancel anytime
               </h1>
               <h1 className="mb-2 text-center text-stone-400 font-light sm:text-xl sm:mb-8">
                 Ready to watch? Enter your email to create or restart your
@@ -97,8 +96,7 @@ function Welcome() {
                   Download your shows to watch offline.
                 </h1>
                 <h1 className="m-4 text-center text-stone-400 font-light lg:text-left lg:ml-8 lg:text-2xl lg:w-9/12">
-                  Save your favourites easily and always have something to
-                  watch.
+                  Save your favorites easily and always have something to watch.
                 </h1>
               </div>
             </div>
@@ -141,7 +139,7 @@ function Welcome() {
                   Create profiles for children.
                 </h1>
                 <h1 className="m-4 text-center text-stone-400 font-light lg:text-left lg:ml-8 lg:text-2xl lg:w-9/12">
-                  Send children on adventures with their favourite characters in
+                  Send children on adventures with their favorite characters in
                   a space made just for them—free with your membership.
                 </h1>
               </div>

@@ -1,12 +1,13 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
-import { getAuth, updateProfile, signOut } from "firebase/auth";
-import { db } from "../config/FirebaseConfig";
+import React, { useContext, useEffect, useRef, useState } from "react";
+
+import { getAuth, signOut, updateProfile } from "firebase/auth";
 import {
-  ref,
-  uploadBytesResumable,
   getDownloadURL,
   getStorage,
+  ref,
+  uploadBytesResumable,
 } from "firebase/storage";
+
 import { useNavigate } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
 import toast, { Toaster } from "react-hot-toast";
@@ -22,11 +23,11 @@ function Profile() {
   const { User } = useContext(AuthContext);
 
   const [profilePic, setProfilePic] = useState("");
-  const [newProfielPicURL, setNewProfielPicURL] = useState("");
-  const [newProfielPic, setNewProfielPic] = useState("");
+  const [newProfilePicURL, setNewProfilePicURL] = useState("");
+  const [newProfilePic, setNewProfilePic] = useState("");
   const [isUserNameChanged, setIsUserNameChanged] = useState(false);
   const [userName, setUserName] = useState("");
-  const [isMyListUpdated, setisMyListUpdated] = useState(false);
+  const [IsMyListUpdated, setIsMyListUpdated] = useState(false);
 
   const navigate = useNavigate();
 
@@ -44,13 +45,13 @@ function Profile() {
   };
 
   function notify() {
-    toast.success("  Data Updated Sucessfuly  ");
+    toast.success("  Data Updated Successfully  ");
   }
 
   const handleFileChange = (event) => {
     const fileObj = event.target.files[0];
-    setNewProfielPic(fileObj);
-    setNewProfielPicURL(URL.createObjectURL(fileObj));
+    setNewProfilePic(fileObj);
+    setNewProfilePicURL(URL.createObjectURL(fileObj));
     if (!fileObj) {
       return;
     }
@@ -75,10 +76,10 @@ function Profile() {
       }
     }
 
-    if (newProfielPic != "") {
+    if (newProfilePic != "") {
       const storage = getStorage();
       const storageRef = ref(storage, `/ProfilePics/${User.uid}`);
-      const uploadTask = uploadBytesResumable(storageRef, newProfielPic);
+      const uploadTask = uploadBytesResumable(storageRef, newProfilePic);
 
       uploadTask.on(
         "state_changed",
@@ -99,7 +100,7 @@ function Profile() {
             updateProfile(auth.currentUser, { photoURL: url })
               .then(() => {
                 notify();
-                setisMyListUpdated(true);
+                setIsMyListUpdated(true);
               })
               .catch((error) => {
                 alert(error.message);
@@ -141,7 +142,7 @@ function Profile() {
           backgroundImage: `linear-gradient(0deg, hsl(0deg 0% 0% / 73%) 0%, hsl(0deg 0% 0% / 73%) 35%), url(${WelcomePageBanner})`,
         }}
       >
-        {isMyListUpdated ? (
+        {IsMyListUpdated ? (
           <Toaster
             toastOptions={{
               style: {
@@ -255,8 +256,8 @@ function Profile() {
                     />
                   </svg>
                 </div>
-                {newProfielPicURL ? (
-                  <img className="h-30 w-72" src={newProfielPicURL} />
+                {newProfilePicURL ? (
+                  <img className="h-30 w-72" src={newProfilePicURL} />
                 ) : null}
               </div>
             </div>
@@ -281,7 +282,7 @@ function Profile() {
                 </svg>
                 SignOut
               </button>
-              {userName != "" || newProfielPic != "" ? (
+              {userName != "" || newProfilePic != "" ? (
                 <button
                   onClick={changeUserName}
                   className="flex items-center bg-red-700 text-white font-medium sm:font-bold text-xs px-10 md:px-16 md:text-xl  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"
