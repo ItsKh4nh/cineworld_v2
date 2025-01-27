@@ -1,11 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import { Link } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
 
 import Footer from "../components/Footer/Footer";
-
-import WelcomePageBanner from "/WelcomePageBanner.jpg";
 
 function Welcome() {
   return (
@@ -13,7 +11,7 @@ function Welcome() {
       {/*Hero Section*/}
       <div
         style={{
-          background: `linear-gradient(0deg, hsl(0deg 0% 0% / 73%) 0%, hsl(0deg 0% 0% / 73%) 35%),url(${WelcomePageBanner})`,
+          background: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.5)), url("/hero.png")`,
         }}
         className="h-[32rem] w-full sm:h-[65vh] xl:h-[80vh] bg-slate-800 relative"
       >

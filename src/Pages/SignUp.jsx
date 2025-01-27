@@ -14,11 +14,8 @@ import { setDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 
-import WelcomePageBanner from "../assets/WelcomePageBanner.jpg";
-
 function SignUp() {
   const { User, setUser } = useContext(AuthContext);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
@@ -84,7 +81,7 @@ function SignUp() {
     <section
       className="h-[100vh] bg-gray-500"
       style={{
-        background: `linear-gradient(0deg, hsl(0deg 0% 0% / 73%) 0%, hsl(0deg 0% 0% / 73%) 35%),url(${WelcomePageBanner})`,
+        background: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.5)), url("/hero.png")`,
       }}
     >
       <div className="h-[100vh] flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
