@@ -8,6 +8,7 @@ import {
   validateEmail,
   validatePassword,
   validateConfirmPassword,
+  validateUsername,
 } from "../controllers/auth.controller";
 
 function SignUp() {
@@ -35,6 +36,39 @@ function SignUp() {
       setEmail(emailParam);
     }
   }, [location]);
+
+  const handleUsernameChange = async (e) => {
+    const username = e.target.value;
+    setUsername(username);
+
+    const validation = await validateUsername(username);
+    setFieldErrors((prev) => ({
+      ...prev,
+      username: validation.error || "",
+    }));
+  };
+
+  const handleEmailChange = async (e) => {
+    const email = e.target.value;
+    setEmail(email);
+
+    const validation = await validateEmail(email);
+    setFieldErrors((prev) => ({
+      ...prev,
+      email: validation.error || "",
+    }));
+  };
+
+  const handlePasswordChange = (e) => {
+    const password = e.target.value;
+    setPassword(password);
+
+    const validation = validatePassword(password);
+    setFieldErrors((prev) => ({
+      ...prev,
+      password: validation.error || "",
+    }));
+  };
 
   const handleConfirmPasswordChange = (e) => {
     const confirmPass = e.target.value;
@@ -149,7 +183,7 @@ function SignUp() {
                       Username
                     </label>
                     <input
-                      onChange={(e) => setUsername(e.target.value)}
+                      onChange={handleUsernameChange}
                       type="text"
                       name="username"
                       id="username"
@@ -171,7 +205,7 @@ function SignUp() {
                       Your email
                     </label>
                     <input
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={handleEmailChange}
                       type="email"
                       name="email"
                       id="email"
@@ -194,7 +228,7 @@ function SignUp() {
                       Password
                     </label>
                     <input
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={handlePasswordChange}
                       type="password"
                       name="password"
                       id="password"
