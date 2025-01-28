@@ -18,7 +18,9 @@ function SignUp() {
   const location = useLocation();
   const { User, setUser } = useContext(AuthContext);
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
   const [loader, setLoader] = useState(false);
 
@@ -36,6 +38,12 @@ function SignUp() {
     e.preventDefault();
     setLoader(true);
 
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match!");
+      setLoader(false);
+      return;
+    }
+
     const auth = getAuth();
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
@@ -44,6 +52,7 @@ function SignUp() {
           const EmptyArray = [];
           setDoc(doc(db, "Users", user.uid), {
             email: email,
+            username: username,
             Uid: user.uid,
           }).then(() => {
             setDoc(
@@ -101,14 +110,32 @@ function SignUp() {
                 <h1 className="text-xl font-bold leading-tight tracking-tight text-white md:text-2xl dark:text-white">
                   Create a new account
                 </h1>
-                <h1 className="text-white text-2xl p-3 text-center border-2 border-red-700 rounded-sm">
-                  Not Real Cineworld
-                </h1>
                 <form
                   onSubmit={handleSubmit}
                   className="space-y-4 md:space-y-6"
                   action="#"
                 >
+                  <div>
+                    <label
+                      htmlFor="username"
+                      className="block mb-2 text-sm font-medium text-white dark:text-white"
+                    >
+                      Username
+                    </label>
+                    <input
+                      onChange={(e) => setUsername(e.target.value)}
+                      type="text"
+                      name="username"
+                      id="username"
+                      className={
+                        ErrorMessage
+                          ? "bg-stone-700 text-white sm:text-sm rounded-sm border-2 border-red-700 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                          : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white"
+                      }
+                      placeholder="Enter your username"
+                      required=""
+                    />
+                  </div>
                   <div>
                     <label
                       htmlFor="email"
@@ -127,7 +154,7 @@ function SignUp() {
                           ? "bg-stone-700 text-white sm:text-sm rounded-sm border-2 border-red-700 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white "
                           : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white "
                       }
-                      placeholder="name@email.com"
+                      placeholder="name@example.com"
                       required=""
                     ></input>
                   </div>
@@ -151,6 +178,27 @@ function SignUp() {
                       }
                       required=""
                     ></input>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="confirmPassword"
+                      className="block mb-2 text-sm font-medium text-white dark:text-white"
+                    >
+                      Confirm Password
+                    </label>
+                    <input
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      type="password"
+                      name="confirmPassword"
+                      id="confirmPassword"
+                      placeholder="••••••••"
+                      className={
+                        ErrorMessage
+                          ? "bg-stone-700 text-white sm:text-sm rounded-sm border-2 border-red-700 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                          : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white"
+                      }
+                      required=""
+                    />
                   </div>
                   <div>
                     {ErrorMessage && (
@@ -208,7 +256,7 @@ function SignUp() {
                       className="font-medium text-white hover:underline"
                       to={"/signin"}
                     >
-                      Sign in
+                      Log in
                     </Link>
                   </p>
                 </form>
