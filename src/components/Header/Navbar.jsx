@@ -193,7 +193,7 @@ function Navbar(props) {
                           onClick={SignOut}
                           className="cursor-pointer rounded-b bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
                         >
-                          Sign Out
+                          Logout
                         </a>
                       </li>
                     </ul>
@@ -302,7 +302,7 @@ function Navbar(props) {
                     onClick={SignOut}
                     className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white"
                   >
-                    Sign Out
+                    Logout
                   </a>
                 </div>
               </div>

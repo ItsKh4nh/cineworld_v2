@@ -1,18 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
-
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
 import { ClipLoader } from "react-spinners";
-
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-} from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
-
-import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
+import { emailSignUp, validatePasswords } from "../controllers/auth.controller";
 
 function SignUp() {
   const location = useLocation();
@@ -34,65 +25,29 @@ function SignUp() {
     }
   }, [location]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoader(true);
 
-    if (password !== confirmPassword) {
+    // Validate passwords match
+    if (!validatePasswords(password, confirmPassword)) {
       setErrorMessage("Passwords do not match!");
       setLoader(false);
       return;
     }
 
-    const auth = getAuth();
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-        onAuthStateChanged(auth, (user) => {
-          const EmptyArray = [];
-          setDoc(doc(db, "Users", user.uid), {
-            email: email,
-            username: username,
-            Uid: user.uid,
-          }).then(() => {
-            setDoc(
-              doc(db, "MyList", user.uid),
-              {
-                movies: EmptyArray,
-              },
-              { merge: true }
-            ).then(() => {
-              setDoc(
-                doc(db, "WatchedMovies", user.uid),
-                {
-                  movies: EmptyArray,
-                },
-                { merge: true }
-              );
-              setDoc(
-                doc(db, "LikedMovies", user.uid),
-                {
-                  movies: EmptyArray,
-                },
-                { merge: true }
-              );
-            });
-          });
-        });
+    // Attempt to sign up
+    const { user, error } = await emailSignUp(email, password, username);
 
-        const user = userCredential.user;
-        if (user != null) {
-          navigate("/");
-        }
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        setLoader(false);
-        setErrorMessage(errorMessage);
-        console.log(errorCode);
-        console.log(errorMessage);
-      });
+    if (error) {
+      setErrorMessage(error);
+      setLoader(false);
+      return;
+    }
+
+    if (user) {
+      navigate("/");
+    }
   };
 
   return (

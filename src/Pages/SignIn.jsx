@@ -1,19 +1,9 @@
 import React, { useContext, useState } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
 import { ClipLoader } from "react-spinners";
-
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-} from "firebase/auth";
-import { setDoc, doc, getDoc } from "firebase/firestore";
-
-import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
+import { emailSignIn, googleSignIn } from "../controllers/auth.controller";
 
 function SignIn() {
   const { User, setUser } = useContext(AuthContext);
@@ -24,94 +14,38 @@ function SignIn() {
   const [ErrorMessage, setErrorMessage] = useState("");
   const [loader, setLoader] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoader(true);
 
-    const auth = getAuth();
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        console.log(user);
-        if (user != null) {
-          navigate("/");
-        }
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        setErrorMessage(error.message);
-        setLoader(false);
-        console.log(errorCode);
-        console.log(errorMessage);
-      });
+    const { user, error } = await emailSignIn(email, password);
+
+    if (error) {
+      setErrorMessage(error);
+      setLoader(false);
+      return;
+    }
+
+    if (user) {
+      navigate("/");
+    }
   };
 
-  const loginWithGoogle = (e) => {
+  const loginWithGoogle = async (e) => {
     e.preventDefault();
-    const auth = getAuth();
-    const provider = new GoogleAuthProvider();
+    setLoader(true);
 
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        console.log(user);
-        const EmptyArray = [];
+    const { user, error } = await googleSignIn();
 
-        setDoc(
-          doc(db, "Users", user.uid),
-          {
-            email: user.email,
-            Uid: user.uid,
-          },
-          { merge: true }
-        ).then(() => {
-          getDoc(doc(db, "MyList", user.uid)).then((result) => {
-            if (result.exists()) {
-              // Data exist in MyList section for this user
-            } else {
-              // Creating a new MyList, WatchedMovies List, LikedMovies List for the user in the database
-              setDoc(
-                doc(db, "MyList", user.uid),
-                {
-                  movies: EmptyArray,
-                },
-                { merge: true }
-              );
-              setDoc(
-                doc(db, "WatchedMovies", user.uid),
-                {
-                  movies: EmptyArray,
-                },
-                { merge: true }
-              );
-              setDoc(
-                doc(db, "LikedMovies", user.uid),
-                {
-                  movies: EmptyArray,
-                },
-                { merge: true }
-              ).then(() => {
-                navigate("/");
-              });
-            }
-          });
-        });
-        if (user != null) {
-          navigate("/");
-        }
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        setErrorMessage(error.message);
-        setLoader(false);
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-      });
+    if (error) {
+      setErrorMessage(error);
+      setLoader(false);
+      return;
+    }
+
+    if (user) {
+      navigate("/");
+    }
   };
 
   return (
