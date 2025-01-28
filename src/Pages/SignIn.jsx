@@ -17,6 +17,7 @@ function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoader(true);
+    setErrorMessage("");
 
     const { user, error } = await emailSignIn(email, password);
 
@@ -73,7 +74,7 @@ function SignIn() {
                       htmlFor="email"
                       className="block mb-2 text-sm font-medium text-white dark:text-white"
                     >
-                      Your email
+                      Email
                     </label>
                     <input
                       type="email"

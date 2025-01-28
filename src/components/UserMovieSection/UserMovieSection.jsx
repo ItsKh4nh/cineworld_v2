@@ -49,11 +49,11 @@ function UserMovieSection(props) {
   useEffect(() => {
     getMovies();
     if (props.from === "MyList") {
-      setTitle("Movies in My List");
+      setTitle("Movies in MyList");
     } else if (props.from === "WatchedMovies") {
       setTitle("Watched Movies");
     } else if (props.from === "LikedMovies") {
-      setTitle("Movies you Liked");
+      setTitle("Movies you liked");
     }
   }, []);
 

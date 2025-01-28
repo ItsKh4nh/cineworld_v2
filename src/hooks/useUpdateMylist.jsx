@@ -18,7 +18,7 @@ function useUpdateMyList() {
   const addToMyList = (movie) => {
     updateDoc(doc(db, "MyList", User.uid), { movies: arrayUnion(movie) })
       .then(() => {
-        console.log("Data added to my List");
+        console.log("Data added to MyList");
         notify();
         setIsMyListUpdates(true);
       })

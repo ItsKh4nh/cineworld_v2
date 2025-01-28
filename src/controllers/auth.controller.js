@@ -46,8 +46,65 @@ const createUserProfile = async (uid, data) => {
   );
 };
 
+// Sign In Email validation
+export const validateSignInEmail = (email) => {
+  // Required field check
+  if (!email || email.length === 0) {
+    return { isValid: false, error: "Email is required" };
+  }
+
+  // Leading/trailing spaces check
+  if (email !== email.trim()) {
+    return {
+      isValid: false,
+      error: "Email cannot contain leading or trailing spaces",
+    };
+  }
+
+  // Format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return {
+      isValid: false,
+      error: "Please enter a valid email address",
+    };
+  }
+
+  return { isValid: true, error: null };
+};
+
+// Sign In Password validation
+export const validateSignInPassword = (password) => {
+  // Required field check
+  if (!password || password.length === 0) {
+    return { isValid: false, error: "Password is required" };
+  }
+
+  // Check for spaces
+  if (password !== password.trim()) {
+    return {
+      isValid: false,
+      error: "Password cannot contain leading or trailing spaces",
+    };
+  }
+
+  return { isValid: true, error: null };
+};
+
 // Email/Password Sign In
 export const emailSignIn = async (email, password) => {
+  // Validate email
+  const emailValidation = validateSignInEmail(email);
+  if (!emailValidation.isValid) {
+    return { user: null, error: emailValidation.error };
+  }
+
+  // Validate password
+  const passwordValidation = validateSignInPassword(password);
+  if (!passwordValidation.isValid) {
+    return { user: null, error: passwordValidation.error };
+  }
+
   const auth = getAuth();
   try {
     const userCredential = await signInWithEmailAndPassword(
@@ -57,7 +114,8 @@ export const emailSignIn = async (email, password) => {
     );
     return { user: userCredential.user, error: null };
   } catch (error) {
-    return { user: null, error: error.message };
+    // Generic error message for security
+    return { user: null, error: "Invalid email or password" };
   }
 };
 
@@ -251,19 +309,28 @@ export const validateConfirmPassword = (password, confirmPassword) => {
 export const emailSignUp = async (email, password, username) => {
   const auth = getAuth();
 
-  // Validate username first
-  const usernameValidation = await validateUsername(username);
-  if (!usernameValidation.isValid) {
-    return { user: null, error: usernameValidation.error };
-  }
-
-  // Validate email
-  const emailValidation = await validateEmail(email);
-  if (!emailValidation.isValid) {
-    return { user: null, error: emailValidation.error };
-  }
-
   try {
+    // Check username availability in Firestore
+    const usersRef = collection(db, "Users");
+    const usernameQuery = query(
+      usersRef,
+      where("username", "==", username.trim())
+    );
+    const usernameSnapshot = await getDocs(usernameQuery);
+
+    if (!usernameSnapshot.empty) {
+      return { user: null, error: "Username is already taken" };
+    }
+
+    // Check email existence in Firebase Auth
+    const emailQuery = query(usersRef, where("email", "==", email));
+    const emailSnapshot = await getDocs(emailQuery);
+
+    if (!emailSnapshot.empty) {
+      return { user: null, error: "Email is already registered" };
+    }
+
+    // If both checks pass, create the user
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -271,15 +338,19 @@ export const emailSignUp = async (email, password, username) => {
     );
     const user = userCredential.user;
 
-    // Only create profile and collections if username validation passed
+    // Create user profile and collections
     await createUserProfile(user.uid, {
       email,
-      username: username.trim(), // Store trimmed username
+      username: username.trim(),
     });
     await createUserCollections(user.uid);
 
     return { user, error: null };
   } catch (error) {
+    // Handle Firebase specific errors
+    if (error.code === "auth/email-already-in-use") {
+      return { user: null, error: "Email is already registered" };
+    }
     return { user: null, error: error.message };
   }
 };
