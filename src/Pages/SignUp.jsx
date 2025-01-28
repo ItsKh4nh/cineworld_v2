@@ -3,7 +3,11 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
 import { ClipLoader } from "react-spinners";
 import { AuthContext } from "../contexts/UserContext";
-import { emailSignUp, validatePasswords } from "../controllers/auth.controller";
+import {
+  emailSignUp,
+  validatePasswords,
+  validateEmail,
+} from "../controllers/auth.controller";
 
 function SignUp() {
   const location = useLocation();
@@ -14,6 +18,11 @@ function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
   const [loader, setLoader] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
 
   const navigate = useNavigate();
 
@@ -28,10 +37,30 @@ function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoader(true);
+    setErrorMessage("");
+    setFieldErrors({
+      username: "",
+      email: "",
+      password: "",
+    });
+
+    // Validate email format first
+    const emailValidation = await validateEmail(email);
+    if (!emailValidation.isValid) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        email: emailValidation.error,
+      }));
+      setLoader(false);
+      return;
+    }
 
     // Validate passwords match
     if (!validatePasswords(password, confirmPassword)) {
-      setErrorMessage("Passwords do not match!");
+      setFieldErrors((prev) => ({
+        ...prev,
+        password: "Passwords do not match!",
+      }));
       setLoader(false);
       return;
     }
@@ -40,7 +69,13 @@ function SignUp() {
     const { user, error } = await emailSignUp(email, password, username);
 
     if (error) {
-      setErrorMessage(error);
+      if (error.includes("Username")) {
+        setFieldErrors((prev) => ({ ...prev, username: error }));
+      } else if (error.includes("Email")) {
+        setFieldErrors((prev) => ({ ...prev, email: error }));
+      } else {
+        setErrorMessage(error);
+      }
       setLoader(false);
       return;
     }
@@ -48,6 +83,13 @@ function SignUp() {
     if (user) {
       navigate("/");
     }
+  };
+
+  // Modify the input class assignment
+  const getInputClass = (fieldName) => {
+    return fieldErrors[fieldName]
+      ? "bg-stone-700 text-white sm:text-sm rounded-sm border-2 border-red-700 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+      : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white";
   };
 
   return (
@@ -82,14 +124,15 @@ function SignUp() {
                       type="text"
                       name="username"
                       id="username"
-                      className={
-                        ErrorMessage
-                          ? "bg-stone-700 text-white sm:text-sm rounded-sm border-2 border-red-700 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                          : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white"
-                      }
+                      className={getInputClass("username")}
                       placeholder="Enter your username"
                       required=""
                     />
+                    {fieldErrors.username && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {fieldErrors.username}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label
@@ -104,14 +147,15 @@ function SignUp() {
                       name="email"
                       id="email"
                       value={email}
-                      className={
-                        ErrorMessage
-                          ? "bg-stone-700 text-white sm:text-sm rounded-sm border-2 border-red-700 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white "
-                          : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white "
-                      }
+                      className={getInputClass("email")}
                       placeholder="name@example.com"
                       required=""
                     ></input>
+                    {fieldErrors.email && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {fieldErrors.email}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label
@@ -126,13 +170,14 @@ function SignUp() {
                       name="password"
                       id="password"
                       placeholder="••••••••"
-                      className={
-                        ErrorMessage
-                          ? "bg-stone-700 text-white sm:text-sm rounded-sm border-2 border-red-700 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                          : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white"
-                      }
+                      className={getInputClass("password")}
                       required=""
                     ></input>
+                    {fieldErrors.password && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {fieldErrors.password}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label
