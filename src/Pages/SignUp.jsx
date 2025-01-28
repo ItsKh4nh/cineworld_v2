@@ -5,8 +5,9 @@ import { ClipLoader } from "react-spinners";
 import { AuthContext } from "../contexts/UserContext";
 import {
   emailSignUp,
-  validatePasswords,
   validateEmail,
+  validatePassword,
+  validateConfirmPassword,
 } from "../controllers/auth.controller";
 
 function SignUp() {
@@ -22,6 +23,7 @@ function SignUp() {
     username: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
 
   const navigate = useNavigate();
@@ -34,6 +36,17 @@ function SignUp() {
     }
   }, [location]);
 
+  const handleConfirmPasswordChange = (e) => {
+    const confirmPass = e.target.value;
+    setConfirmPassword(confirmPass);
+
+    const validation = validateConfirmPassword(password, confirmPass);
+    setFieldErrors((prev) => ({
+      ...prev,
+      confirmPassword: validation.error || "",
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoader(true);
@@ -42,24 +55,40 @@ function SignUp() {
       username: "",
       email: "",
       password: "",
+      confirmPassword: "",
     });
 
-    // Validate email format first
-    const emailValidation = await validateEmail(email);
-    if (!emailValidation.isValid) {
+    // Validate password first
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
       setFieldErrors((prev) => ({
         ...prev,
-        email: emailValidation.error,
+        password: passwordValidation.error,
       }));
       setLoader(false);
       return;
     }
 
-    // Validate passwords match
-    if (!validatePasswords(password, confirmPassword)) {
+    // Add confirm password validation
+    const confirmPasswordValidation = validateConfirmPassword(
+      password,
+      confirmPassword
+    );
+    if (!confirmPasswordValidation.isValid) {
       setFieldErrors((prev) => ({
         ...prev,
-        password: "Passwords do not match!",
+        confirmPassword: confirmPasswordValidation.error,
+      }));
+      setLoader(false);
+      return;
+    }
+
+    // Validate email format
+    const emailValidation = await validateEmail(email);
+    if (!emailValidation.isValid) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        email: emailValidation.error,
       }));
       setLoader(false);
       return;
@@ -187,18 +216,19 @@ function SignUp() {
                       Confirm Password
                     </label>
                     <input
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      onChange={handleConfirmPasswordChange}
                       type="password"
                       name="confirmPassword"
                       id="confirmPassword"
                       placeholder="••••••••"
-                      className={
-                        ErrorMessage
-                          ? "bg-stone-700 text-white sm:text-sm rounded-sm border-2 border-red-700 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                          : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white"
-                      }
+                      className={getInputClass("confirmPassword")}
                       required=""
                     />
+                    {fieldErrors.confirmPassword && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {fieldErrors.confirmPassword}
+                      </p>
+                    )}
                   </div>
                   <div>
                     {ErrorMessage && (

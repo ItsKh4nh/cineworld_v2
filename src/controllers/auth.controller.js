@@ -200,6 +200,53 @@ export const validateEmail = async (email) => {
   return { isValid: true, error: null };
 };
 
+// Password validation function
+export const validatePassword = (password) => {
+  // Required field check
+  if (!password || password.trim().length === 0) {
+    return { isValid: false, error: "Password is required" };
+  }
+
+  // Check for spaces
+  if (password !== password.trim() || password.includes(" ")) {
+    return { isValid: false, error: "Password cannot contain spaces" };
+  }
+
+  // Length validation
+  if (password.length < 6 || password.length > 20) {
+    return {
+      isValid: false,
+      error: "Password must be between 6 and 20 characters",
+    };
+  }
+
+  // Check for non-English characters
+  const nonEnglishRegex = /[^\x00-\x7F]+/;
+  if (nonEnglishRegex.test(password)) {
+    return {
+      isValid: false,
+      error: "Password can only contain English characters",
+    };
+  }
+
+  return { isValid: true, error: null };
+};
+
+// Export the confirm password validation function
+export const validateConfirmPassword = (password, confirmPassword) => {
+  // Required field check
+  if (!confirmPassword || confirmPassword.trim().length === 0) {
+    return { isValid: false, error: "Please re-confirm your password" };
+  }
+
+  // Match validation
+  if (password !== confirmPassword) {
+    return { isValid: false, error: "Passwords do not match" };
+  }
+
+  return { isValid: true, error: null };
+};
+
 // Email/Password Sign Up
 export const emailSignUp = async (email, password, username) => {
   const auth = getAuth();
@@ -235,9 +282,4 @@ export const emailSignUp = async (email, password, username) => {
   } catch (error) {
     return { user: null, error: error.message };
   }
-};
-
-// Validate passwords match
-export const validatePasswords = (password, confirmPassword) => {
-  return password === confirmPassword;
 };
