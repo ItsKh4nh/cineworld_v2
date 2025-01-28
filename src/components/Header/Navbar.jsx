@@ -70,11 +70,13 @@ function Navbar(props) {
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <img
-                    className="h-6 cursor-pointer w-18"
-                    src="/cineworld-logo.png"
-                    alt="CINEWORLD"
-                  />
+                  <Link to="/">
+                    <img
+                      className="h-6 cursor-pointer w-18"
+                      src="/cineworld-logo.png"
+                      alt="CINEWORLD"
+                    />
+                  </Link>
                 </div>
                 <div className="hidden md:block">
                   <div className="flex items-center ml-10 space-x-4">

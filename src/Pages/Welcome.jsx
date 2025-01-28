@@ -29,19 +29,18 @@ function Welcome() {
               <h1 className="mb-2 text-center text-stone-400 font-light sm:text-xl sm:mb-8">
                 Ready to watch? Enter your email to create an account.
               </h1>
-              TODO: Add fn to add Email to the SignUp Form
               <div className="max-w-2xl mx-auto">
                 <div className="flex flex-col md:flex-row md:space-x-4">
                   <input
                     type="email"
                     placeholder="Email Address"
-                    className="w-full p-2 py-3 rounded-sm sm:py-4 md:py-5 md:w-2/3"
+                    className="w-full p-2 py-3 rounded-sm sm:py-4 md:py-5 md:w-3/4"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                   <Link
                     to={email ? `/signup?email=${email}` : "/signup"}
-                    className="md:w-1/3"
+                    className="md:w-1/4"
                   >
                     <button className="w-full px-4 py-2 mt-3 font-medium text-white bg-cineworldYellow rounded-sm sm:py-4 md:mt-0 md:py-5 md:text-xl">
                       Get Started
