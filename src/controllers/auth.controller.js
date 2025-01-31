@@ -241,20 +241,6 @@ export const validateEmail = async (email) => {
     };
   }
 
-  // Check if email exists in Firebase
-  try {
-    const usersRef = collection(db, "Users");
-    const q = query(usersRef, where("email", "==", email));
-    const querySnapshot = await getDocs(q);
-
-    if (!querySnapshot.empty) {
-      return { isValid: false, error: "Email is already registered" };
-    }
-  } catch (error) {
-    console.error("Firebase email check error:", error);
-    return { isValid: false, error: "Error checking email availability" };
-  }
-
   return { isValid: true, error: null };
 };
 
@@ -322,7 +308,7 @@ export const emailSignUp = async (email, password, username) => {
       return { user: null, error: "Username is already taken" };
     }
 
-    // Check email existence in Firebase Auth
+    // Check email existence in both Firebase Auth and Firestore
     const emailQuery = query(usersRef, where("email", "==", email));
     const emailSnapshot = await getDocs(emailQuery);
 

@@ -26,8 +26,7 @@ function SignUp() {
     password: "",
     confirmPassword: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPasswords, setShowPasswords] = useState(false);
 
   const navigate = useNavigate();
 
@@ -232,7 +231,7 @@ function SignUp() {
                     <div className="relative">
                       <input
                         onChange={handlePasswordChange}
-                        type={showPassword ? "text" : "password"}
+                        type={showPasswords ? "text" : "password"}
                         name="password"
                         id="password"
                         placeholder="••••••••"
@@ -242,9 +241,9 @@ function SignUp() {
                       <button
                         type="button"
                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-white"
-                        onClick={() => setShowPassword(!showPassword)}
+                        onClick={() => setShowPasswords(!showPasswords)}
                       >
-                        {showPassword ? (
+                        {showPasswords ? (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -298,7 +297,7 @@ function SignUp() {
                     <div className="relative">
                       <input
                         onChange={handleConfirmPasswordChange}
-                        type={showConfirmPassword ? "text" : "password"}
+                        type={showPasswords ? "text" : "password"}
                         name="confirmPassword"
                         id="confirmPassword"
                         placeholder="••••••••"
@@ -308,11 +307,9 @@ function SignUp() {
                       <button
                         type="button"
                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-white"
-                        onClick={() =>
-                          setShowConfirmPassword(!showConfirmPassword)
-                        }
+                        onClick={() => setShowPasswords(!showPasswords)}
                       >
-                        {showConfirmPassword ? (
+                        {showPasswords ? (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
