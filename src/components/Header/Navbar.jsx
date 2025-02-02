@@ -53,14 +53,14 @@ function Navbar(props) {
   };
 
   return (
-    <Fade>
-      <header
-        className={
-          props.playPage
-            ? "fixed top-0 z-10 w-full backdrop-blur-sm"
-            : "fixed top-0 z-10 w-full"
-        }
-      >
+    <header
+      className={
+        props.playPage
+          ? "fixed top-0 z-10 w-full backdrop-blur-sm"
+          : "fixed top-0 z-10 w-full"
+      }
+    >
+      <Fade>
         <nav
           className={`transition duration-500 ease-in-out  ${
             show && "transition duration-500 ease-in-out bg-black "
@@ -309,8 +309,8 @@ function Navbar(props) {
             )}
           </Transition>
         </nav>
-      </header>
-    </Fade>
+      </Fade>
+    </header>
   );
 }
 
