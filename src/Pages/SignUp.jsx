@@ -145,6 +145,11 @@ function SignUp() {
     }
 
     if (user) {
+      // Update the AuthContext immediately
+      setUser({
+        ...user,
+        displayName: username.trim(), // Ensure displayName is set immediately
+      });
       navigate("/");
     }
   };

@@ -38,6 +38,12 @@ function Profile() {
     }
   }, []);
 
+  useEffect(() => {
+    if (User) {
+      setUserName(User.displayName || "");
+    }
+  }, [User]);
+
   const inputRef = useRef(null);
 
   const handleClick = () => {
@@ -59,23 +65,30 @@ function Profile() {
     event.target.value = null;
   };
 
-  const changeUserName = (e) => {
+  const changeUserName = async (e) => {
     e.preventDefault();
-    if (isUserNameChanged) {
-      if (userName !== "") {
-        const auth = getAuth();
-        updateProfile(auth.currentUser, { displayName: userName })
-          .then(() => {
-            notify();
-          })
-          .catch((error) => {
-            alert(error.message);
-          });
-      } else {
-        setIsUserNameChanged(false);
+    if (isUserNameChanged && userName.trim()) {
+      const auth = getAuth();
+      try {
+        // Update both Auth profile and Firestore
+        await updateProfile(auth.currentUser, {
+          displayName: userName.trim(),
+        });
+
+        await setDoc(
+          doc(db, "Users", User.uid),
+          {
+            username: userName.trim(),
+            displayName: userName.trim(),
+          },
+          { merge: true }
+        );
+
+        notify();
+      } catch (error) {
+        alert(error.message);
       }
     }
-
     if (newProfilePic != "") {
       const storage = getStorage();
       const storageRef = ref(storage, `/ProfilePics/${User.uid}`);

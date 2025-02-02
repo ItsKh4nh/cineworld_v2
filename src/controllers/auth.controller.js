@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   createUserWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import {
   setDoc,
@@ -324,14 +325,29 @@ export const emailSignUp = async (email, password, username) => {
     );
     const user = userCredential.user;
 
-    // Create user profile and collections
+    const trimmedUsername = username.trim();
+
+    // Update Auth profile first and wait for it to complete
+    await updateProfile(user, {
+      displayName: trimmedUsername,
+    });
+
+    // Then update Firestore
     await createUserProfile(user.uid, {
       email,
-      username: username.trim(),
+      username: trimmedUsername,
+      displayName: trimmedUsername,
     });
     await createUserCollections(user.uid);
 
-    return { user, error: null };
+    // Return the updated user object
+    return {
+      user: {
+        ...user,
+        displayName: trimmedUsername, // Ensure displayName is included
+      },
+      error: null,
+    };
   } catch (error) {
     // Handle Firebase specific errors
     if (error.code === "auth/email-already-in-use") {
