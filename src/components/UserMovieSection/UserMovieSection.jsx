@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import StarRatings from "react-star-ratings";
 import { ClipLoader } from "react-spinners";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +9,7 @@ import { db } from "../../firebase/FirebaseConfig";
 import { AuthContext } from "../../contexts/UserContext";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
 import MoviePopUp from "../PopUp/MoviePopUp";
+import StarRatings from "../StarRatings/StarRatings";
 
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
@@ -251,13 +251,7 @@ function UserMovieSection(props) {
                       </a>
 
                       <br></br>
-                      <StarRatings
-                        rating={movie.vote_average / 2}
-                        starRatedColor="red"
-                        numberOfStars={5}
-                        name="rating"
-                        starDimension="1.2rem"
-                      />
+                      <StarRatings rating={movie.vote_average} />
                       <br></br>
                       <div className="mt-1">
                         {converted &&

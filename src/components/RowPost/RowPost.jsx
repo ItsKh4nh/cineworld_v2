@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import { Fade } from "react-awesome-reveal";
-import StarRatings from "react-star-ratings";
 import YouTube from "react-youtube";
 import axios from "../../axios";
 import { API_KEY, imageURL, imageURL2 } from "../../config/constants";
@@ -19,6 +18,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./RowPostStyles.scss";
+import StarRatings from "../StarRatings/StarRatings";
 
 function RowPost(props) {
   const { addToMyList, PopupMessage } = useUpdateMyList();
@@ -271,14 +271,7 @@ function RowPost(props) {
                       </h1>
 
                       <div className="ml-4">
-                        <StarRatings
-                          rating={obj.vote_average / 2}
-                          starRatedColor="red"
-                          numberOfStars={5}
-                          name="rating"
-                          starDimension="0.8rem"
-                          starSpacing="0.2rem"
-                        />
+                        <StarRatings rating={obj.vote_average} />
                       </div>
 
                       {converted &&
@@ -439,12 +432,7 @@ function RowPost(props) {
                             Rating :
                             <div className="ml-2">
                               <StarRatings
-                                rating={moviePopupInfo.vote_average / 2}
-                                starRatedColor="red"
-                                numberOfStars={5}
-                                name="rating"
-                                starDimension="1rem"
-                                starSpacing="0.2rem"
+                                rating={moviePopupInfo.vote_average}
                               />
                             </div>
                           </h1>

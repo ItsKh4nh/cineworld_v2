@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import StarRatings from "react-star-ratings";
+import StarRatings from "../components/StarRatings/StarRatings";
 
 import axios from "../axios";
 import { API_KEY, imageURL, imageURL2 } from "../config/constants";
@@ -132,14 +131,7 @@ function Play() {
               <h1 className="text-white font-bold text-3xl mb-2">
                 {movieDetails.original_title || movieDetails.title}
               </h1>
-              <StarRatings
-                rating={movieDetails.vote_average / 2}
-                starRatedColor="red"
-                numberOfStars={5}
-                name="rating"
-                starDimension="1rem"
-                starSpacing="0.2rem"
-              />
+              <StarRatings rating={movieDetails.vote_average} />
               <p className="text-neutral-400 mt-3">{movieDetails.overview}</p>
               <div className="bg-neutral-600 w-full h-[0.1rem] my-5"></div>
 

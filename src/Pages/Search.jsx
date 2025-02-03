@@ -1,11 +1,10 @@
 import React, { useContext, useState } from "react";
 
-import StarRatings from "react-star-ratings";
-
 import axios from "../axios";
 import { API_KEY, imageURL2 } from "../config/constants";
 
 import MoviePopUp from "../components/PopUp/MoviePopUp";
+import { StarRatings } from "../components/StarRatings";
 
 import { PopUpContext } from "../contexts/moviePopUpContext";
 
@@ -200,13 +199,7 @@ function Search() {
                     </a>
 
                     <br></br>
-                    <StarRatings
-                      rating={movie.vote_average / 2}
-                      starRatedColor="red"
-                      numberOfStars={5}
-                      name="rating"
-                      starDimension="1.2rem"
-                    />
+                    <StarRatings rating={movie.vote_average} />
                     <br></br>
                     <div className="mt-1">
                       {converted &&
