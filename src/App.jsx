@@ -13,6 +13,7 @@ const ErrorPage = lazy(() => import("./pages/ErrorPage"));
 const Play = lazy(() => import("./pages/Play"));
 const LikedMovies = lazy(() => import("./pages/LikedMovies"));
 const History = lazy(() => import("./pages/History"));
+const Statistics = lazy(() => import("./pages/Statistics"));
 
 import { Routes, Route } from "react-router-dom";
 
@@ -50,6 +51,7 @@ function App() {
               <Route path="/liked" element={<LikedMovies />} />
               <Route path="/history" element={<History />} />
               <Route path="/play/:id" element={<Play />} />
+              <Route path="/statistics" element={<Statistics />} />
             </>
           ) : null}
           <Route path="/play/:id" element={<Play />} />

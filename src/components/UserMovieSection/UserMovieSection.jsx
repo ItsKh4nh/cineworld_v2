@@ -57,7 +57,8 @@ function UserMovieSection(props) {
     }
   }, []);
 
-  const removeMovie = (movie) => {
+  const removeMovie = (movie, event) => {
+    event.stopPropagation();
     if (props.from === "MyList") {
       removeFromMyList(movie);
     } else if (props.from === "WatchedMovies") {
@@ -137,7 +138,7 @@ function UserMovieSection(props) {
                         {props.from === "LikedMovies" ? (
                           <>
                             <div
-                              onClick={() => removeMovie(movie)}
+                              onClick={(e) => removeMovie(movie, e)}
                               className="text-white w-10 h-10 2xl:w-14 2xl:h-14 border-[2px] 2xl:border-[3px] rounded-full p-2 mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:border-red-600 hover:text-red-600"
                             >
                               <svg
@@ -158,7 +159,10 @@ function UserMovieSection(props) {
                         ) : (
                           <>
                             <div
-                              onClick={() => addToLikedMovies(movie)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addToLikedMovies(movie);
+                              }}
                               className="text-white w-10 h-10 2xl:w-14 2xl:h-14 border-[2px] 2xl:border-[3px] rounded-full p-2 mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:border-red-600 hover:text-red-600"
                             >
                               <svg
@@ -183,7 +187,7 @@ function UserMovieSection(props) {
                         props.from === "WatchedMovies" ? (
                           <>
                             <div
-                              onClick={() => removeMovie(movie)}
+                              onClick={(e) => removeMovie(movie, e)}
                               className="text-white w-10 h-10 2xl:w-14 2xl:h-14 border-[2px] 2xl:border-[3px] rounded-full p-2 mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:border-red-600 hover:text-red-600"
                             >
                               <svg
@@ -204,7 +208,10 @@ function UserMovieSection(props) {
                         ) : (
                           <>
                             <div
-                              onClick={() => addToMyList(movie)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addToMyList(movie);
+                              }}
                               className="text-white w-10 h-10 2xl:w-14 2xl:h-14 border-[2px] 2xl:border-[3px] rounded-full p-2 mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:border-red-600 hover:text-red-600"
                             >
                               <svg

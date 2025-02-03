@@ -87,14 +87,14 @@ function Navbar(props) {
                       to={"/"}
                       className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m"
                     >
-                      Home
+                      Movies
                     </Link>
 
                     <Link
                       to={"/series"}
                       className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m"
                     >
-                      Series
+                      TV Series
                     </Link>
 
                     <Link
@@ -158,7 +158,7 @@ function Navbar(props) {
                         alt="Profile"
                       />
                     </Link>
-                    <ul className="absolute hidden text-white pt-1 -ml-32 group-hover:block transition ease-in-out delay-150">
+                    <ul className="absolute hidden text-white pt-1 right-0 group-hover:block transition ease-in-out delay-150">
                       <li>
                         <Link
                           to={"/profile"}
@@ -169,10 +169,10 @@ function Navbar(props) {
                       </li>
                       <li>
                         <Link
-                          to={"/signin"}
-                          className="cursor-pointer bg-stone-900 font-semibold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
+                          to={"/"}
+                          className="cursor-pointer bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
                         >
-                          Add another User
+                          Statistics
                         </Link>
                       </li>
                       <li>
@@ -251,7 +251,7 @@ function Navbar(props) {
                 <div ref={ref} className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                   <Link to={"/"}>
                     <a className="block px-3 py-2 text-base font-medium text-white rounded-md hover:bg-red-800">
-                      Home
+                      Movies
                     </a>
                   </Link>
 
@@ -279,9 +279,9 @@ function Navbar(props) {
                     </a>
                   </Link>
 
-                  <Link to={"/signin"}>
+                  <Link to={"/"}>
                     <a className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white">
-                      Add another user
+                      Statistics
                     </a>
                   </Link>
 
