@@ -23,7 +23,7 @@ function Banner(props) {
     };
   }
 
-  const [windowSeize, setWindowSeize] = useState(getWindowSize());
+  const [windowSize, setWindowSize] = useState(getWindowSize());
 
   useEffect(() => {
     axios.get(props.url).then((response) => {
@@ -36,7 +36,7 @@ function Banner(props) {
     });
 
     function handleWindowResize() {
-      setWindowSeize(getWindowSize());
+      setWindowSize(getWindowSize());
     }
 
     window.addEventListener("resize", handleWindowResize);
