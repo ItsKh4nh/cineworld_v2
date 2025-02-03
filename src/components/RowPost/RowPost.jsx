@@ -434,7 +434,7 @@ function RowPost(props) {
                         {/*More Info*/}
                         <div className="relative p-2 py-5 sm:p-6 flex-auto">
                           <h1 className="flex -mt-4 text-neutral-400 text-sm leading-relaxed">
-                            Rating :
+                            Rating:
                             <div className="ml-2">
                               <StarRatings
                                 rating={moviePopupInfo.vote_average}
@@ -442,7 +442,7 @@ function RowPost(props) {
                             </div>
                           </h1>
                           <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                            Released on :{"  "}
+                            Released on:{"  "}
                             <p className="text-white ml-2 font-medium">
                               {formatDate(
                                 moviePopupInfo.release_date ||
@@ -451,14 +451,14 @@ function RowPost(props) {
                             </p>
                           </h1>
                           <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                            Language :
+                            Language:
                             <p className="text-white ml-2 font-medium">
                               {moviePopupInfo.original_language}
                             </p>
                           </h1>
 
                           <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                            Genre :
+                            Genre:
                             {convertGenre(moviePopupInfo.genre_ids)
                               .slice(0, 2)
                               .map((genre) => {

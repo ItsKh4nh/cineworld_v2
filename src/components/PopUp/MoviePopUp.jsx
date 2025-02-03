@@ -160,7 +160,7 @@ function MoviePopUp(props) {
                       {/*More Info*/}
                       <div className="relative p-2 py-5 sm:p-6 flex-auto">
                         <h1 className="flex -mt-4 text-neutral-400 text-sm leading-relaxed">
-                          Rating :
+                          Rating:
                           <div className="ml-2">
                             {PopupInfo.vote_average && (
                               <StarRatings rating={PopupInfo.vote_average} />
@@ -168,7 +168,7 @@ function MoviePopUp(props) {
                           </div>
                         </h1>
                         <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                          Released on :{"  "}
+                          Released on:{"  "}
                           <p className="text-white ml-2 font-medium">
                             {formatDate(
                               PopupInfo.release_date || PopupInfo.first_air_date
@@ -176,14 +176,14 @@ function MoviePopUp(props) {
                           </p>
                         </h1>
                         <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                          Language :
+                          Language:
                           <p className="text-white ml-2 font-medium">
                             {PopupInfo.original_language}
                           </p>
                         </h1>
 
                         <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                          Genre :
+                          Genre:
                           {PopupInfo.genre_ids &&
                             convertGenre(PopupInfo.genre_ids).map((genre) => {
                               return (

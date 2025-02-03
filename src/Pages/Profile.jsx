@@ -203,7 +203,7 @@ function Profile() {
                   {User ? User.email : null}
                 </h1>
                 <h1 className="text-white text-xl p-2 rounded mb-4">
-                  Unique ID : {User ? User.uid : null}
+                  Unique ID: {User ? User.uid : null}
                 </h1>
                 <hr className="h-px bg-gray-500 border-0 mb-4 md:mb-10 dark:bg-gray-700"></hr>
 

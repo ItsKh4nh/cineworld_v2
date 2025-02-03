@@ -147,7 +147,7 @@ function Play() {
 
               <div className="hidden lg:grid">
                 <h1 className=" text-red-700 ">
-                  Released on :{" "}
+                  Released on:{" "}
                   <a className="text-white ml-1">
                     {formatDate(
                       movieDetails.release_date || movieDetails.air_date
@@ -155,13 +155,13 @@ function Play() {
                   </a>
                 </h1>
                 <h1 className="text-red-700">
-                  Language :{" "}
+                  Language:{" "}
                   <a className="text-white ml-1">
                     {movieDetails.original_language}
                   </a>
                 </h1>
                 <h1 className="text-red-700">
-                  Genres :{" "}
+                  Genres:{" "}
                   {movieDetails.genres &&
                     movieDetails.genres.map((genre) => {
                       return (
@@ -285,7 +285,7 @@ function Play() {
               <div className="lg:hidden">
                 <div>
                   <h1 className=" text-red-700 text-sm leading-7 sm:text-lg sm:leading-9 lg:text-2xl lg:leading-10">
-                    Released on :{" "}
+                    Released on:{" "}
                     <a className="text-white ml-2">
                       {formatDate(
                         movieDetails.release_date || movieDetails.air_date
@@ -293,13 +293,13 @@ function Play() {
                     </a>
                   </h1>
                   <h1 className=" text-red-700 text-sm leading-7 sm:text-lg sm:leading-9 lg:text-2xl lg:leading-10">
-                    Language :{" "}
+                    Language:{" "}
                     <a className="text-white ml-2">
                       {movieDetails.original_language}
                     </a>
                   </h1>
                   <h1 className="text-red-700 text-sm leading-7 sm:text-lg sm:leading-9 lg:text-2xl lg:leading-10">
-                    Genres :{" "}
+                    Genres:{" "}
                     {movieDetails.genres &&
                       movieDetails.genres.slice(0, 2).map((genre) => {
                         return (
