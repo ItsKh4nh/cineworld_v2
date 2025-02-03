@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 
 import { Fade } from "react-awesome-reveal";
-import StarRatings from "react-star-ratings";
+import StarRatings from "../StarRatings/StarRatings"; // Add local StarRatings import
 
 import { imageURL } from "../../config/constants";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
@@ -155,14 +155,7 @@ function MoviePopUp(props) {
                           Rating :
                           <div className="ml-2">
                             {PopupInfo.vote_average && (
-                              <StarRatings
-                                rating={PopupInfo.vote_average / 2}
-                                starRatedColor="red"
-                                numberOfStars={5}
-                                name="rating"
-                                starDimension="1rem"
-                                starSpacing="0.2rem"
-                              />
+                              <StarRatings rating={PopupInfo.vote_average} />
                             )}
                           </div>
                         </h1>

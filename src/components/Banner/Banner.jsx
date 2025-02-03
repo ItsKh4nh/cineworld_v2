@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import StarRatings from "react-star-ratings";
 import { Fade } from "react-awesome-reveal";
+import StarRatings from "../StarRatings/StarRatings";
 
 import axios from "../../axios";
 import { API_KEY, imageURL } from "../../config/constants";
@@ -84,14 +84,7 @@ function Banner(props) {
             <div className="flex">
               <div className="hidden sm:flex justify-center sm:justify-start ml-2">
                 {movie.vote_average ? (
-                  <StarRatings
-                    rating={movie.vote_average / 2}
-                    starRatedColor="red"
-                    numberOfStars={5}
-                    name="rating"
-                    starDimension="1.1rem"
-                    starSpacing="0.2rem"
-                  />
+                  <StarRatings rating={movie.vote_average} />
                 ) : null}
               </div>
               <div className="ml-2 hidden sm:flex justify-center sm:justify-start">
