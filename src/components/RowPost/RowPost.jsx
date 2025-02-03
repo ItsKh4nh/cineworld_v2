@@ -18,7 +18,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./RowPostStyles.scss";
-import StarRatings from "../StarRatings/StarRatings";
+import StarRatings from "../StarRatings";
 
 function RowPost(props) {
   const { addToMyList, PopupMessage } = useUpdateMyList();

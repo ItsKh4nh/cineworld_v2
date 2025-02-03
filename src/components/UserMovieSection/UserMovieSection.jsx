@@ -9,7 +9,7 @@ import { db } from "../../firebase/FirebaseConfig";
 import { AuthContext } from "../../contexts/UserContext";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
 import MoviePopUp from "../PopUp/MoviePopUp";
-import StarRatings from "../StarRatings/StarRatings";
+import StarRatings from "../StarRatings";
 
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";

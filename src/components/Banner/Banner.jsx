@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Fade } from "react-awesome-reveal";
-import StarRatings from "../StarRatings/StarRatings";
+import StarRatings from "../StarRatings";
 
 import axios from "../../axios";
 import { API_KEY, imageURL } from "../../config/constants";
