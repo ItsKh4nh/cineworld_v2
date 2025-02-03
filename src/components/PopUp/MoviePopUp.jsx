@@ -27,6 +27,17 @@ function MoviePopUp(props) {
     setPopupInfo(props.data1);
   }, []);
 
+  // Add this helper function
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
   return (
     <>
       {PopupMessage}
@@ -132,7 +143,7 @@ function MoviePopUp(props) {
                         {PopupInfo.title || PopupInfo.name}
                       </h3>
                       <h1 className="text-green-700 font-bold mt-2">
-                        {PopupInfo.release_date}
+                        {formatDate(PopupInfo.release_date)}
                       </h1>
                     </div>
                   </Fade>
@@ -162,7 +173,9 @@ function MoviePopUp(props) {
                         <h1 className="flex text-neutral-400 text-sm leading-relaxed">
                           Released on :{"  "}
                           <p className="text-white ml-2 font-medium">
-                            {PopupInfo.release_date || PopupInfo.first_air_date}
+                            {formatDate(
+                              PopupInfo.release_date || PopupInfo.first_air_date
+                            )}
                           </p>
                         </h1>
                         <h1 className="flex text-neutral-400 text-sm leading-relaxed">

@@ -37,6 +37,16 @@ function Play() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
   useEffect(() => {
     if (location.state?.From === "MyList") {
       setIsFromMyList(true);
@@ -139,7 +149,9 @@ function Play() {
                 <h1 className=" text-red-700 ">
                   Released on :{" "}
                   <a className="text-white ml-1">
-                    {movieDetails.release_date || movieDetails.air_date}
+                    {formatDate(
+                      movieDetails.release_date || movieDetails.air_date
+                    )}
                   </a>
                 </h1>
                 <h1 className="text-red-700">
@@ -275,7 +287,9 @@ function Play() {
                   <h1 className=" text-red-700 text-sm leading-7 sm:text-lg sm:leading-9 lg:text-2xl lg:leading-10">
                     Released on :{" "}
                     <a className="text-white ml-2">
-                      {movieDetails.release_date || movieDetails.air_date}
+                      {formatDate(
+                        movieDetails.release_date || movieDetails.air_date
+                      )}
                     </a>
                   </h1>
                   <h1 className=" text-red-700 text-sm leading-7 sm:text-lg sm:leading-9 lg:text-2xl lg:leading-10">
@@ -401,9 +415,12 @@ function Play() {
                                     </h1>
                                     <h1 className="text-xs lg:text-base ml-2 sm:ml-0">
                                       {similarMovie.release_date ||
-                                        (similarMovie.first_air_date &&
-                                          similarMovie.release_date) ||
-                                        similarMovie.first_air_date}
+                                      similarMovie.first_air_date
+                                        ? formatDate(
+                                            similarMovie.release_date ||
+                                              similarMovie.first_air_date
+                                          )
+                                        : ""}
                                     </h1>
                                   </div>
                                   <h1 className="hidden sm:grid py-1 px-2 border-2 border-gray-800 rounded-md ml-2">

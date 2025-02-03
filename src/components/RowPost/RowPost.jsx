@@ -71,6 +71,16 @@ function RowPost(props) {
     showinfo: 0,
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
   const handleMoviePopup = (movieInfo) => {
     if (shouldPop) {
       setMoviePopupInfo(movieInfo);
@@ -265,9 +275,7 @@ function RowPost(props) {
                       </h1>
 
                       <h1 className="text-white text-xs font-semibold ml-4 w-11/12">
-                        {obj.release_date ||
-                          (obj.first_air_date && obj.release_date) ||
-                          obj.first_air_date}
+                        {formatDate(obj.release_date || obj.first_air_date)}
                       </h1>
 
                       <div className="ml-4">
@@ -409,7 +417,7 @@ function RowPost(props) {
                           {moviePopupInfo.title || moviePopupInfo.name}
                         </h3>
                         <h1 className="text-green-700 font-bold mt-2">
-                          {moviePopupInfo.release_date}
+                          {formatDate(moviePopupInfo.release_date)}
                         </h1>
                       </div>
                     </Fade>
@@ -439,8 +447,10 @@ function RowPost(props) {
                           <h1 className="flex text-neutral-400 text-sm leading-relaxed">
                             Released on :{"  "}
                             <p className="text-white ml-2 font-medium">
-                              {moviePopupInfo.release_date ||
-                                moviePopupInfo.first_air_date}
+                              {formatDate(
+                                moviePopupInfo.release_date ||
+                                  moviePopupInfo.first_air_date
+                              )}
                             </p>
                           </h1>
                           <h1 className="flex text-neutral-400 text-sm leading-relaxed">

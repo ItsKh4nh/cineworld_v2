@@ -59,6 +59,16 @@ function Banner(props) {
       });
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
   return (
     <>
       <div
@@ -90,7 +100,7 @@ function Banner(props) {
               <div className="ml-2 hidden sm:flex justify-center sm:justify-start">
                 {movie.release_date || movie.first_air_date ? (
                   <h1 className="flex text-white text-base font-bold drop-shadow-lg">
-                    {movie.release_date || movie.first_air_date}
+                    {formatDate(movie.release_date || movie.first_air_date)}
                   </h1>
                 ) : null}
               </div>
