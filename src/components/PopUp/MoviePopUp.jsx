@@ -142,9 +142,6 @@ function MoviePopUp(props) {
                       <h3 className="text-3xl font-semibold text-white">
                         {PopupInfo.title || PopupInfo.name}
                       </h3>
-                      <h1 className="text-green-700 font-bold mt-2">
-                        {formatDate(PopupInfo.release_date)}
-                      </h1>
                     </div>
                   </Fade>
                   {/*body*/}
