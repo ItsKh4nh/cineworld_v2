@@ -156,8 +156,8 @@ function RowPost(props) {
                       />
                     </>
                   )}
-                  <div className="content pt-16">
-                    <Fade direction="bottom" duration={300}>
+                  <Fade direction="bottom" duration={300}>
+                    <div className="content pt-16">
                       <div className="flex transition ml-3 ease-in-out delay-150">
                         <div
                           onClick={() => playMovie(obj)}
@@ -293,8 +293,8 @@ function RowPost(props) {
                             </span>
                           );
                         })}
-                    </Fade>
-                  </div>
+                    </div>
+                  </Fade>
                 </SwiperSlide>
               );
             })}
@@ -432,9 +432,9 @@ function RowPost(props) {
                       </div>
                     </Fade>
                     {/*footer*/}
-                    <div className="sm:flex items-center justify-end p-2 rounded-b">
-                      {/*More Info*/}
-                      <Fade bottom>
+                    <Fade bottom>
+                      <div className="sm:flex items-center justify-end p-2 rounded-b">
+                        {/*More Info*/}
                         <div className="relative p-2 py-5 sm:p-6 flex-auto">
                           <h1 className="flex -mt-4 text-neutral-400 text-sm leading-relaxed">
                             Rating :
@@ -473,53 +473,53 @@ function RowPost(props) {
                               })}
                           </h1>
                         </div>
-                      </Fade>
-
-                      <div className="flex justify-between p-2">
-                        <button
-                          className="group flex items-center justify-center border-[0.7px] border-white text-white font-medium sm:font-bold text-xs px-4 mr-4 sm:px-6 md:text-sm  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-                          type="button"
-                          onClick={() => addToMyList(moviePopupInfo)}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6 mr-1 text-white hover:text-red-700 group-hover:text-red-700 ease-linear transition-all duration-150"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          Add to MyList
-                        </button>
-
-                        <button
-                          className="flex items-center text-red-500 background-transparent font-medium sm:font-bold uppercase px-2 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                          type="button"
-                          onClick={() => setShowModal(false)}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-6 h-6 mr-1"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          Close
-                        </button>
                       </div>
+                    </Fade>
+
+                    <div className="flex justify-between p-2">
+                      <button
+                        className="group flex items-center justify-center border-[0.7px] border-white text-white font-medium sm:font-bold text-xs px-4 mr-4 sm:px-6 md:text-sm  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
+                        type="button"
+                        onClick={() => addToMyList(moviePopupInfo)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6 mr-1 text-white hover:text-red-700 group-hover:text-red-700 ease-linear transition-all duration-150"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Add to MyList
+                      </button>
+
+                      <button
+                        className="flex items-center text-red-500 background-transparent font-medium sm:font-bold uppercase px-2 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button"
+                        onClick={() => setShowModal(false)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6 mr-1"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Close
+                      </button>
                     </div>
                   </div>
                 </Fade>
