@@ -27,11 +27,6 @@ const createUserCollections = async (uid) => {
       { movies: EmptyArray },
       { merge: true }
     ),
-    setDoc(
-      doc(db, "LikedMovies", uid),
-      { movies: EmptyArray },
-      { merge: true }
-    ),
   ]);
 };
 
