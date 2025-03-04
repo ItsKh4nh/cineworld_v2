@@ -70,20 +70,6 @@ function Play() {
         }
       });
 
-    if (urlId === "") {
-      axios
-        .get(`/tv/${id}/videos?api_key=${API_KEY}&language=en-US`)
-        .then((response) => {
-          if (response.data.results.length !== 0) {
-            console.log(response.data.results[0], "This is using find ");
-            setUrlId(response.data.results[0]);
-            setMoreTrailerVideos(response.data.results);
-            console.log(moreTrailerVideos);
-          } else {
-            console.log("Array Empty");
-          }
-        });
-    }
     axios
       .get(`/movie/${id}?api_key=${API_KEY}&language=en-US`)
       .then((response) => {

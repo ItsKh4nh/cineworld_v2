@@ -2,7 +2,11 @@ import React from "react";
 import StarRatingsLib from "react-star-ratings";
 
 const StarRatings = ({ rating }) => {
+  // Add a default value of 0 if rating is undefined or null
+  const safeRating = rating || 0;
+
   const getStarColor = (rating) => {
+    // Use the safe rating value
     const normalizedRating = rating / 2;
     if (normalizedRating <= 1) return "#ff4545";
     if (normalizedRating <= 2) return "#ffa534";
@@ -13,8 +17,8 @@ const StarRatings = ({ rating }) => {
 
   return (
     <StarRatingsLib
-      rating={rating / 2}
-      starRatedColor={getStarColor(rating)}
+      rating={safeRating / 2}
+      starRatedColor={getStarColor(safeRating)}
       numberOfStars={5}
       name="rating"
       starDimension="1.1rem"

@@ -2,7 +2,6 @@ import { useContext, useEffect, lazy, Suspense } from "react";
 import "./App.css";
 
 const Home = lazy(() => import("./pages/Home"));
-const Series = lazy(() => import("./pages/Series"));
 const Search = lazy(() => import("./pages/Search"));
 const Profile = lazy(() => import("./pages/Profile"));
 const MyList = lazy(() => import("./pages/MyList"));
@@ -44,7 +43,6 @@ function App() {
           {User ? (
             <>
               <Route path="/home" element={<Home />} />
-              <Route path="/series" element={<Series />} />
               <Route path="/search" element={<Search />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/mylist" element={<MyList />} />

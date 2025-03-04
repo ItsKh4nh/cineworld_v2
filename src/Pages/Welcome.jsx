@@ -21,7 +21,7 @@ function Welcome() {
           <div className="max-w-5xl text-center mx-auto">
             <Fade duration={2000}>
               <h1 className="mb-3 text-xl font-semibold text-center text-white sm:text-3xl md:text-4xl lg:text-5xl">
-                Unlimited movies, TV shows and more.
+                Unlimited movies with excellent quality.
               </h1>
               <h1 className="mb-4 text-center text-stone-400 font-light sm:text-xl">
                 Find the right content that suits your needs right away.
@@ -157,8 +157,7 @@ function Welcome() {
               Watch everywhere
             </h2>
             <p className="text-lg md:text-xl">
-              Stream unlimited movies and TV Series on your phone, tablet,
-              laptop, and TV.
+              Stream unlimited movies on your phone, tablet, laptop, and TV.
             </p>
           </div>
 

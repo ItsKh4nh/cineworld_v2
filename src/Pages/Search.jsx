@@ -4,7 +4,7 @@ import axios from "../axios";
 import { API_KEY, imageURL2 } from "../config/constants";
 
 import MoviePopUp from "../components/PopUp/MoviePopUp";
-import { StarRatings } from "../components/StarRatings";
+import StarRatings from "../components/StarRatings";
 
 import { PopUpContext } from "../contexts/moviePopUpContext";
 
@@ -57,7 +57,7 @@ function Search() {
           onChange={Search}
           type="text"
           className="w-[60%] xl:w-1/4 bg-stone-700 text-white outline-none sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block p-2.5 placeholder:text-white"
-          placeholder="Search for Movie name"
+          placeholder="Search for any movie..."
           required=""
         ></input>
         <button
@@ -86,9 +86,12 @@ function Search() {
       <div className="grid-cols-2 grid p-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5 md:p-5 space-y-1 lg:space-y-0 lg:grid lg:gap-3 lg:grid-rows-3">
         {movies.length !== 0 ? (
           movies.map((movie) => {
-            const converted = convertGenre(movie.genre_ids);
+            // Add null check before converting genres
+            const converted = movie.genre_ids
+              ? convertGenre(movie.genre_ids)
+              : [];
             return (
-              <div className="p-1 mt-2 mb-5">
+              <div className="p-1 mt-2 mb-5" key={movie.id}>
                 <div className="hover:scale-105 hover:border-2 group relative block overflow-hidden rounded-sm transition-all duration-500">
                   <a
                     className="lightbox transition-all duration-500 group-hover:scale-105"
@@ -203,9 +206,12 @@ function Search() {
                     <br></br>
                     <div className="mt-1">
                       {converted &&
-                        converted.map((genre) => {
+                        converted.map((genre, index) => {
                           return (
-                            <span className="text-white mr-4 text-xs  2xl:text-sm font-thin">
+                            <span
+                              key={index}
+                              className="text-white mr-4 text-xs 2xl:text-sm font-thin"
+                            >
                               {genre}
                             </span>
                           );
