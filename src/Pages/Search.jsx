@@ -180,7 +180,7 @@ function Search() {
                     </a>
 
                     <br></br>
-                    <StarRatings rating={movie.vote_average} />
+                    <StarRatings rating={movie.vote_average} showDenominator={false} />
                     <br></br>
                     <div className="mt-1">
                       {converted &&

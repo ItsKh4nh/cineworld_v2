@@ -121,7 +121,7 @@ function MoviePopUp(props) {
                           Rating:
                           <div className="ml-2">
                             {PopupInfo.vote_average && (
-                              <StarRatings rating={PopupInfo.vote_average} />
+                              <StarRatings rating={PopupInfo.vote_average} showDenominator={true} />
                             )}
                           </div>
                         </h1>

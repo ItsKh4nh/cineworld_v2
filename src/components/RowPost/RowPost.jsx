@@ -397,6 +397,7 @@ function RowPost(props) {
                             <div className="ml-2">
                               <StarRatings
                                 rating={moviePopupInfo.vote_average}
+                                showDenominator={true}
                               />
                             </div>
                           </h1>
