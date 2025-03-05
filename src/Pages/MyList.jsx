@@ -1,8 +1,8 @@
 import React from "react";
-import UserMovieSection from "../components/UserMovieSection/UserMovieSection";
+import MyListTable from "../components/MyListTable/MyListTable";
 
 function MyList() {
-  return <UserMovieSection from="MyList"></UserMovieSection>;
+  return <MyListTable />;
 }
 
 export default MyList;

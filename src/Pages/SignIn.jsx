@@ -4,6 +4,7 @@ import { Fade } from "react-awesome-reveal";
 import { ClipLoader } from "react-spinners";
 import { AuthContext } from "../contexts/UserContext";
 import { emailSignIn, googleSignIn } from "../controllers/auth.controller";
+import ForgotPasswordModal from "../components/Modals/ForgotPasswordModal";
 
 function SignIn() {
   const { User, setUser } = useContext(AuthContext);
@@ -14,6 +15,7 @@ function SignIn() {
   const [ErrorMessage, setErrorMessage] = useState("");
   const [loader, setLoader] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +35,7 @@ function SignIn() {
     }
   };
 
-  const loginWithGoogle = async (e) => {
+  const signinWithGoogle = async (e) => {
     e.preventDefault();
     setLoader(true);
 
@@ -197,6 +199,15 @@ function SignIn() {
                         </label>
                       </div>
                     </div>
+                    <div className="text-sm">
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPasswordModal(true)}
+                        className="font-medium text-blue-400 hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
                   </div>
                   <button
                     type="submit"
@@ -209,7 +220,7 @@ function SignIn() {
                     {loader ? <ClipLoader color="#ff0000" /> : `Log in`}
                   </button>
                   <button
-                    onClick={loginWithGoogle}
+                    onClick={signinWithGoogle}
                     className={`flex justify-center items-center w-full text-white ${
                       loader
                         ? `bg-stone-700`
@@ -226,7 +237,7 @@ function SignIn() {
                     )}
                   </button>
                   <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                    Don’t have an account yet?{" "}
+                    Don't have an account yet?{" "}
                     <Link
                       className="font-medium text-white hover:underline dark:text-primary-500"
                       to={"/signup"}
@@ -240,6 +251,9 @@ function SignIn() {
           </Fade>
         </div>
       </div>
+      {showForgotPasswordModal && (
+        <ForgotPasswordModal onClose={() => setShowForgotPasswordModal(false)} />
+      )}
     </section>
   );
 }

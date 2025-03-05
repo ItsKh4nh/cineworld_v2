@@ -5,6 +5,7 @@ import {
   signInWithPopup,
   createUserWithEmailAndPassword,
   updateProfile,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import {
   setDoc,
@@ -180,18 +181,26 @@ export const validateUsername = async (username) => {
     };
   }
 
-  // Uniqueness check in Firebase
+  // Uniqueness check in Firebase - only perform if we have auth
   try {
-    const usersRef = collection(db, "Users");
-    const q = query(usersRef, where("username", "==", trimmedUsername));
-    const querySnapshot = await getDocs(q);
+    const auth = getAuth();
+    // Only check for uniqueness if we're in an authenticated context
+    // During signup, we'll skip this check and verify during account creation
+    if (auth.currentUser) {
+      const usersRef = collection(db, "Users");
+      const q = query(usersRef, where("username", "==", trimmedUsername));
+      const querySnapshot = await getDocs(q);
 
-    if (!querySnapshot.empty) {
-      return { isValid: false, error: "Username is already taken" };
+      if (!querySnapshot.empty) {
+        return { isValid: false, error: "Username is already taken" };
+      }
     }
   } catch (error) {
     console.error("Firebase username check error:", error);
-    return { isValid: false, error: "Error checking username availability" };
+    // Don't fail validation during signup - we'll check during account creation
+    if (getAuth().currentUser) {
+      return { isValid: false, error: "Error checking username availability" };
+    }
   }
 
   return { isValid: true, error: null };
@@ -252,14 +261,6 @@ export const validatePassword = (password) => {
     return { isValid: false, error: "Password cannot contain spaces" };
   }
 
-  // Length validation
-  if (password.length < 6 || password.length > 20) {
-    return {
-      isValid: false,
-      error: "Password must be between 6 and 20 characters",
-    };
-  }
-
   // Check for non-English characters
   const nonEnglishRegex = /[^\x00-\x7F]+/;
   if (nonEnglishRegex.test(password)) {
@@ -290,29 +291,10 @@ export const validateConfirmPassword = (password, confirmPassword) => {
 // Email/Password Sign Up
 export const emailSignUp = async (email, password, username) => {
   const auth = getAuth();
+  const trimmedUsername = username.trim();
 
   try {
-    // Check username availability in Firestore
-    const usersRef = collection(db, "Users");
-    const usernameQuery = query(
-      usersRef,
-      where("username", "==", username.trim())
-    );
-    const usernameSnapshot = await getDocs(usernameQuery);
-
-    if (!usernameSnapshot.empty) {
-      return { user: null, error: "Username is already taken" };
-    }
-
-    // Check email existence in both Firebase Auth and Firestore
-    const emailQuery = query(usersRef, where("email", "==", email));
-    const emailSnapshot = await getDocs(emailQuery);
-
-    if (!emailSnapshot.empty) {
-      return { user: null, error: "Email is already registered" };
-    }
-
-    // If both checks pass, create the user
+    // Create the user first
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -320,34 +302,92 @@ export const emailSignUp = async (email, password, username) => {
     );
     const user = userCredential.user;
 
-    const trimmedUsername = username.trim();
+    try {
+      // Now that we're authenticated, check if username is already taken
+      const usersRef = collection(db, "Users");
+      const usernameQuery = query(
+        usersRef,
+        where("username", "==", trimmedUsername)
+      );
+      const usernameSnapshot = await getDocs(usernameQuery);
 
-    // Update Auth profile first and wait for it to complete
-    await updateProfile(user, {
-      displayName: trimmedUsername,
-    });
+      if (!usernameSnapshot.empty) {
+        // Username is taken, delete the user and return error
+        await user.delete();
+        return { user: null, error: "Username is already taken" };
+      }
 
-    // Then update Firestore
-    await createUserProfile(user.uid, {
-      email,
-      username: trimmedUsername,
-      displayName: trimmedUsername,
-    });
-    await createUserCollections(user.uid);
+      // Update Auth profile
+      await updateProfile(user, {
+        displayName: trimmedUsername,
+      });
 
-    // Return the updated user object
-    return {
-      user: {
-        ...user,
-        displayName: trimmedUsername, // Ensure displayName is included
-      },
-      error: null,
-    };
+      // Then update Firestore
+      await createUserProfile(user.uid, {
+        email,
+        username: trimmedUsername,
+        displayName: trimmedUsername,
+      });
+      await createUserCollections(user.uid);
+
+      // Return the updated user object
+      return {
+        user: {
+          ...user,
+          displayName: trimmedUsername, // Ensure displayName is included
+        },
+        error: null,
+      };
+    } catch (error) {
+      // If there's an error checking username or updating profile, delete the user
+      console.error("Error during post-signup process:", error);
+      await user.delete();
+      return {
+        user: null,
+        error: "An error occurred during account creation. Please try again.",
+      };
+    }
   } catch (error) {
-    // Handle Firebase specific errors
+    console.error("Firebase signup error:", error);
+
+    // Handle specific Firebase Auth errors
     if (error.code === "auth/email-already-in-use") {
       return { user: null, error: "Email is already registered" };
+    } else if (error.code === "auth/invalid-email") {
+      return { user: null, error: "Invalid email format" };
+    } else if (error.code === "auth/weak-password") {
+      return { user: null, error: "Password is too weak" };
     }
+
     return { user: null, error: error.message };
+  }
+};
+
+// Password Reset
+export const resetPassword = async (email) => {
+  // Validate email
+  const emailValidation = validateSignInEmail(email);
+  if (!emailValidation.isValid) {
+    return { success: false, error: emailValidation.error };
+  }
+
+  const auth = getAuth();
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return { success: true, error: null };
+  } catch (error) {
+    console.error("Password reset error:", error);
+    
+    // Handle specific Firebase Auth errors
+    if (error.code === "auth/user-not-found") {
+      // For security reasons, don't reveal if the email exists or not
+      return { success: true, error: null };
+    } else if (error.code === "auth/invalid-email") {
+      return { success: false, error: "Invalid email format" };
+    } else if (error.code === "auth/too-many-requests") {
+      return { success: false, error: "Too many requests. Please try again later." };
+    }
+    
+    return { success: false, error: "Failed to send password reset email. Please try again." };
   }
 };

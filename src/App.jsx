@@ -14,10 +14,9 @@ const History = lazy(() => import("./pages/History"));
 const Statistics = lazy(() => import("./pages/Statistics"));
 
 import { Routes, Route } from "react-router-dom";
-
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-
 import { AuthContext } from "./contexts/UserContext";
+import { RatingModalProvider } from "./contexts/RatingModalContext";
 
 import Loading from "./components/Loading/Loading";
 import Navbar from "./components/Header/Navbar";
@@ -34,30 +33,32 @@ function App() {
   }, []);
 
   return (
-    <div>
-      {User ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
-      <Suspense replace fallback={<Loading />}>
-        <Routes>
-          <Route index path="/" element={User ? <Home /> : <Welcome />} />
-          {User ? (
-            <>
-              <Route path="/home" element={<Home />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/mylist" element={<MyList />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/play/:id" element={<Play />} />
-              <Route path="/statistics" element={<Statistics />} />
-            </>
-          ) : null}
-          <Route path="/play/:id" element={<Play />} />
+    <RatingModalProvider>
+      <div>
+        {User ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
+        <Suspense replace fallback={<Loading />}>
+          <Routes>
+            <Route index path="/" element={User ? <Home /> : <Welcome />} />
+            {User ? (
+              <>
+                <Route path="/home" element={<Home />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/mylist" element={<MyList />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/play/:id" element={<Play />} />
+                <Route path="/statistics" element={<Statistics />} />
+              </>
+            ) : null}
+            <Route path="/play/:id" element={<Play />} />
 
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="*" element={<ErrorPage />} />
-        </Routes>
-      </Suspense>
-    </div>
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="*" element={<ErrorPage />} />
+          </Routes>
+        </Suspense>
+      </div>
+    </RatingModalProvider>
   );
 }
 

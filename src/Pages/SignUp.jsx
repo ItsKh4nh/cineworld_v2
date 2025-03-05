@@ -8,7 +8,6 @@ import {
   validateEmail,
   validatePassword,
   validateConfirmPassword,
-  validateUsername,
 } from "../controllers/auth.controller";
 
 function SignUp() {
@@ -42,10 +41,50 @@ function SignUp() {
     const username = e.target.value;
     setUsername(username);
 
-    const validation = await validateUsername(username);
+    // Only perform basic validation without checking Firebase
+    // We'll check username uniqueness during account creation
+    if (!username || username.trim().length === 0) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        username: "Username is required",
+      }));
+      return;
+    }
+
+    const trimmedUsername = username.trim();
+
+    // Leading/trailing spaces check
+    if (username !== trimmedUsername) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        username: "Username cannot start or end with spaces",
+      }));
+      return;
+    }
+
+    // Length validation (6-20 characters)
+    if (trimmedUsername.length < 6 || trimmedUsername.length > 20) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        username: "Username must be between 6 and 20 characters",
+      }));
+      return;
+    }
+
+    // Character restriction check (only alphanumeric and underscore)
+    const validUsernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!validUsernameRegex.test(trimmedUsername)) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        username: "Username can only contain letters, numbers, and underscores",
+      }));
+      return;
+    }
+
+    // Clear any previous errors if validation passes
     setFieldErrors((prev) => ({
       ...prev,
-      username: validation.error || "",
+      username: "",
     }));
   };
 
@@ -92,6 +131,49 @@ function SignUp() {
       password: "",
       confirmPassword: "",
     });
+
+    // Validate username
+    if (!username || username.trim().length === 0) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        username: "Username is required",
+      }));
+      setLoader(false);
+      return;
+    }
+
+    const trimmedUsername = username.trim();
+
+    // Leading/trailing spaces check
+    if (username !== trimmedUsername) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        username: "Username cannot start or end with spaces",
+      }));
+      setLoader(false);
+      return;
+    }
+
+    // Length validation (6-20 characters)
+    if (trimmedUsername.length < 6 || trimmedUsername.length > 20) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        username: "Username must be between 6 and 20 characters",
+      }));
+      setLoader(false);
+      return;
+    }
+
+    // Character restriction check (only alphanumeric and underscore)
+    const validUsernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!validUsernameRegex.test(trimmedUsername)) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        username: "Username can only contain letters, numbers, and underscores",
+      }));
+      setLoader(false);
+      return;
+    }
 
     // Validate password first
     const passwordValidation = validatePassword(password);
