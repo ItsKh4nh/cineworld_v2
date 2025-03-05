@@ -23,16 +23,6 @@ import {
 
 function Home() {
   const { User } = useContext(AuthContext);
-  const [watchedMovies, setWatchedMovies] = useState([]);
-
-  useEffect(() => {
-    getDoc(doc(db, "WatchedMovies", User.uid)).then((result) => {
-      if (result.exists()) {
-        const mv = result.data();
-        setWatchedMovies(mv.movies);
-      }
-    });
-  }, []);
 
   return (
     <div>
@@ -40,13 +30,6 @@ function Home() {
       <div className="w-[99%] ml-1">
         <RowPost first title="Trending" url={trending} key={trending}></RowPost>
         <RowPost title="Animated" url={Animated} key={Animated}></RowPost>
-        {watchedMovies.length != 0 ? (
-          <RowPost
-            title="Watched Movies"
-            movieData={watchedMovies}
-            key={"Watched Movies"}
-          ></RowPost>
-        ) : null}
         <RowPost
           title="Cineworld Originals"
           islarge

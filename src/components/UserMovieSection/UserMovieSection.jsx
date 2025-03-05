@@ -14,15 +14,12 @@ import StarRatings from "../StarRatings";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
-import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
 
 function UserMovieSection(props) {
   const { User } = useContext(AuthContext);
   const { showModal, setShowModal } = useContext(PopUpContext);
 
   const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
-  const { removeFromWatchedMovies, removePopupMessage } =
-    useUpdateWatchedMovies();
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
 
@@ -56,8 +53,6 @@ function UserMovieSection(props) {
     event.stopPropagation();
     if (props.from === "MyList") {
       removeFromMyList(movie);
-    } else if (props.from === "WatchedMovies") {
-      removeFromWatchedMovies(movie);
     }
     getMovies();
   };
@@ -128,8 +123,7 @@ function UserMovieSection(props) {
                         </div>
 
                         {/* Add to MyList or remove from MyList Button */}
-                        {props.from === "MyList" ||
-                        props.from === "WatchedMovies" ? (
+                        {props.from === "MyList" ? (
                           <>
                             <div
                               onClick={(e) => removeMovie(movie, e)}
@@ -204,11 +198,6 @@ function UserMovieSection(props) {
 
                       <br></br>
                       <StarRatings rating={movie.vote_average} showDenominator={false} />
-                      {props.from === "WatchedMovies" && movie.userRating?.dateAdded && (
-                        <div className="text-white text-xs 2xl:text-sm font-thin mb-1">
-                          Watched on: {new Date(movie.userRating.dateAdded).toLocaleDateString()}
-                        </div>
-                      )}
                       <br></br>
                       <div className="mt-1">
                         {converted &&

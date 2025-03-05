@@ -10,7 +10,6 @@ import Footer from "../components/Footer/Footer";
 
 import usePlayMovie from "../hooks/usePlayMovie";
 import useUpdateMyList from "../hooks/useUpdateMyList";
-import useUpdateWatchedMovies from "../hooks/useUpdateWatchedMovies";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -20,13 +19,10 @@ function Play() {
   const [urlId, setUrlId] = useState("");
   const [movieDetails, setMovieDetails] = useState({});
   const [isFromMyList, setIsFromMyList] = useState(false);
-  const [isFromWatchedMovies, setIsFromWatchedMovies] = useState(false);
   const [moreTrailerVideos, setMoreTrailerVideos] = useState([]);
   const [similarMovies, setSimilarMovies] = useState([]);
 
   const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
-  const { removeFromWatchedMovies, removePopupMessage } =
-    useUpdateWatchedMovies();
   const { playMovie } = usePlayMovie();
 
   const { id } = useParams();
@@ -46,9 +42,6 @@ function Play() {
   useEffect(() => {
     if (location.state?.From === "MyList") {
       setIsFromMyList(true);
-    }
-    if (location.state?.From === "WatchedMovies") {
-      setIsFromWatchedMovies(true);
     }
 
     axios

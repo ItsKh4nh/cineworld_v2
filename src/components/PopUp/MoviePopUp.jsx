@@ -8,13 +8,10 @@ import { PopUpContext } from "../../contexts/moviePopUpContext";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
-import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
 
 function MoviePopUp(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);
   const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
-  const { removeFromWatchedMovies, removePopupMessage } =
-    useUpdateWatchedMovies();
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
 

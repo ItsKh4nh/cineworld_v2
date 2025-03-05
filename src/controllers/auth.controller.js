@@ -23,11 +23,6 @@ const createUserCollections = async (uid) => {
   const EmptyArray = [];
   await Promise.all([
     setDoc(doc(db, "MyList", uid), { movies: EmptyArray }, { merge: true }),
-    setDoc(
-      doc(db, "WatchedMovies", uid),
-      { movies: EmptyArray },
-      { merge: true }
-    ),
   ]);
 };
 

@@ -8,7 +8,6 @@ import { API_KEY, imageURL, imageURL2 } from "../../config/constants";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
-import useUpdateWatchedMovies from "../../hooks/useUpdateWatchedMovies";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -22,8 +21,6 @@ import StarRatings from "../StarRatings";
 function RowPost(props) {
   const { addToMyList, PopupMessage } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
-  const { removeFromWatchedMovies, removePopupMessage } =
-    useUpdateWatchedMovies();
   const { convertGenre } = useGenresConverter();
 
   const [movies, setMovies] = useState([]);
@@ -102,7 +99,6 @@ function RowPost(props) {
       style={{ marginTop: `${props.first ? "-8rem" : ""}` }}
     >
       {PopupMessage}
-      {removePopupMessage}
 
       {movies[0] ? (
         <>
@@ -181,7 +177,6 @@ function RowPost(props) {
                         {props.movieData != null ? (
                           <>
                             <div
-                              onClick={() => removeFromWatchedMovies(obj)}
                               onMouseEnter={() => setshouldPop(false)}
                               onMouseLeave={() => setshouldPop(true)}
                               className="text-white w-9 h-9 border-[2px] rounded-full p-2 mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
