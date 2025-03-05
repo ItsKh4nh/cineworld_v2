@@ -23,6 +23,19 @@ function useUpdateMyList() {
     openRatingModal(movie, User);
   };
 
+  const addRatedMovieToList = (ratedMovie) => {
+    updateDoc(doc(db, "MyList", User.uid), { movies: arrayUnion(ratedMovie) })
+      .then(() => {
+        console.log("Rated movie added to MyList");
+        notify();
+      })
+      .catch((error) => {
+        console.log(error.code);
+        console.log(error.message);
+        alertError(error.message);
+      });
+  };
+
   const removeFromMyList = (movie) => {
     updateDoc(doc(db, "MyList", User.uid), { movies: arrayRemove(movie) })
       .then(() => {
@@ -72,6 +85,7 @@ function useUpdateMyList() {
 
   return { 
     addToMyList, 
+    addRatedMovieToList,
     removeFromMyList, 
     updateMovieNote,
     PopupMessage

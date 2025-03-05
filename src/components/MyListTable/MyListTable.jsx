@@ -18,6 +18,10 @@ function MyListTable() {
   const [editingNote, setEditingNote] = useState(null);
   const [noteText, setNoteText] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: 'dateAdded', direction: 'desc' });
+  const [editingRating, setEditingRating] = useState(null);
+
+  // Get a reference to the updateDoc function from Firebase
+  const { addRatedMovieToList } = useUpdateMyList();
 
   useEffect(() => {
     getMovies();
@@ -52,7 +56,31 @@ function MyListTable() {
         // Handle nested properties for userRating
         if (sortConfig.key.includes('.')) {
           const [parent, child] = sortConfig.key.split('.');
-          if (!a[parent] || !b[parent]) return 0;
+          
+          // Handle the case where one or both movies don't have the parent property
+          if (!a[parent] && !b[parent]) return 0;
+          if (!a[parent]) return sortConfig.direction === 'asc' ? -1 : 1;
+          if (!b[parent]) return sortConfig.direction === 'asc' ? 1 : -1;
+          
+          // Handle the case where one or both movies don't have the child property
+          // This is especially important for score which might be undefined for 'Plan to Watch' movies
+          if (child === 'score') {
+            const scoreA = a[parent][child] !== undefined ? a[parent][child] : -1;
+            const scoreB = b[parent][child] !== undefined ? b[parent][child] : -1;
+            
+            if (scoreA < scoreB) {
+              return sortConfig.direction === 'asc' ? -1 : 1;
+            }
+            if (scoreA > scoreB) {
+              return sortConfig.direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+          }
+          
+          // For other properties
+          if (a[parent][child] === undefined && b[parent][child] === undefined) return 0;
+          if (a[parent][child] === undefined) return sortConfig.direction === 'asc' ? -1 : 1;
+          if (b[parent][child] === undefined) return sortConfig.direction === 'asc' ? 1 : -1;
           
           if (a[parent][child] < b[parent][child]) {
             return sortConfig.direction === 'asc' ? -1 : 1;
@@ -109,6 +137,25 @@ function MyListTable() {
     return sortConfig.direction === 'asc' ? '↑' : '↓';
   };
 
+  const handleEditRating = (movie) => {
+    setEditingRating(movie);
+  };
+
+  const handleSaveRating = (updatedMovie) => {
+    // First remove the old movie
+    removeFromMyList(editingRating);
+    
+    // Then add the updated movie
+    setTimeout(() => {
+      // Add the updated movie to the list
+      addRatedMovieToList(updatedMovie);
+      
+      // Refresh the list and close the modal
+      setEditingRating(null);
+      getMovies();
+    }, 500);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -120,8 +167,6 @@ function MyListTable() {
   return (
     <div className="container mx-auto px-4 py-8">
       {PopupMessage}
-      
-      <h1 className="text-3xl font-bold text-white mb-6">My List</h1>
       
       {myMovies.length === 0 ? (
         <div className="text-center py-10">
@@ -183,12 +228,18 @@ function MyListTable() {
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                      ${movie.userRating?.score >= 7 ? 'bg-green-800 text-green-100' : 
-                        movie.userRating?.score >= 4 ? 'bg-yellow-800 text-yellow-100' : 
-                        'bg-red-800 text-red-100'}`}>
-                      {movie.userRating?.score || "N/A"}
-                    </span>
+                    {movie.userRating?.score ? (
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        ${movie.userRating.score >= 7 ? 'bg-green-800 text-green-100' : 
+                          movie.userRating.score >= 4 ? 'bg-yellow-800 text-yellow-100' : 
+                          'bg-red-800 text-red-100'}`}>
+                        {movie.userRating.score}
+                      </span>
+                    ) : (
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-700 text-gray-300">
+                        N/A
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
                     {movie.userRating?.status || "N/A"}
@@ -245,6 +296,15 @@ function MyListTable() {
                       </svg>
                     </button>
                     <button
+                      onClick={() => handleEditRating(movie)}
+                      className="text-yellow-400 hover:text-yellow-300 mr-3"
+                      title="Edit Rating"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </button>
+                    <button
                       onClick={() => handleRemoveMovie(movie)}
                       className="text-red-400 hover:text-red-300"
                       title="Remove"
@@ -259,6 +319,14 @@ function MyListTable() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {editingRating && (
+        <RatingModal
+          movie={editingRating}
+          onClose={() => setEditingRating(null)}
+          onSave={handleSaveRating}
+        />
       )}
     </div>
   );
