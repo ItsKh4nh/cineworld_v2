@@ -10,7 +10,6 @@ const SignUp = lazy(() => import("./pages/SignUp"));
 const Welcome = lazy(() => import("./pages/Welcome"));
 const ErrorPage = lazy(() => import("./pages/ErrorPage"));
 const Play = lazy(() => import("./pages/Play"));
-const History = lazy(() => import("./pages/History"));
 
 import { Routes, Route } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -44,7 +43,6 @@ function App() {
                 <Route path="/search" element={<Search />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/mylist" element={<MyList />} />
-                <Route path="/history" element={<History />} />
                 <Route path="/play/:id" element={<Play />} />
               </>
             ) : null}
