@@ -19,6 +19,7 @@ import { RatingModalProvider } from "./contexts/RatingModalContext";
 import Loading from "./components/Loading/Loading";
 import Navbar from "./components/Header/Navbar";
 import NavbarWithoutUser from "./components/Header/NavbarWithoutUser";
+import MoviePopUp from "./components/PopUp/MoviePopUp";
 
 function App() {
   const { User, setUser } = useContext(AuthContext);
@@ -53,6 +54,7 @@ function App() {
             <Route path="*" element={<ErrorPage />} />
           </Routes>
         </Suspense>
+        <MoviePopUp />
       </div>
     </RatingModalProvider>
   );

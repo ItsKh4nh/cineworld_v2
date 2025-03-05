@@ -8,6 +8,7 @@ import { API_KEY, imageURL, imageURL2 } from "../../config/constants";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
+import useMoviePopup from "../../hooks/useMoviePopup";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -22,12 +23,12 @@ function RowPost(props) {
   const { addToMyList, PopupMessage } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
+  const { handleMoviePopup, formatDate } = useMoviePopup();
 
   const [movies, setMovies] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [moviePopupInfo, setMoviePopupInfo] = useState({});
-  const [shouldPop, setshouldPop] = useState(true);
-  const [urlId, setUrlId] = useState("");
+  const [shouldPop, setShouldPop] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     if (props.movieData != null) {
@@ -64,33 +65,6 @@ function RowPost(props) {
     rel: 0,
     autohide: 1,
     showinfo: 0,
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  const handleMoviePopup = (movieInfo) => {
-    if (shouldPop) {
-      setMoviePopupInfo(movieInfo);
-      setShowModal(true);
-      axios
-        .get(`/movie/${movieInfo.id}/videos?api_key=${API_KEY}&language=en-US`)
-        .then((response) => {
-          console.log(response.data);
-          if (response.data.results.length !== 0) {
-            setUrlId(response.data.results[0]);
-          } else {
-            console.log("Array Empty");
-          }
-        });
-    }
   };
 
   return (
@@ -155,8 +129,8 @@ function RowPost(props) {
                       <div className="flex transition ml-3 ease-in-out delay-150">
                         <div
                           onClick={() => playMovie(obj)}
-                          onMouseEnter={() => setshouldPop(false)}
-                          onMouseLeave={() => setshouldPop(true)}
+                          onMouseEnter={() => setShouldPop(false)}
+                          onMouseLeave={() => setShouldPop(true)}
                           className="text-white w-9 h-9 border-[2px] rounded-full p-2 mr-1 backdrop-blur-[2px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
                         >
                           <svg
@@ -177,8 +151,8 @@ function RowPost(props) {
                         {props.movieData != null ? (
                           <>
                             <div
-                              onMouseEnter={() => setshouldPop(false)}
-                              onMouseLeave={() => setshouldPop(true)}
+                              onMouseEnter={() => setShouldPop(false)}
+                              onMouseLeave={() => setShouldPop(true)}
                               className="text-white w-9 h-9 border-[2px] rounded-full p-2 mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
                             >
                               <svg
@@ -200,8 +174,8 @@ function RowPost(props) {
                           <>
                             <div
                               onClick={() => addToMyList(obj)}
-                              onMouseEnter={() => setshouldPop(false)}
-                              onMouseLeave={() => setshouldPop(true)}
+                              onMouseEnter={() => setShouldPop(false)}
+                              onMouseLeave={() => setShouldPop(true)}
                               className="text-white w-9 h-9 border-[2px] rounded-full p-2 mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
                             >
                               <svg
@@ -280,207 +254,6 @@ function RowPost(props) {
           </div>
         </>
       )}
-
-      <>
-        {/* Movie Pop Up section */}
-        {showModal && (
-          <>
-            <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-              <div className="relative w-auto mt-24 sm:my-6 mx-4 max-w-3xl">
-                {/*content*/}
-                <Fade direction="bottom" duration={500}>
-                  <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-neutral-800 outline-none focus:outline-none">
-                    {/*header*/}
-                    <button
-                      className="group p-1 ml-2 mt-2 backdrop-blur-[20px] bg-transparent border-2 border-white hover:bg-white hover:text-black fixed right-4 rounded-full cursor-pointer float-right font-semibold outline-none focus:outline-none ease-linear transition-all duration-150"
-                      onClick={() => setShowModal(false)}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="text-white w-6 h-6 group-hover:text-black ease-linear transition-all duration-150"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                    {/*Movie Trailer or Image*/}
-                    {urlId ? (
-                      <YouTube
-                        opts={opts}
-                        videoId={urlId.key}
-                        className="YouTubeVid"
-                      />
-                    ) : (
-                      <img src={`${imageURL + moviePopupInfo.backdrop_path}`} />
-                    )}
-
-                    <div className="flex ml-4 items-center -mt-14">
-                      <button
-                        className="flex items-center justify-center bg-red-800 text-white active:bg-red-800 font-medium sm:font-bold uppercase text-xs px-4 sm:px-6 md:text-sm  py-2 rounded shadow hover:shadow-lg cursor-pointer outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"
-                        type="button"
-                        onClick={() => {
-                          playMovie(moviePopupInfo);
-                        }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6 mr-1 text-white hover:text-gray-300 ease-linear transition-all duration-150"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Play
-                      </button>
-                      <div
-                        onClick={() => {
-                          addToMyList(moviePopupInfo);
-                        }}
-                        className="group text-white w-10 h-10 border-[2px] rounded-full p-2 mr-3  backdrop-blur-[1px] hover:bg-white hover:text-black shadow-md cursor-pointer ease-linear transition-all duration-150 "
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 4.5v15m7.5-7.5h-15"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-
-                    <Fade bottom>
-                      <div className="p-5 py-4 -mb-6 mt-2 sm:mb-0 sm:mt-0 sm:py-2 sm:pt-6 rounded-t">
-                        <h3 className="text-3xl font-semibold text-white">
-                          {moviePopupInfo.title || moviePopupInfo.name}
-                        </h3>
-                      </div>
-                    </Fade>
-                    {/*body*/}
-                    <Fade bottom>
-                      <div className="relative p-4 sm:p-6 flex-auto">
-                        <div className="bg-neutral-700 h-[0.15rem]"></div>
-                        <p className="my-4 sm:my-7 text-neutral-400 text-xs md:text-lg leading-relaxed line-clamp-4 sm:line-clamp-none">
-                          {moviePopupInfo.overview}
-                        </p>
-                        <div className="bg-neutral-700 h-[0.15rem]"></div>
-                      </div>
-                    </Fade>
-                    {/*footer*/}
-                    <Fade bottom>
-                      <div className="sm:flex items-center justify-end p-2 rounded-b">
-                        {/*More Info*/}
-                        <div className="relative p-2 py-5 sm:p-6 flex-auto">
-                          <h1 className="flex -mt-4 text-neutral-400 text-sm leading-relaxed">
-                            Rating:
-                            <div className="ml-2">
-                              <StarRatings
-                                rating={moviePopupInfo.vote_average}
-                                showDenominator={true}
-                              />
-                            </div>
-                          </h1>
-                          <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                            Released on:{"  "}
-                            <p className="text-white ml-2 font-medium">
-                              {formatDate(
-                                moviePopupInfo.release_date ||
-                                  moviePopupInfo.first_air_date
-                              )}
-                            </p>
-                          </h1>
-                          <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                            Language:
-                            <p className="text-white ml-2 font-medium">
-                              {moviePopupInfo.original_language}
-                            </p>
-                          </h1>
-
-                          <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                            Genre:
-                            {convertGenre(moviePopupInfo.genre_ids)
-                              .slice(0, 2)
-                              .map((genre) => {
-                                return (
-                                  <span className="text-white ml-2 font-medium">
-                                    {genre}
-                                  </span>
-                                );
-                              })}
-                          </h1>
-                        </div>
-                      </div>
-                    </Fade>
-
-                    <div className="flex justify-between p-2">
-                      <button
-                        className="group flex items-center justify-center border-[0.7px] border-white text-white font-medium sm:font-bold text-xs px-4 mr-4 sm:px-6 md:text-sm  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-                        type="button"
-                        onClick={() => addToMyList(moviePopupInfo)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6 mr-1 text-white hover:text-red-700 group-hover:text-red-700 ease-linear transition-all duration-150"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        Add to MyList
-                      </button>
-
-                      <button
-                        className="flex items-center text-red-500 background-transparent font-medium sm:font-bold uppercase px-2 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                        type="button"
-                        onClick={() => setShowModal(false)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6 mr-1"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        Close
-                      </button>
-                    </div>
-                  </div>
-                </Fade>
-              </div>
-            </div>
-            <div className="opacity-40 fixed inset-0 z-40 bg-black"></div>
-          </>
-        )}
-      </>
     </div>
   );
 }

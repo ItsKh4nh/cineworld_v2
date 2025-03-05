@@ -8,25 +8,25 @@ import { API_KEY, imageURL2 } from "../../config/constants";
 import { db } from "../../firebase/FirebaseConfig";
 import { AuthContext } from "../../contexts/UserContext";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
-import MoviePopUp from "../PopUp/MoviePopUp";
 import StarRatings from "../StarRatings";
 
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
+import useMoviePopup from "../../hooks/useMoviePopup";
 
 function UserMovieSection(props) {
   const { User } = useContext(AuthContext);
-  const { showModal, setShowModal } = useContext(PopUpContext);
+  const { showModal } = useContext(PopUpContext);
 
   const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
+  const { handleMoviePopup } = useMoviePopup();
 
   const [myMovies, setMyMovies] = useState([]);
-  const [moviePopupInfo, setMoviePopupInfo] = useState({});
-  const [title, setTitle] = useState("");
   const [isResultEmpty, setIsResultEmpty] = useState(false);
+  const [title, setTitle] = useState("");
 
   const navigate = useNavigate();
 
@@ -55,11 +55,6 @@ function UserMovieSection(props) {
       removeFromMyList(movie);
     }
     getMovies();
-  };
-
-  const handleMoviePopup = (movieInfo) => {
-    setMoviePopupInfo(movieInfo);
-    setShowModal(true);
   };
 
   return (
@@ -258,9 +253,6 @@ function UserMovieSection(props) {
           </>
         )}
       </div>
-      {showModal ? (
-        <MoviePopUp data1={moviePopupInfo} from={props.from} />
-      ) : null}
     </div>
   );
 }

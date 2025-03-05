@@ -3,7 +3,6 @@ import React, { useContext, useState } from "react";
 import axios from "../axios";
 import { API_KEY, imageURL2 } from "../config/constants";
 
-import MoviePopUp from "../components/PopUp/MoviePopUp";
 import StarRatings from "../components/StarRatings";
 
 import { PopUpContext } from "../contexts/moviePopUpContext";
@@ -11,16 +10,17 @@ import { PopUpContext } from "../contexts/moviePopUpContext";
 import useGenresConverter from "../hooks/useGenresConverter";
 import usePlayMovie from "../hooks/usePlayMovie";
 import useUpdateMyList from "../hooks/useUpdateMyList";
+import useMoviePopup from "../hooks/useMoviePopup";
 
 function Search() {
-  const { showModal, setShowModal } = useContext(PopUpContext);
+  const { showModal } = useContext(PopUpContext);
   const { addToMyList, PopupMessage } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
+  const { handleMoviePopup } = useMoviePopup();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState([]);
-  const [moviePopupInfo, setMoviePopupInfo] = useState({});
 
   const Search = (e) => {
     setSearchQuery(e.target.value);
@@ -39,11 +39,6 @@ function Search() {
     if (searchQuery === "") {
       setMovies([]);
     }
-  };
-
-  const handleMoviePopup = (movieInfo) => {
-    setMoviePopupInfo(movieInfo);
-    setShowModal(true);
   };
 
   return (
@@ -188,8 +183,6 @@ function Search() {
           </>
         )}
       </div>
-
-      {showModal ? <MoviePopUp data1={moviePopupInfo} /> : null}
     </div>
   );
 }

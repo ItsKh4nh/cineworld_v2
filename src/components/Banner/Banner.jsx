@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Fade } from "react-awesome-reveal";
 import StarRatings from "../StarRatings";
+import { useNavigate } from "react-router-dom";
 
 import axios from "../../axios";
 import { API_KEY, imageURL } from "../../config/constants";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
-import MoviePopUp from "../PopUp/MoviePopUp";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useGenresConverter from "../../hooks/useGenresConverter";
+import useUpdateMyList from "../../hooks/useUpdateMyList";
+import useMoviePopup from "../../hooks/useMoviePopup";
 
 function Banner(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
+  const { addToMyList, PopupMessage } = useUpdateMyList();
+  const { handleMoviePopup, formatDate } = useMoviePopup();
 
   const [movie, setMovie] = useState([]);
   const [moviePopupInfo, setMoviePopupInfo] = useState({});
@@ -44,32 +48,6 @@ function Banner(props) {
     window.addEventListener("resize", handleWindowResize);
     return () => window.removeEventListener("resize", handleWindowResize); // Cleanup
   }, [props.url]); // Added dependency array
-
-  const handleMoviePopup = (movieInfo) => {
-    setMoviePopupInfo(movieInfo);
-    setShowModal(true);
-
-    axios
-      .get(`/movie/${movieInfo.id}/videos?api_key=${API_KEY}&language=en-US`)
-      .then((response) => {
-        console.log(response.data);
-        if (response.data.results.length !== 0) {
-          setUrlId(response.data.results[0]);
-        } else {
-          console.log("Array Empty");
-        }
-      });
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
 
   return (
     <>
@@ -241,8 +219,6 @@ function Banner(props) {
           className="h-80 mt-auto"
         ></div>
       </div>
-
-      {showModal ? <MoviePopUp data1={moviePopupInfo} data2={urlId} /> : null}
     </>
   );
 }
