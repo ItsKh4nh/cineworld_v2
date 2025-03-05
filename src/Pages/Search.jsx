@@ -133,26 +133,6 @@ function Search() {
                         </svg>
                       </div>
 
-                      {/* Add to MyList Button */}
-                      <div
-                        onClick={() => addToMyList(movie)}
-                        className="text-white w-10 h-10 2xl:w-14 2xl:h-14 border-[2px] 2xl:border-[3px] rounded-full p-2 mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:border-red-600 hover:text-red-600"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 4.5v15m7.5-7.5h-15"
-                          />
-                        </svg>
-                      </div>
-
                       {/* PopUp Button */}
                       <div
                         onClick={() => handleMoviePopup(movie)}

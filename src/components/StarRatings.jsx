@@ -17,17 +17,24 @@ const StarRatings = ({ rating, size = "normal", showDenominator = false }) => {
 
   const starColor = getStarColor(safeRating);
   
-  // Determine size classes based on the size prop
-  let starSizeClass = "w-5 h-5";
-  let textSizeClass = "text-sm";
+  // Define size configurations
+  const sizeConfig = {
+    normal: {
+      star: "w-5 h-5",
+      text: "text-sm"
+    },
+    large: {
+      star: "w-7 h-7",
+      text: "text-base"
+    },
+    "extra-large": {
+      star: "w-9 h-9",
+      text: "text-xl font-bold"
+    }
+  };
   
-  if (size === "large") {
-    starSizeClass = "w-6 h-6";
-    textSizeClass = "text-base";
-  } else if (size === "extra-large") {
-    starSizeClass = "w-7 h-7";
-    textSizeClass = "text-lg";
-  }
+  // Get the appropriate size configuration
+  const { star: starSizeClass, text: textSizeClass } = sizeConfig[size] || sizeConfig.normal;
 
   return (
     <div className="flex items-center">
@@ -35,7 +42,8 @@ const StarRatings = ({ rating, size = "normal", showDenominator = false }) => {
         xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 24 24" 
         fill={starColor} 
-        className={`${starSizeClass} mr-1`}
+        className={`${starSizeClass} mr-1.5`}
+        aria-hidden="true"
       >
         <path 
           fillRule="evenodd" 

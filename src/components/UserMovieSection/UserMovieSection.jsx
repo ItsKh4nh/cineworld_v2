@@ -204,6 +204,11 @@ function UserMovieSection(props) {
 
                       <br></br>
                       <StarRatings rating={movie.vote_average} showDenominator={false} />
+                      {props.from === "WatchedMovies" && movie.userRating?.dateAdded && (
+                        <div className="text-white text-xs 2xl:text-sm font-thin mb-1">
+                          Watched on: {new Date(movie.userRating.dateAdded).toLocaleDateString()}
+                        </div>
+                      )}
                       <br></br>
                       <div className="mt-1">
                         {converted &&

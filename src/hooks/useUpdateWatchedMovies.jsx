@@ -15,8 +15,14 @@ function useUpdateWatchedMovies() {
     toast.error(message);
   }
   const addToWatchedMovies = (movie) => {
+    // Add dateAdded property if it doesn't exist
+    const movieWithDate = {
+      ...movie,
+      dateAdded: movie.dateAdded || new Date().toISOString()
+    };
+    
     updateDoc(doc(db, "WatchedMovies", User.uid), {
-      movies: arrayUnion(movie),
+      movies: arrayUnion(movieWithDate),
     });
   };
 

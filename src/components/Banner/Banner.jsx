@@ -7,10 +7,12 @@ import { API_KEY, imageURL } from "../../config/constants";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
 import MoviePopUp from "../PopUp/MoviePopUp";
 import usePlayMovie from "../../hooks/usePlayMovie";
+import useGenresConverter from "../../hooks/useGenresConverter";
 
 function Banner(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);
   const { playMovie } = usePlayMovie();
+  const { convertGenre } = useGenresConverter();
 
   const [movie, setMovie] = useState([]);
   const [moviePopupInfo, setMoviePopupInfo] = useState({});
@@ -82,32 +84,48 @@ function Banner(props) {
         <div className="ml-2 mr-2 sm:mr-0 sm:ml-12 mt-[75%] sm:mt-52">
           <Fade direction="bottom">
             {movie.title || movie.name ? (
-              <h1 className="text-white text-3xl font-semibold text-center mb-5 py-2 sm:text-left sm:text-5xl sm:border-l-8 pl-4 border-red-700 md:text-6xl lg:w-2/3 xl:w-1/2 sm:font-bold drop-shadow-lg">
-                {movie.title || movie.name}
-              </h1>
+              <div className="flex flex-wrap items-center mb-5">
+              <div className="flex items-center">
+                <h1 className="text-white text-3xl font-semibold text-center py-2 sm:text-left sm:text-5xl sm:border-l-8 pl-4 border-red-700 md:text-6xl sm:font-bold drop-shadow-lg">
+                  {movie.title || movie.name}
+                </h1>
+              </div>
+            </div>
             ) : (
               <div className="grid justify-center sm:justify-start">
                 <div className="animate-pulse w-72 ml-4 sm:ml-0 sm:w-96 py-5 mb-7 xl:py-7 xl:w-45rem bg-neutral-900 rounded-md"></div>
               </div>
             )}
 
-            <div className="flex">
-              <div className="hidden sm:flex justify-center sm:justify-start ml-2">
-                {movie.vote_average ? (
-                  <StarRatings rating={movie.vote_average} />
-                ) : null}
+            <div className="flex flex-col space-y-3 mb-4">
+              <div className="flex items-center">
+                <div className="flex justify-center sm:justify-start">
+                  {movie.vote_average ? (
+                    <StarRatings rating={movie.vote_average} size="extra-large" showDenominator={false} />
+                  ) : null}
+                </div>
+                <div className="flex justify-center sm:justify-start ml-6">
+                  {movie.release_date || movie.first_air_date ? (
+                    <h1 className="flex text-white text-xl font-bold drop-shadow-lg">
+                      {formatDate(movie.release_date || movie.first_air_date)}
+                    </h1>
+                  ) : null}
+                </div>
               </div>
-              <div className="ml-2 hidden sm:flex justify-center sm:justify-start">
-                {movie.release_date || movie.first_air_date ? (
-                  <h1 className="flex text-white text-base font-bold drop-shadow-lg">
-                    {formatDate(movie.release_date || movie.first_air_date)}
-                  </h1>
-                ) : null}
-              </div>
-              {movie.id && (
-                <h1 className="hidden sm:flex text-white px-2 bg-[#1e1e1e89] border-2 border-stone-600 rounded ml-2">
-                  HD
-                </h1>
+              
+              {movie.genre_ids && movie.genre_ids.length > 0 && (
+                <div className="flex items-center">
+                  <div className="flex text-white text-lg">
+                    {convertGenre(movie.genre_ids).map((genre, index, array) => (
+                      <React.Fragment key={index}>
+                        <span className="font-medium">{genre}</span>
+                        {index < array.length - 1 && (
+                          <span className="mx-2 text-gray-400">•</span>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
 
