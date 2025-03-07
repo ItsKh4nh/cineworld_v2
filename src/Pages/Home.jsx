@@ -9,16 +9,10 @@ import Footer from "../components/Footer/Footer";
 import RowPost from "../components/RowPost/RowPost";
 
 import {
-  Adventure,
-  Animated,
-  comedy,
-  horror,
-  originals,
-  SciFi,
-  trending,
-  trendingSeries,
-  UpcomingMovies,
-  War,
+  Trending,
+  Popular,
+  TopRated,
+  NowPlaying,
 } from "../config/URLs";
 
 function Home() {
@@ -26,27 +20,20 @@ function Home() {
 
   return (
     <div>
-      <Banner url={trending}></Banner>
+      <Banner url={Trending}></Banner>
       <div className="w-[99%] ml-1">
-        <RowPost first title="Trending" url={trending} key={trending}></RowPost>
-        <RowPost title="Animated" url={Animated} key={Animated}></RowPost>
+        <RowPost first title="Trending" islarge url={Trending} key={Trending}></RowPost>
+        <RowPost title="Popular" url={Popular} key={Popular}></RowPost>
         <RowPost
-          title="Cineworld Originals"
-          islarge
-          url={originals}
-          key={originals}
+          title="Top Rated of All Time"
+          url={TopRated}
+          key={TopRated}
         ></RowPost>
         <RowPost
-          title="Trending Series"
-          url={trendingSeries}
-          key={trendingSeries}
+          title="Now Playing"
+          url={NowPlaying}
+          key={NowPlaying}
         ></RowPost>
-        <RowPost title="Science Fiction" url={SciFi}></RowPost>
-        <RowPost title="Upcoming Movies" url={UpcomingMovies}></RowPost>
-        <RowPost title="Comedy" url={comedy}></RowPost>
-        <RowPost title="Adventure" url={Adventure}></RowPost>
-        <RowPost title="Horror" url={horror}></RowPost>
-        <RowPost title="War" url={War}></RowPost>
       </div>
       <Footer></Footer>
     </div>
