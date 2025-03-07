@@ -1,7 +1,8 @@
 import React, { useContext, useState } from "react";
 
 import axios from "../axios";
-import { API_KEY, imageURL2 } from "../config/constants";
+import { searchMovie } from "../config/URLs";
+import { imageURL2 } from "../config/constants";
 
 import StarRatings from "../components/StarRatings";
 
@@ -28,9 +29,7 @@ function Search() {
     console.log(searchQuery);
 
     axios
-      .get(
-        `/search/movie?api_key=${API_KEY}&language=en-US&query=${searchQuery}&page=1&include_adult=false`
-      )
+      .get(searchMovie(searchQuery))
       .then((response) => {
         console.log(response.data.results);
         setMovies(response.data.results);

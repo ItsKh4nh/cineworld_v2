@@ -15,6 +15,7 @@ import { Routes, Route } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { AuthContext } from "./contexts/UserContext";
 import { RatingModalProvider } from "./contexts/RatingModalContext";
+import { UserPreferencesProvider } from "./contexts/UserPreferencesContext";
 
 import Loading from "./components/Loading/Loading";
 import Navbar from "./components/Header/Navbar";
@@ -33,29 +34,31 @@ function App() {
 
   return (
     <RatingModalProvider>
-      <div>
-        {User ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
-        <Suspense replace fallback={<Loading />}>
-          <Routes>
-            <Route index path="/" element={User ? <Home /> : <Welcome />} />
-            {User ? (
-              <>
-                <Route path="/home" element={<Home />} />
-                <Route path="/search" element={<Search />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/mylist" element={<MyList />} />
-                <Route path="/play/:id" element={<Play />} />
-              </>
-            ) : null}
-            <Route path="/play/:id" element={<Play />} />
+      <UserPreferencesProvider>
+        <div>
+          {User ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
+          <Suspense replace fallback={<Loading />}>
+            <Routes>
+              <Route index path="/" element={User ? <Home /> : <Welcome />} />
+              {User ? (
+                <>
+                  <Route path="/home" element={<Home />} />
+                  <Route path="/search" element={<Search />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/mylist" element={<MyList />} />
+                  <Route path="/play/:id" element={<Play />} />
+                </>
+              ) : null}
+              <Route path="/play/:id" element={<Play />} />
 
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="*" element={<ErrorPage />} />
-          </Routes>
-        </Suspense>
-        <MoviePopUp />
-      </div>
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="*" element={<ErrorPage />} />
+            </Routes>
+          </Suspense>
+          <MoviePopUp />
+        </div>
+      </UserPreferencesProvider>
     </RatingModalProvider>
   );
 }

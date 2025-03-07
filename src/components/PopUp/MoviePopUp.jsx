@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Fade } from "react-awesome-reveal";
 import StarRatings from "../StarRatings";
 import YouTube from "react-youtube";
@@ -26,6 +26,19 @@ function MoviePopUp() {
     },
   };
 
+  // Add body overflow control when modal is open
+  useEffect(() => {
+    if (showModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showModal]);
+
   // Check if we have a movie to display
   if (!movieInfo || Object.keys(movieInfo).length === 0) {
     return null;
@@ -37,169 +50,114 @@ function MoviePopUp() {
     <>
       {PopupMessage}
       {showModal && (
-        <>
-          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-            <div className="relative w-auto mt-24 sm:my-6 mx-4 max-w-3xl">
-              {/*content*/}
-              <Fade direction="up" duration={500}>
-                <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-neutral-800 outline-none focus:outline-none">
-                  {/*header*/}
-                  {/*Movie Trailer or Image*/}
-                  {trailerUrl ? (
-                    <div className="relative pt-[56.25%] w-full">
-                      <YouTube
-                        videoId={trailerUrl}
-                        opts={opts}
-                        className="absolute top-0 left-0 w-full h-full"
-                      />
-                    </div>
-                  ) : movieInfo.backdrop_path ? (
-                    <img 
-                      src={`${imageURL + movieInfo.backdrop_path}`}
-                      alt={movieInfo.title || movieInfo.name}
-                      className="w-full rounded-t-lg"
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-70"
+            onClick={() => setShowModal(false)}
+          ></div>
+          
+          <div className="relative z-50 w-full max-w-3xl mx-4 my-8 rounded-lg overflow-hidden">
+            <Fade direction="up" duration={500}>
+              <div className="bg-neutral-800 rounded-lg shadow-xl">
+                {/* Movie Trailer or Image */}
+                {trailerUrl ? (
+                  <div className="relative pt-[56.25%] w-full">
+                    <YouTube
+                      videoId={trailerUrl}
+                      opts={opts}
+                      className="absolute top-0 left-0 w-full h-full"
                     />
-                  ) : null}
-
-                  <div className="flex ml-4 items-center -mt-14">
-                    <button
-                      className="flex items-center justify-center bg-red-800 text-white active:bg-red-800 font-medium sm:font-bold uppercase text-xs px-4 sm:px-6 md:text-sm py-2 rounded shadow hover:shadow-lg cursor-pointer outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"
-                      type="button"
-                      onClick={() => {
-                        setShowModal(false);
-                        playMovie(movieInfo);
-                      }}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 mr-1 text-white hover:text-gray-300 ease-linear transition-all duration-150"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Play
-                    </button>
                   </div>
+                ) : movieInfo.backdrop_path ? (
+                  <img 
+                    src={`${imageURL + movieInfo.backdrop_path}`}
+                    alt={movieInfo.title || movieInfo.name}
+                    className="w-full rounded-t-lg"
+                  />
+                ) : null}
 
-                  <Fade bottom>
-                    <div className="p-5 py-4 -mb-6 mt-2 sm:mb-0 sm:mt-0 sm:py-0 sm:pt-6 rounded-t">
-                      <h3 className="text-3xl font-semibold text-white">
-                        {movieInfo.title || movieInfo.name}
-                      </h3>
-                    </div>
-                  </Fade>
-                  {/*body*/}
-                  <Fade bottom>
-                    <div className="relative p-4 sm:p-6 flex-auto">
-                      <div className="bg-neutral-700 h-[0.125rem]"></div>
-                      <p className="my-4 sm:my-5 text-neutral-400 text-xs md:text-base leading-relaxed line-clamp-3 sm:line-clamp-4">
-                        {movieInfo.overview}
-                      </p>
-                      <div className="bg-neutral-700 h-[0.125rem]"></div>
-                    </div>
-                  </Fade>
-                  {/*footer*/}
-                  <Fade bottom>
-                    <div className="sm:flex items-center justify-end p-2 rounded-b">
-                      {/*More Info*/}
-                      <div className="relative p-2 py-5 sm:p-6 flex-auto">
-                        <h1 className="flex -mt-4 text-neutral-400 text-sm leading-relaxed">
-                          Rating:
-                          <div className="ml-2">
-                            {movieInfo.vote_average && (
-                              <StarRatings rating={movieInfo.vote_average} showDenominator={true} />
-                            )}
-                          </div>
-                        </h1>
-                        <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                          Released on:{"  "}
-                          <p className="text-white ml-2 font-medium">
-                            {formatDate(
-                              movieInfo.release_date || movieInfo.first_air_date
-                            )}
-                          </p>
-                        </h1>
-                        <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                          Language:
-                          <p className="text-white ml-2 font-medium">
-                            {movieInfo.original_language}
-                          </p>
-                        </h1>
+                {/* Play button */}
+                <div className="flex ml-4 items-center -mt-14 relative z-10">
+                  <button
+                    className="flex items-center justify-center bg-red-700 hover:bg-red-800 text-white font-medium sm:font-bold uppercase text-xs px-4 sm:px-6 md:text-sm py-2 rounded shadow hover:shadow-lg cursor-pointer transition-all duration-200"
+                    type="button"
+                    onClick={() => {
+                      setShowModal(false);
+                      playMovie(movieInfo);
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6 mr-1"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Play
+                  </button>
+                </div>
 
-                        <h1 className="flex text-neutral-400 text-sm leading-relaxed">
-                          Genre:
-                          {movieInfo.genre_ids &&
-                            convertGenre(movieInfo.genre_ids).map((genre, index) => {
-                              return (
-                                <span key={index} className="text-white ml-2 font-medium">
-                                  {genre}
-                                </span>
-                              );
-                            })}
-                        </h1>
-                      </div>
-
-                      <div className="flex justify-between p-2">
-                        {isInMyList ? (
-                          <button
-                            className="group flex items-center justify-center border-[0.7px] border-white text-white font-medium sm:font-bold text-xs px-4 mr-4 sm:px-6 md:text-sm py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-                            type="button"
-                            onClick={() => {
-                              removeFromMyList(movieInfo);
-                              setShowModal(false);
-                            }}
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="h-6 w-6 mr-1 text-white hover:text-red-700 group-hover:text-red-700 ease-linear transition-all duration-150"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            Remove from MyList
-                          </button>
-                        ) : (
-                          <button
-                            className="group flex items-center justify-center border-[0.7px] border-white text-white font-medium sm:font-bold text-xs px-4 mr-4 sm:px-6 md:text-sm py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-                            type="button"
-                            onClick={() => {
-                              addToMyList(movieInfo);
-                              setShowModal(false);
-                            }}
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="h-6 w-6 mr-1 text-white hover:text-red-700 group-hover:text-red-700 ease-linear transition-all duration-150"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            Add to MyList
-                          </button>
+                {/* Movie title */}
+                <div className="p-5 pt-6">
+                  <h3 className="text-2xl sm:text-3xl font-semibold text-white mb-2">
+                    {movieInfo.title || movieInfo.name}
+                  </h3>
+                  
+                  <div className="h-[1px] bg-neutral-700 my-3"></div>
+                  
+                  {/* Movie overview */}
+                  <p className="text-neutral-300 text-sm md:text-base leading-relaxed mb-4">
+                    {movieInfo.overview}
+                  </p>
+                  
+                  <div className="h-[1px] bg-neutral-700 my-3"></div>
+                  
+                  {/* Movie details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <div className="flex items-center text-neutral-400 text-sm mb-2">
+                        <span className="mr-2">Rating:</span>
+                        {movieInfo.vote_average && (
+                          <StarRatings rating={movieInfo.vote_average} showDenominator={true} />
                         )}
+                      </div>
+                      
+                      <div className="text-neutral-400 text-sm mb-2">
+                        <span>Released on: </span>
+                        <span className="text-white font-medium">
+                          {formatDate(movieInfo.release_date || movieInfo.first_air_date)}
+                        </span>
+                      </div>
+                      
+                      <div className="text-neutral-400 text-sm mb-2">
+                        <span>Language: </span>
+                        <span className="text-white font-medium">
+                          {movieInfo.original_language?.toUpperCase()}
+                        </span>
+                      </div>
+                      
+                      <div className="text-neutral-400 text-sm mb-2">
+                        <span>Genre: </span>
+                        <span className="text-white font-medium">
+                          {movieInfo.genre_ids && convertGenre(movieInfo.genre_ids).join(', ')}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Action buttons */}
+                    <div className="flex flex-col sm:flex-row sm:justify-end gap-3 mt-4 sm:mt-0">
+                      {isInMyList ? (
                         <button
-                          className="group flex items-center justify-center bg-red-700 border-[0.7px] border-red-700 text-white font-medium sm:font-bold text-xs px-4 sm:px-6 md:text-sm py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-                          type="button"
-                          onClick={() => setShowModal(false)}
+                          className="flex items-center justify-center border border-white text-white font-medium py-2 px-4 rounded hover:bg-white hover:text-red-700 transition-all duration-200"
+                          onClick={() => {
+                            removeFromMyList(movieInfo);
+                            setShowModal(false);
+                          }}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -207,25 +165,69 @@ function MoviePopUp() {
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-6 h-6 mr-1 text-white group-hover:text-red-700"
+                            className="w-5 h-5 mr-2"
                           >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
-                              d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
                             />
                           </svg>
-                          Close
+                          Remove
                         </button>
-                      </div>
+                      ) : (
+                        <button
+                          className="flex items-center justify-center border border-white text-white font-medium py-2 px-4 rounded hover:bg-white hover:text-red-700 transition-all duration-200"
+                          onClick={() => {
+                            addToMyList(movieInfo);
+                            setShowModal(false);
+                          }}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5 mr-2"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          Add to List
+                        </button>
+                      )}
+                      
+                      <button
+                        className="flex items-center justify-center bg-red-700 text-white font-medium py-2 px-4 rounded hover:bg-red-800 transition-all duration-200"
+                        onClick={() => setShowModal(false)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-5 h-5 mr-2"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Close
+                      </button>
                     </div>
-                  </Fade>
+                  </div>
                 </div>
-              </Fade>
-            </div>
+              </div>
+            </Fade>
           </div>
-          <div className="opacity-40 fixed inset-0 z-40 bg-black"></div>
-        </>
+        </div>
       )}
     </>
   );

@@ -1,8 +1,35 @@
 import { API_KEY } from "./constants";
 
-// export const Recommendations = '';
+// Base endpoints
 export const Trending = `trending/movie/week?api_key=${API_KEY}&language=en-US`;
-// export const GenreList = `discover/movie?api_key=${API_KEY}&with_genres={genre_id}`;
 export const Popular = `movie/popular?api_key=${API_KEY}&language=en-US`;
 export const TopRated = `movie/top_rated?api_key=${API_KEY}&language=en-US`;
 export const NowPlaying = `movie/now_playing?api_key=${API_KEY}&language=en-US`;
+
+// Keep the original string template for backward compatibility
+export const GenreList = `discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&vote_count.gte=1000&with_genres={genre_id}`;
+export const PeopleList = `discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&vote_count.gte=1000&with_people={people_id}`;
+
+// Add function versions with different names
+export const getGenreList = (genreId) => 
+  `discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&vote_count.gte=1000&with_genres=${genreId}`;
+export const getPeopleList = (peopleId) => 
+  `discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&vote_count.gte=1000&with_people=${peopleId}`;
+
+// Search endpoints
+export const searchMovie = (query) => 
+  `search/movie?api_key=${API_KEY}&language=en-US&query=${query}&page=1&include_adult=false`;
+export const searchPerson = (query) => 
+  `search/person?api_key=${API_KEY}&language=en-US&query=${query}&page=1&include_adult=false`;
+
+// Movie details endpoints
+export const movieDetails = (movieId) => 
+  `movie/${movieId}?api_key=${API_KEY}&language=en-US`;
+export const movieVideos = (movieId) => 
+  `movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`;
+export const movieRecommendations = (movieId) => 
+  `movie/${movieId}/recommendations?api_key=${API_KEY}&language=en-US&page=1`;
+
+// Discovery endpoints
+export const discoverByPeople = (peopleIds) => 
+  `discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&include_adult=false&include_video=false&page=1&with_people=${peopleIds}&vote_count.gte=100`;

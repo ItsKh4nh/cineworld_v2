@@ -3,7 +3,8 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import StarRatings from "../components/StarRatings";
 
 import axios from "../axios";
-import { API_KEY, imageURL, imageURL2 } from "../config/constants";
+import { movieVideos, movieDetails as getMovieDetails, movieRecommendations } from "../config/URLs";
+import { imageURL, imageURL2 } from "../config/constants";
 
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
@@ -45,7 +46,7 @@ function Play() {
     }
 
     axios
-      .get(`/movie/${id}/videos?api_key=${API_KEY}&language=en-US`)
+      .get(movieVideos(id))
       .then((response) => {
         console.log(response.data, "This is the data");
         if (response.data.results.length !== 0) {
@@ -57,16 +58,14 @@ function Play() {
       });
 
     axios
-      .get(`/movie/${id}?api_key=${API_KEY}&language=en-US`)
+      .get(getMovieDetails(id))
       .then((response) => {
         console.log(response.data, "Movie details");
         setMovieDetails(response.data);
         console.log(response.data.genres[0]);
 
         axios
-          .get(
-            `movie/${id}/recommendations?api_key=${API_KEY}&language=en-US&page=1`
-          )
+          .get(movieRecommendations(id))
           .then((res) => {
             console.log(
               res.data.results.slice(0, 8),
