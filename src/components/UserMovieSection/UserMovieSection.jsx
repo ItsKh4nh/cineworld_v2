@@ -14,10 +14,12 @@ import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
 import useMoviePopup from "../../hooks/useMoviePopup";
+import { RatingModalContext } from "../../contexts/RatingModalContext";
 
 function UserMovieSection(props) {
   const { User } = useContext(AuthContext);
   const { showModal } = useContext(PopUpContext);
+  const { openRatingModal } = useContext(RatingModalContext) || {};
 
   const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
@@ -124,9 +126,9 @@ function UserMovieSection(props) {
                             <div
                               onClick={(e) => {
                                 e.stopPropagation();
-                                // This would be replaced with an edit function in the future
-                                // For now, we'll keep the removeFromMyList function as a placeholder
-                                removeFromMyList(movie);
+                                if (openRatingModal) {
+                                  openRatingModal(movie, User);
+                                }
                               }}
                               className="bg-cineworldYellow text-white w-10 h-10 2xl:w-14 2xl:h-14 rounded-full flex items-center justify-center mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:bg-white hover:text-cineworldYellow"
                             >

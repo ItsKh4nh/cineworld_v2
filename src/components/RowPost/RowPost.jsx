@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 
 import { Fade } from "react-awesome-reveal";
 import YouTube from "react-youtube";
 import axios from "../../axios";
 import { API_KEY, imageURL, imageURL2 } from "../../config/constants";
+import { AuthContext } from "../../contexts/UserContext";
 
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
 import useMoviePopup from "../../hooks/useMoviePopup";
+import { RatingModalContext } from "../../contexts/RatingModalContext";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -20,10 +22,12 @@ import "./RowPostStyles.scss";
 import StarRatings from "../StarRatings";
 
 function RowPost(props) {
+  const { User } = useContext(AuthContext);
   const { addToMyList, PopupMessage } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
   const { handleMoviePopup, formatDate, myListMovies } = useMoviePopup();
+  const { openRatingModal } = useContext(RatingModalContext) || {};
 
   const [movies, setMovies] = useState([]);
   const [shouldPop, setShouldPop] = useState(true);
@@ -181,9 +185,9 @@ function RowPost(props) {
                               <div
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  // This would be replaced with an edit function in the future
-                                  // For now, we'll keep the addToMyList function as a placeholder
-                                  addToMyList({...obj, isInMyList});
+                                  if (openRatingModal) {
+                                    openRatingModal(obj, User);
+                                  }
                                 }}
                                 onMouseEnter={() => setShouldPop(false)}
                                 onMouseLeave={() => setShouldPop(true)}

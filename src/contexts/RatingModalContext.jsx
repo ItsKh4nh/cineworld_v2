@@ -11,7 +11,6 @@ export const RatingModalProvider = ({ children }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [user, setUser] = useState(null);
-  const [isDuplicate, setIsDuplicate] = useState(false);
   const [userMovies, setUserMovies] = useState([]);
   const navigate = useNavigate();
 
@@ -31,17 +30,18 @@ export const RatingModalProvider = ({ children }) => {
           setUserMovies(data.movies || []);
           
           // Check if movie with same ID already exists in the list
-          const duplicate = data.movies?.some(m => 
-            m.id === movie.id
-          );
+          const existingMovie = data.movies?.find(m => m.id === movie.id);
           
-          setIsDuplicate(duplicate);
-        } else {
-          setIsDuplicate(false);
+          // If movie exists, update the selectedMovie with the existing data
+          if (existingMovie) {
+            setSelectedMovie({
+              ...movie,
+              userRating: existingMovie.userRating
+            });
+          }
         }
       } catch (error) {
-        console.error("Error checking for duplicate:", error);
-        setIsDuplicate(false);
+        console.error("Error checking for existing movie:", error);
       }
     }
     
@@ -51,7 +51,6 @@ export const RatingModalProvider = ({ children }) => {
   const closeRatingModal = () => {
     setShowModal(false);
     setSelectedMovie(null);
-    setIsDuplicate(false);
   };
   
   const goToMyList = () => {
@@ -93,7 +92,6 @@ export const RatingModalProvider = ({ children }) => {
           movie={selectedMovie}
           onClose={closeRatingModal}
           onSave={addRatedMovieToList}
-          isDuplicate={isDuplicate}
           onGoToMyList={goToMyList}
         />
       )}

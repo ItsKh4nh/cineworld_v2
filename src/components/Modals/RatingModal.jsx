@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { imageURL2 } from "../../config/constants";
 
-function RatingModal({ movie, onClose, onSave, isDuplicate, onGoToMyList }) {
+function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
   const [status, setStatus] = useState(movie.userRating?.status || "Plan to Watch");
   const [score, setScore] = useState(movie.userRating?.score || 5);
   const [note, setNote] = useState(movie.userRating?.note || "");
@@ -60,8 +60,7 @@ function RatingModal({ movie, onClose, onSave, isDuplicate, onGoToMyList }) {
       <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md mx-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-white">
-            {isDuplicate ? "Movie already in MyList" : 
-             isUpdating ? "Update Your Rating" : "Add to MyList"}
+            {isUpdating ? "Update Your Rating" : "Add to MyList"}
           </h2>
           <button
             onClick={onClose}
@@ -103,60 +102,54 @@ function RatingModal({ movie, onClose, onSave, isDuplicate, onGoToMyList }) {
           </div>
         </div>
 
-        {isDuplicate ? (
-          <div className="mb-4"></div>
-        ) : (
-          <>
-            <div className="mb-4">
-              <label className="block text-white text-sm font-medium mb-2">
-                Status
-              </label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="w-full bg-gray-800 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
-              >
-                {statusOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
+        <div className="mb-4">
+          <label className="block text-white text-sm font-medium mb-2">
+            Status
+          </label>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="w-full bg-gray-800 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
+          >
+            {statusOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
 
-            {shouldShowScore && (
-              <div className="mb-4">
-                <label className="block text-white text-sm font-medium mb-2">
-                  Your Score
-                </label>
-                <select
-                  value={score}
-                  onChange={(e) => setScore(Number(e.target.value))}
-                  className="w-full bg-gray-800 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
-                >
-                  {scoreOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div className="mb-4">
-              <label className="block text-white text-sm font-medium mb-2">
-                Notes (Optional)
-              </label>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                className="w-full bg-gray-800 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
-                rows="3"
-                placeholder="Add your thoughts about this movie..."
-              ></textarea>
-            </div>
-          </>
+        {shouldShowScore && (
+          <div className="mb-4">
+            <label className="block text-white text-sm font-medium mb-2">
+              Your Score
+            </label>
+            <select
+              value={score}
+              onChange={(e) => setScore(Number(e.target.value))}
+              className="w-full bg-gray-800 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
+            >
+              {scoreOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
+
+        <div className="mb-4">
+          <label className="block text-white text-sm font-medium mb-2">
+            Notes (Optional)
+          </label>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="w-full bg-gray-800 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
+            rows="3"
+            placeholder="Add your thoughts about this movie..."
+          ></textarea>
+        </div>
 
         <div className="flex justify-end">
           <button
@@ -166,21 +159,12 @@ function RatingModal({ movie, onClose, onSave, isDuplicate, onGoToMyList }) {
             Cancel
           </button>
           
-          {isDuplicate ? (
-            <button
-              onClick={onGoToMyList}
-              className="px-4 py-2 text-white bg-red-700 rounded hover:bg-red-600 transition-colors"
-            >
-              Go to MyList
-            </button>
-          ) : (
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 text-white bg-red-700 rounded hover:bg-red-600 transition-colors"
-            >
-              {isUpdating ? "Save" : "Add to MyList"}
-            </button>
-          )}
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 text-white bg-red-700 rounded hover:bg-red-600 transition-colors"
+          >
+            {isUpdating ? "Save" : "Add to MyList"}
+          </button>
         </div>
       </div>
     </div>

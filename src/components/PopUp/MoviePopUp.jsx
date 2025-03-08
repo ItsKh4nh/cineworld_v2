@@ -6,15 +6,19 @@ import YouTube from "react-youtube";
 import { imageURL } from "../../config/constants";
 import { API_KEY } from "../../config/constants";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
+import { AuthContext } from "../../contexts/UserContext";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
 import useMoviePopup from "../../hooks/useMoviePopup";
+import { RatingModalContext } from "../../contexts/RatingModalContext";
 import axios from "../../axios";
 
 function MoviePopUp() {
+  const { User } = useContext(AuthContext);
   const { showModal, setShowModal, movieInfo, trailerUrl } = useContext(PopUpContext);
   const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
+  const { openRatingModal } = useContext(RatingModalContext) || {};
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
   const { formatDate } = useMoviePopup();
@@ -205,9 +209,10 @@ function MoviePopUp() {
                         <button
                           className="flex items-center justify-center bg-cineworldYellow text-white font-medium py-2 px-4 rounded hover:bg-white hover:text-cineworldYellow transition-colors"
                           onClick={() => {
-                            // In a real implementation, this would open a rating/edit modal
-                            // For now, we'll keep the removeFromMyList function as a placeholder
-                            removeFromMyList(movieInfo);
+                            setShowModal(false);
+                            if (openRatingModal) {
+                              openRatingModal(movieInfo, User);
+                            }
                           }}
                         >
                           <svg
