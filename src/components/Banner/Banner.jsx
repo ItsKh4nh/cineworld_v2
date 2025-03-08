@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Fade } from "react-awesome-reveal";
 import StarRatings from "../StarRatings";
-import { useNavigate } from "react-router-dom";
 
 import axios from "../../axios";
-import { API_KEY, imageURL } from "../../config/constants";
+import { imageURL } from "../../config/constants";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useGenresConverter from "../../hooks/useGenresConverter";

@@ -10,7 +10,6 @@ import RowPost from "../components/RowPost/RowPost";
 
 import {
   Trending,
-  Popular,
   TopRated,
   NowPlaying,
   GenreList,
@@ -83,6 +82,11 @@ function Home() {
       <Banner url={Trending}></Banner>
       <div className="w-[99%] ml-1">
         <RowPost first title="Trending" islarge url={Trending} key={Trending}></RowPost>
+        <RowPost
+          title="Now Playing"
+          url={NowPlaying}
+          key={NowPlaying}
+        ></RowPost>
         
         {/* Display genre-specific rows based on user preferences */}
         {userGenres.map((genre) => (
@@ -102,20 +106,10 @@ function Home() {
           ></RowPost>
         )}
         
-        <RowPost 
-          title="Popular" 
-          url={`${Popular}`} 
-          key={Popular}
-        ></RowPost>
         <RowPost
           title="Top Rated of All Time"
           url={`${TopRated}`}
           key={TopRated}
-        ></RowPost>
-        <RowPost
-          title="Now Playing"
-          url={NowPlaying}
-          key={NowPlaying}
         ></RowPost>
       </div>
       <Footer></Footer>

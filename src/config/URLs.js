@@ -2,7 +2,6 @@ import { API_KEY } from "./constants";
 
 // Base endpoints
 export const Trending = `trending/movie/week?api_key=${API_KEY}&language=en-US`;
-export const Popular = `movie/popular?api_key=${API_KEY}&language=en-US`;
 export const TopRated = `movie/top_rated?api_key=${API_KEY}&language=en-US`;
 export const NowPlaying = `movie/now_playing?api_key=${API_KEY}&language=en-US`;
 
