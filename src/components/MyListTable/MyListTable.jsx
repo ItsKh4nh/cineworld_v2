@@ -1,19 +1,22 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { doc, getDoc, updateDoc, arrayRemove } from "firebase/firestore";
 import { db } from "../../firebase/FirebaseConfig";
 import { AuthContext } from "../../contexts/UserContext";
-import { imageURL2 } from "../../config/constants";
+import { imageURL2, genresList } from "../../config/constants";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useMoviePopup from "../../hooks/useMoviePopup";
 import RatingModal from "../Modals/RatingModal";
+import FilterModal from "../Modals/FilterModal";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-hot-toast";
 import useGenresConverter from "../../hooks/useGenresConverter";
+import axios from "../../axios";
+import { API_KEY } from "../../config/constants";
 
 function MyListTable() {
   const { User } = useContext(AuthContext);
-  const { removeFromMyList, updateMovieNote, PopupMessage } = useUpdateMyList();
+  const { removeFromMyList, updateMovieNote, PopupMessage, addRatedMovieToList, updateRatedMovie } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { handleMoviePopup } = useMoviePopup();
   const { convertGenre } = useGenresConverter();
@@ -28,9 +31,10 @@ function MyListTable() {
   const [activeTab, setActiveTab] = useState("movies");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [movieToRemove, setMovieToRemove] = useState(null);
-
-  // Get a reference to the updateDoc function from Firebase
-  const { addRatedMovieToList } = useUpdateMyList();
+  const [selectedGenres, setSelectedGenres] = useState([]);
+  const [availableGenres, setAvailableGenres] = useState([]);
+  const [allMovies, setAllMovies] = useState([]); // Store all movies for filtering
+  const [showFilterModal, setShowFilterModal] = useState(false);
 
   // Add states to track screen size
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -51,19 +55,60 @@ function MyListTable() {
     getMovies();
   }, []);
 
+  useEffect(() => {
+    if (myMovies.length > 0) {
+      // Extract all genre IDs from movies
+      const allGenreIds = myMovies.flatMap(movie => movie.genre_ids || []);
+      // Get unique genre IDs
+      const uniqueGenreIds = [...new Set(allGenreIds)];
+      // Map to genre names using the genresList from constants
+      const genres = uniqueGenreIds.map(id => {
+        const genre = genresList.find(g => g.id === id);
+        return genre ? { id, name: genre.name } : null;
+      }).filter(Boolean);
+      
+      setAvailableGenres(genres);
+    }
+  }, [myMovies]);
+
   function getMovies() {
     setLoading(true);
     getDoc(doc(db, "MyList", User.uid)).then((result) => {
       const data = result.data();
       if (data) {
         if (data.movies) {
-          setMyMovies(data.movies);
+          // Get runtime for each movie
+          const moviesWithRuntime = data.movies.map(async (movie) => {
+            try {
+              // Use the project's axios instance with baseURL already configured
+              const response = await axios.get(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=en-US`);
+              return {
+                ...movie,
+                runtime: response.data.runtime,
+                release_date_full: response.data.release_date
+              };
+            } catch (error) {
+              console.error("Error fetching movie details:", error);
+              return movie;
+            }
+          });
+          
+          // Wait for all promises to resolve
+          Promise.all(moviesWithRuntime).then(updatedMovies => {
+            setMyMovies(updatedMovies);
+            setAllMovies(updatedMovies); // Store all movies for filtering
+            setLoading(false);
+          });
+        } else {
+          setLoading(false);
         }
+        
         if (data.people) {
           setMyPeople(data.people || []);
         }
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     }).catch(error => {
       console.error("Error fetching data:", error);
       setLoading(false);
@@ -80,8 +125,39 @@ function MyListTable() {
 
   const sortedMovies = React.useMemo(() => {
     let sortableMovies = [...myMovies];
+    
+    // First apply genre filter if any genres are selected
+    if (selectedGenres.length > 0) {
+      sortableMovies = sortableMovies.filter(movie => {
+        // Check if movie has ALL of the selected genres (AND logic)
+        return movie.genre_ids && selectedGenres.every(genreId => 
+          movie.genre_ids.includes(genreId)
+        );
+      });
+    }
+    
     if (sortConfig.key) {
       sortableMovies.sort((a, b) => {
+        // Special handling for date fields
+        if (sortConfig.key === 'release_date_full' || sortConfig.key === 'release_date' || sortConfig.key === 'first_air_date') {
+          const dateA = a[sortConfig.key] ? new Date(a[sortConfig.key]) : new Date(0);
+          const dateB = b[sortConfig.key] ? new Date(b[sortConfig.key]) : new Date(0);
+          
+          return sortConfig.direction === 'asc' 
+            ? dateA - dateB 
+            : dateB - dateA;
+        }
+        
+        // Special handling for userRating.dateAdded
+        if (sortConfig.key === 'userRating.dateAdded') {
+          const dateA = a.userRating?.dateAdded ? new Date(a.userRating.dateAdded) : new Date(0);
+          const dateB = b.userRating?.dateAdded ? new Date(b.userRating.dateAdded) : new Date(0);
+          
+          return sortConfig.direction === 'asc' 
+            ? dateA - dateB 
+            : dateB - dateA;
+        }
+        
         // Handle nested properties for userRating
         if (sortConfig.key.includes('.')) {
           const [parent, child] = sortConfig.key.split('.');
@@ -92,7 +168,6 @@ function MyListTable() {
           if (!b[parent]) return sortConfig.direction === 'asc' ? 1 : -1;
           
           // Handle the case where one or both movies don't have the child property
-          // This is especially important for score which might be undefined for 'Plan to Watch' movies
           if (child === 'score') {
             const scoreA = a[parent][child] !== undefined ? a[parent][child] : -1;
             const scoreB = b[parent][child] !== undefined ? b[parent][child] : -1;
@@ -131,20 +206,24 @@ function MyListTable() {
       });
     }
     return sortableMovies;
-  }, [myMovies, sortConfig]);
+  }, [myMovies, sortConfig, selectedGenres]);
 
   const handleEditNote = (movie) => {
     setEditingNote(movie.id);
     setNoteText(movie.userRating?.note || "");
   };
 
-  const handleSaveNote = (movie) => {
-    updateMovieNote(movie, noteText);
-    setEditingNote(null);
-    // Refresh the list after a short delay to allow the update to complete
-    setTimeout(() => {
-      getMovies();
-    }, 500);
+  const handleSaveNote = async (movie) => {
+    const success = await updateMovieNote(movie, noteText);
+    
+    if (success) {
+      setEditingNote(null);
+      
+      // Refresh the list after a short delay to show the updated data
+      setTimeout(() => {
+        getMovies();
+      }, 1000);
+    }
   };
 
   const handleRemoveMovie = (movie) => {
@@ -155,12 +234,12 @@ function MyListTable() {
   const confirmRemove = () => {
     if (movieToRemove) {
       removeFromMyList(movieToRemove);
-      // Refresh the list after a short delay
-      setTimeout(() => {
-        getMovies();
-      }, 500);
       setShowConfirmation(false);
       setMovieToRemove(null);
+      // Refresh the list after a short delay to allow the update to complete
+      setTimeout(() => {
+        getMovies();
+      }, 1000);
     }
   };
 
@@ -170,52 +249,95 @@ function MyListTable() {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return "Unknown";
+    
     const date = new Date(dateString);
-    return date.toLocaleDateString();
+    if (isNaN(date.getTime())) return "Unknown";
+    
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return null;
-    return sortConfig.direction === 'asc' ? '↑' : '↓';
+    return sortConfig.direction === 'asc' ? ' ↑' : ' ↓';
   };
 
   const handleEditRating = (movie) => {
     setEditingRating(movie);
   };
 
-  const handleSaveRating = (updatedMovie) => {
-    // First remove the old movie
-    removeFromMyList(editingRating);
+  const handleSaveRating = async (updatedMovie) => {
+    // Use the new updateRatedMovie function to properly update the movie
+    const success = await updateRatedMovie(editingRating, updatedMovie);
     
-    // Then add the updated movie
-    setTimeout(() => {
-      // Add the updated movie to the list
-      addRatedMovieToList(updatedMovie);
-      
-      // Refresh the list and close the modal
+    if (success) {
       setEditingRating(null);
-      getMovies();
-    }, 500);
+      
+      // Refresh the list after a short delay to show the updated data
+      setTimeout(() => {
+        getMovies();
+      }, 1000);
+    }
   };
 
-  // Handle removing a person
   const handleRemovePerson = (person) => {
-    // Remove the person from Firestore
-    updateDoc(doc(db, "MyList", User.uid), {
+    // Get the current user's document
+    const userDocRef = doc(db, "MyList", User.uid);
+    
+    // Remove the person from the people array
+    updateDoc(userDocRef, {
       people: arrayRemove(person)
-    })
-      .then(() => {
-        toast.success(" Person removed from MyList  ");
-        // Refresh the list after a short delay
-        setTimeout(() => {
-          getMovies();
-        }, 500);
-      })
-      .catch((error) => {
-        console.log(error.code);
-        console.log(error.message);
-      });
+    }).then(() => {
+      // Update the local state
+      setMyPeople(myPeople.filter(p => p.id !== person.id));
+      toast.success(`${person.name} removed from your list`);
+    }).catch(error => {
+      console.error("Error removing person:", error);
+      toast.error("Failed to remove person from your list");
+    });
+  };
+
+  const formatRuntime = (minutes) => {
+    if (!minutes) return "Unknown";
+    
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    
+    if (hours === 0) {
+      return `${mins}m`;
+    } else if (mins === 0) {
+      return `${hours}h`;
+    } else {
+      return `${hours}h ${mins}m`;
+    }
+  };
+
+  const handleOpenFilterModal = () => {
+    setShowFilterModal(true);
+  };
+
+  const handleCloseFilterModal = () => {
+    setShowFilterModal(false);
+  };
+
+  const handleApplyStatusFilter = (status) => {
+    if (status === "All") {
+      setMyMovies(allMovies);
+    } else {
+      const filtered = allMovies.filter(movie => 
+        movie.userRating?.status === status
+      );
+      setMyMovies(filtered);
+    }
+  };
+
+  const handleResetFilters = () => {
+    setSelectedGenres([]);
+    setMyMovies(allMovies);
   };
 
   if (loading) {
@@ -256,11 +378,31 @@ function MyListTable() {
           </div>
         </div>
       )}
+
+      {/* Filter Modal */}
+      <FilterModal 
+        isOpen={showFilterModal}
+        onClose={handleCloseFilterModal}
+        availableGenres={availableGenres}
+        selectedGenres={selectedGenres}
+        setSelectedGenres={setSelectedGenres}
+        onApplyStatusFilter={handleApplyStatusFilter}
+        onResetFilters={handleResetFilters}
+      />
       
-      {/* Tab Selector */}
-      <div className="flex mb-6 border-b border-gray-700">
+      {/* Rating Modal */}
+      {editingRating && (
+        <RatingModal
+          movie={editingRating}
+          onClose={() => setEditingRating(null)}
+          onSave={handleSaveRating}
+        />
+      )}
+      
+      {/* Tab Selector - Added mt-16 to create more space from navbar */}
+      <div className="flex mb-6 border-b border-gray-700 mt-16">
         <button
-          className={`px-4 py-2 font-medium text-sm ${
+          className={`px-6 py-3 font-medium text-sm ${
             activeTab === "movies"
               ? "text-red-600 border-b-2 border-red-600"
               : "text-gray-400 hover:text-white"
@@ -270,7 +412,7 @@ function MyListTable() {
           Movies
         </button>
         <button
-          className={`px-4 py-2 font-medium text-sm ${
+          className={`px-6 py-3 font-medium text-sm ${
             activeTab === "people"
               ? "text-red-600 border-b-2 border-red-600"
               : "text-gray-400 hover:text-white"
@@ -280,6 +422,92 @@ function MyListTable() {
           People
         </button>
       </div>
+      
+      {/* Add Search, Filter and Sort Controls */}
+      {activeTab === "movies" && (
+        <div className="mb-6 flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search movies..."
+              className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-red-600"
+              onChange={(e) => {
+                // Implement search functionality
+                const searchTerm = e.target.value.toLowerCase();
+                if (searchTerm === '') {
+                  setMyMovies(allMovies); // Reset to original list
+                } else {
+                  const filtered = allMovies.filter(movie => 
+                    (movie.title || movie.name).toLowerCase().includes(searchTerm) ||
+                    (movie.userRating?.note || '').toLowerCase().includes(searchTerm)
+                  );
+                  setMyMovies(filtered);
+                }
+              }}
+            />
+          </div>
+          <div>
+            <button
+              onClick={handleOpenFilterModal}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 w-full md:w-auto"
+            >
+              Filters {selectedGenres.length > 0 ? `(${selectedGenres.length})` : ''}
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {activeTab === "people" && (
+        <div className="mb-6 flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search people..."
+              className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-red-600"
+              onChange={(e) => {
+                // Implement search functionality for people
+                const searchTerm = e.target.value.toLowerCase();
+                if (searchTerm === '') {
+                  getMovies(); // Reset to original list
+                } else {
+                  const filtered = myPeople.filter(person => 
+                    person.name.toLowerCase().includes(searchTerm) ||
+                    (person.known_for_department || '').toLowerCase().includes(searchTerm)
+                  );
+                  setMyPeople(filtered);
+                }
+              }}
+            />
+          </div>
+          <div className="flex gap-2">
+            <select 
+              className="px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-red-600"
+              onChange={(e) => {
+                // Implement sort for people
+                const sortBy = e.target.value;
+                let sortedPeople = [...myPeople];
+                
+                if (sortBy === 'name:asc') {
+                  sortedPeople.sort((a, b) => a.name.localeCompare(b.name));
+                } else if (sortBy === 'name:desc') {
+                  sortedPeople.sort((a, b) => b.name.localeCompare(a.name));
+                } else if (sortBy === 'dateAdded:desc') {
+                  sortedPeople.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+                } else if (sortBy === 'dateAdded:asc') {
+                  sortedPeople.sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
+                }
+                
+                setMyPeople(sortedPeople);
+              }}
+            >
+              <option value="name:asc">Name (A-Z)</option>
+              <option value="name:desc">Name (Z-A)</option>
+              <option value="dateAdded:desc">Date Added (Newest)</option>
+              <option value="dateAdded:asc">Date Added (Oldest)</option>
+            </select>
+          </div>
+        </div>
+      )}
       
       {/* Movies Tab */}
       {activeTab === "movies" && (
@@ -309,6 +537,14 @@ function MyListTable() {
                           </th>
                         )}
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
+                            onClick={() => handleSort('release_date_full')}>
+                          Release Date {getSortIcon('release_date_full')}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
+                            onClick={() => handleSort('runtime')}>
+                          Runtime {getSortIcon('runtime')}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
                             onClick={() => handleSort('userRating.score')}>
                           Score {getSortIcon('userRating.score')}
                         </th>
@@ -316,15 +552,9 @@ function MyListTable() {
                             onClick={() => handleSort('userRating.status')}>
                           Status {getSortIcon('userRating.status')}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
-                            onClick={() => handleSort('userRating.dateAdded')}>
-                          Date Added {getSortIcon('userRating.dateAdded')}
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Notes
                         </th>
-                        {isLargeScreen && (
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                            Note
-                          </th>
-                        )}
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                           Actions
                         </th>
@@ -350,15 +580,6 @@ function MyListTable() {
                                 >
                                   {movie.title || movie.name}
                                 </div>
-                                <div className="text-sm text-gray-400">
-                                  {movie.release_date?.substring(0, 4) || 
-                                  movie.first_air_date?.substring(0, 4) || "N/A"}
-                                </div>
-                                {!isLargeScreen && (
-                                  <div className="text-xs text-gray-500 mt-1 max-w-xs truncate">
-                                    {movie.genre_ids ? convertGenre(movie.genre_ids).join(', ') : "N/A"}
-                                  </div>
-                                )}
                               </div>
                             </div>
                           </td>
@@ -367,6 +588,12 @@ function MyListTable() {
                               {movie.genre_ids ? convertGenre(movie.genre_ids).join(', ') : "N/A"}
                             </td>
                           )}
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {formatDate(movie.release_date_full || movie.release_date || movie.first_air_date)}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {formatRuntime(movie.runtime)}
+                          </td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             {movie.userRating?.score ? (
                               <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -382,51 +609,46 @@ function MyListTable() {
                             )}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
-                            {movie.userRating?.status || "N/A"}
+                            {movie.userRating?.status || "Not set"}
                           </td>
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
-                            {formatDate(movie.userRating?.dateAdded)}
-                          </td>
-                          {isLargeScreen && (
-                            <td className="px-4 py-4">
-                              {editingNote === movie.id ? (
-                                <div>
-                                  <textarea
-                                    value={noteText}
-                                    onChange={(e) => setNoteText(e.target.value)}
-                                    className="w-full bg-gray-700 text-white rounded px-2 py-1 text-sm"
-                                    rows="2"
-                                  ></textarea>
-                                  <div className="flex mt-1">
-                                    <button
-                                      onClick={() => handleSaveNote(movie)}
-                                      className="text-xs bg-green-700 text-white px-2 py-1 rounded mr-1"
-                                    >
-                                      Save
-                                    </button>
-                                    <button
-                                      onClick={() => setEditingNote(null)}
-                                      className="text-xs bg-gray-600 text-white px-2 py-1 rounded"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div>
-                                  <p className="text-sm text-gray-300 line-clamp-2">
-                                    {movie.userRating?.note || "No notes"}
-                                  </p>
+                          <td className="px-4 py-4">
+                            {editingNote === movie.id ? (
+                              <div>
+                                <textarea
+                                  value={noteText}
+                                  onChange={(e) => setNoteText(e.target.value)}
+                                  className="w-full bg-gray-700 text-white rounded px-2 py-1 text-sm"
+                                  rows="2"
+                                ></textarea>
+                                <div className="flex mt-1">
                                   <button
-                                    onClick={() => handleEditNote(movie)}
-                                    className="text-xs text-blue-400 mt-1"
+                                    onClick={() => handleSaveNote(movie)}
+                                    className="text-xs bg-green-700 text-white px-2 py-1 rounded mr-1"
                                   >
-                                    Edit
+                                    Save
+                                  </button>
+                                  <button
+                                    onClick={() => setEditingNote(null)}
+                                    className="text-xs bg-gray-600 text-white px-2 py-1 rounded"
+                                  >
+                                    Cancel
                                   </button>
                                 </div>
-                              )}
-                            </td>
-                          )}
+                              </div>
+                            ) : (
+                              <div>
+                                <p className="text-sm text-gray-300 line-clamp-2">
+                                  {movie.userRating?.note || "No notes"}
+                                </p>
+                                <button
+                                  onClick={() => handleEditNote(movie)}
+                                  className="text-xs text-blue-400 mt-1"
+                                >
+                                  Edit
+                                </button>
+                              </div>
+                            )}
+                          </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex space-x-4">
                               <button
@@ -456,7 +678,7 @@ function MyListTable() {
                 </div>
               )}
 
-              {/* Mobile View - MyAnimeList style */}
+              {/* Mobile View */}
               {isMobile && (
                 <div className="md:hidden">
                   {sortedMovies.map((movie, index) => (
@@ -465,7 +687,7 @@ function MyListTable() {
                         {index + 1}
                       </div>
                       <div className="w-16 flex-shrink-0 mr-3">
-                        <img 
+                        <img
                           src={imageURL2 + (movie.poster_path || movie.backdrop_path)} 
                           alt={movie.title || movie.name}
                           className="w-full h-24 object-cover rounded"
@@ -479,7 +701,7 @@ function MyListTable() {
                           {movie.title || movie.name}
                         </div>
                         <div className="text-sm text-gray-400 mt-1">
-                          {movie.release_date?.substring(0, 4) || movie.first_air_date?.substring(0, 4) || "N/A"}
+                          {formatDate(movie.release_date_full || movie.release_date || movie.first_air_date)}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
                           {movie.genre_ids ? convertGenre(movie.genre_ids).join(', ') : "N/A"}
@@ -583,14 +805,6 @@ function MyListTable() {
             </div>
           )}
         </>
-      )}
-
-      {editingRating && (
-        <RatingModal
-          movie={editingRating}
-          onClose={() => setEditingRating(null)}
-          onSave={handleSaveRating}
-        />
       )}
     </div>
   );
