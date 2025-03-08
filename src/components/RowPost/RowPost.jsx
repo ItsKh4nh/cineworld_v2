@@ -23,7 +23,7 @@ function RowPost(props) {
   const { addToMyList, PopupMessage } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
-  const { handleMoviePopup, formatDate } = useMoviePopup();
+  const { handleMoviePopup, formatDate, myListMovies } = useMoviePopup();
 
   const [movies, setMovies] = useState([]);
   const [shouldPop, setShouldPop] = useState(true);
@@ -40,6 +40,11 @@ function RowPost(props) {
       });
     }
   }, []);
+
+  // Function to check if a movie is in the user's MyList
+  const checkIfInMyList = (movieId) => {
+    return myListMovies.some(movie => movie.id === movieId);
+  };
 
   const customSettings = {
     breakpoints: {
@@ -93,11 +98,13 @@ function RowPost(props) {
           >
             {movies.map((obj, index) => {
               const converted = convertGenre(obj.genre_ids);
+              // Check if this movie is in the user's MyList
+              const isInMyList = checkIfInMyList(obj.id);
               return (
                 <SwiperSlide
                   key={obj.id}
                   className={props.islarge ? "large" : "bg-cover"}
-                  onClick={() => handleMoviePopup(obj)}
+                  onClick={() => handleMoviePopup({...obj, isInMyList})}
                 >
                   {props.islarge ? (
                     <>
@@ -110,17 +117,13 @@ function RowPost(props) {
                     <>
                       <img
                         loading="lazy"
-                        className={
-                          props.movieData != null
-                            ? "border-b-4 border-red-700 rounded-sm"
-                            : "rounded-sm"
-                        }
+                        className="rounded-sm"
                         src={
                           obj.backdrop_path
                             ? `${imageURL2 + obj.backdrop_path}`
                             : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
                         }
-                        onClick={() => handleMoviePopup(obj)}
+                        onClick={() => handleMoviePopup({...obj, isInMyList})}
                       />
                     </>
                   )}
@@ -131,7 +134,7 @@ function RowPost(props) {
                           onClick={() => playMovie(obj)}
                           onMouseEnter={() => setShouldPop(false)}
                           onMouseLeave={() => setShouldPop(true)}
-                          className="text-white w-9 h-9 border-[2px] rounded-full p-2 mr-1 backdrop-blur-[2px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
+                          className="text-white w-9 h-9 border-[2px] rounded-full flex items-center justify-center mr-1 backdrop-blur-[2px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -139,6 +142,7 @@ function RowPost(props) {
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
+                            className="w-5 h-5"
                           >
                             <path
                               strokeLinecap="round"
@@ -153,7 +157,7 @@ function RowPost(props) {
                             <div
                               onMouseEnter={() => setShouldPop(false)}
                               onMouseLeave={() => setShouldPop(true)}
-                              className="text-white w-9 h-9 border-[2px] rounded-full p-2 mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
+                              className="text-white w-9 h-9 border-[2px] rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -161,6 +165,7 @@ function RowPost(props) {
                                 viewBox="0 0 24 24"
                                 strokeWidth={1.5}
                                 stroke="currentColor"
+                                className="w-5 h-5"
                               >
                                 <path
                                   strokeLinecap="round"
@@ -172,48 +177,63 @@ function RowPost(props) {
                           </>
                         ) : (
                           <>
-                            <div
-                              onClick={() => addToMyList(obj)}
-                              onMouseEnter={() => setShouldPop(false)}
-                              onMouseLeave={() => setShouldPop(true)}
-                              className="text-white w-9 h-9 border-[2px] rounded-full p-2 mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
-                                stroke="currentColor"
+                            {isInMyList ? (
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // This would be replaced with an edit function in the future
+                                  // For now, we'll keep the addToMyList function as a placeholder
+                                  addToMyList({...obj, isInMyList});
+                                }}
+                                onMouseEnter={() => setShouldPop(false)}
+                                onMouseLeave={() => setShouldPop(true)}
+                                className="bg-cineworldYellow text-white w-9 h-9 rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:bg-white hover:text-cineworldYellow"
                               >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M12 4.5v15m7.5-7.5h-15"
-                                />
-                              </svg>
-                            </div>
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={1.5}
+                                  stroke="currentColor"
+                                  className="w-5 h-5"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                                  />
+                                </svg>
+                              </div>
+                            ) : (
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addToMyList({...obj, isInMyList: false});
+                                }}
+                                onMouseEnter={() => setShouldPop(false)}
+                                onMouseLeave={() => setShouldPop(true)}
+                                className="text-white w-9 h-9 border-[2px] rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={1.5}
+                                  stroke="currentColor"
+                                  className="w-5 h-5"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M12 4.5v15m7.5-7.5h-15"
+                                  />
+                                </svg>
+                              </div>
+                            )}
                           </>
                         )}
 
-                        <div
-                          onClick={() => handleMoviePopup(obj)}
-                          className="text-white w-9 h-9 border-[2px] rounded-full p-2 mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="text-shadow-xl"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                            />
-                          </svg>
-                        </div>
+                        {/* Down arrow button removed */}
                       </div>
 
                       <h1 className="text-white ml-4 font-medium w-4/5 xl:line-clamp-1">

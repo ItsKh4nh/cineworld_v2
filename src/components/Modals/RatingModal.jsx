@@ -5,6 +5,9 @@ function RatingModal({ movie, onClose, onSave, isDuplicate, onGoToMyList }) {
   const [status, setStatus] = useState(movie.userRating?.status || "Plan to Watch");
   const [score, setScore] = useState(movie.userRating?.score || 5);
   const [note, setNote] = useState(movie.userRating?.note || "");
+  
+  // Check if this is an update (movie already has a userRating)
+  const isUpdating = Boolean(movie.userRating);
 
   const statusOptions = ["Plan to Watch", "Completed", "Dropped"];
   const scoreOptions = [
@@ -57,7 +60,8 @@ function RatingModal({ movie, onClose, onSave, isDuplicate, onGoToMyList }) {
       <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md mx-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-white">
-            {isDuplicate ? "Movie already in MyList" : "Add to My List"}
+            {isDuplicate ? "Movie already in MyList" : 
+             isUpdating ? "Update Your Rating" : "Add to MyList"}
           </h2>
           <button
             onClick={onClose}
@@ -167,14 +171,14 @@ function RatingModal({ movie, onClose, onSave, isDuplicate, onGoToMyList }) {
               onClick={onGoToMyList}
               className="px-4 py-2 text-white bg-red-700 rounded hover:bg-red-600 transition-colors"
             >
-              Go to My List
+              Go to MyList
             </button>
           ) : (
             <button
               onClick={handleSave}
               className="px-4 py-2 text-white bg-red-700 rounded hover:bg-red-600 transition-colors"
             >
-              Add to My List
+              {isUpdating ? "Save" : "Add to MyList"}
             </button>
           )}
         </div>

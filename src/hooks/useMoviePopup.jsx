@@ -43,28 +43,31 @@ function useMoviePopup() {
       isInMyList
     };
     
-    // Update context state
-    setMovieInfo(enrichedMovieInfo);
-    setShowModal(true);
-    
-    // Fetch trailer videos if available
-    axios
-      .get(`/movie/${movieInfo.id}/videos?api_key=${API_KEY}&language=en-US`)
-      .then((response) => {
-        if (response.data.results.length !== 0) {
-          const trailerVideo = response.data.results.find(
-            (video) => video.type === "Trailer"
-          ) || response.data.results[0];
-          
-          setTrailerUrl(trailerVideo.key);
-        } else {
+    // Force a small delay to ensure DOM updates properly
+    setTimeout(() => {
+      // Update context state
+      setMovieInfo(enrichedMovieInfo);
+      setShowModal(true);
+      
+      // Fetch trailer videos if available
+      axios
+        .get(`/movie/${movieInfo.id}/videos?api_key=${API_KEY}&language=en-US`)
+        .then((response) => {
+          if (response.data.results.length !== 0) {
+            const trailerVideo = response.data.results.find(
+              (video) => video.type === "Trailer"
+            ) || response.data.results[0];
+            
+            setTrailerUrl(trailerVideo.key);
+          } else {
+            setTrailerUrl("");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching trailer:", error);
           setTrailerUrl("");
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching trailer:", error);
-        setTrailerUrl("");
-      });
+        });
+    }, 10); // Small delay to ensure state updates are processed
   };
 
   const formatDate = (dateString) => {

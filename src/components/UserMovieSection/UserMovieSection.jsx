@@ -96,11 +96,11 @@ function UserMovieSection(props) {
                       }}
                       className="hidden xl:block absolute -bottom-52 group-hover:bottom-0 w-full transition-all duration-500 p-4 rounded"
                     >
-                      <div className="flex mb-1 transition ease-in-out delay-150">
+                      <div className="flex transition ease-in-out delay-150">
                         {/* Play Button */}
                         <div
-                          onClick={() => playMovie(movie, props.from)}
-                          className="text-white w-10 h-10 2xl:w-14 2xl:h-14 border-[2px] 2xl:border-[3px] rounded-full p-2 mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:border-red-600 hover:text-red-600"
+                          onClick={() => playMovie(movie)}
+                          className="text-white w-10 h-10 2xl:w-14 2xl:h-14 border-[2px] 2xl:border-[3px] rounded-full flex items-center justify-center mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:border-red-600 hover:text-red-600"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -108,6 +108,7 @@ function UserMovieSection(props) {
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
+                            className="w-6 h-6 2xl:w-8 2xl:h-8"
                           >
                             <path
                               strokeLinecap="round"
@@ -118,11 +119,16 @@ function UserMovieSection(props) {
                         </div>
 
                         {/* Add to MyList or remove from MyList Button */}
-                        {props.from === "MyList" ? (
+                        {movie.isInMyList ? (
                           <>
                             <div
-                              onClick={(e) => removeMovie(movie, e)}
-                              className="text-white w-10 h-10 2xl:w-14 2xl:h-14 border-[2px] 2xl:border-[3px] rounded-full p-2 mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:border-red-600 hover:text-red-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // This would be replaced with an edit function in the future
+                                // For now, we'll keep the removeFromMyList function as a placeholder
+                                removeFromMyList(movie);
+                              }}
+                              className="bg-cineworldYellow text-white w-10 h-10 2xl:w-14 2xl:h-14 rounded-full flex items-center justify-center mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:bg-white hover:text-cineworldYellow"
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -130,11 +136,12 @@ function UserMovieSection(props) {
                                 viewBox="0 0 24 24"
                                 strokeWidth={1.5}
                                 stroke="currentColor"
+                                className="w-6 h-6 2xl:w-8 2xl:h-8"
                               >
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
-                                  d="M19.5 12h-15"
+                                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
                                 />
                               </svg>
                             </div>
@@ -146,7 +153,7 @@ function UserMovieSection(props) {
                                 e.stopPropagation();
                                 addToMyList(movie);
                               }}
-                              className="text-white w-10 h-10 2xl:w-14 2xl:h-14 border-[2px] 2xl:border-[3px] rounded-full p-2 mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:border-red-600 hover:text-red-600"
+                              className="text-white w-10 h-10 2xl:w-14 2xl:h-14 border-[2px] 2xl:border-[3px] rounded-full flex items-center justify-center mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:border-red-600 hover:text-red-600"
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -154,6 +161,7 @@ function UserMovieSection(props) {
                                 viewBox="0 0 24 24"
                                 strokeWidth={1.5}
                                 stroke="currentColor"
+                                className="w-6 h-6 2xl:w-8 2xl:h-8"
                               >
                                 <path
                                   strokeLinecap="round"
@@ -164,27 +172,6 @@ function UserMovieSection(props) {
                             </div>
                           </>
                         )}
-
-                        {/* PopUp Button */}
-                        <div
-                          onClick={() => handleMoviePopup(movie)}
-                          className="text-white w-10 h-10 2xl:w-14 2xl:h-14 border-[2px] 2xl:border-[3px] rounded-full p-2 mr-2 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:border-red-600 hover:text-red-600"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="text-shadow-xl"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                            />
-                          </svg>
-                        </div>
                       </div>
 
                       <a className="hover:text-primary-600 text-shadow-xl shadow-red-700 text-white text-base 2xl:text-2xl transition duration-500 font-medium">
@@ -199,62 +186,4 @@ function UserMovieSection(props) {
                           converted.map((genre, index) => {
                             return (
                               <span
-                                key={`${movie.id}-${index}`}
-                                className="text-white mr-4 text-xs  2xl:text-sm font-thin"
-                              >
-                                {genre}
-                              </span>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-        ) : (
-          <>
-            <div>
-              <div className="w-[100vw] h-[70vh] flex justify-center items-center">
-                {!isResultEmpty ? (
-                  <ClipLoader color="#ff0000" size={160} />
-                ) : (
-                  <div>
-                    <h1 className="text-white text-5xl text-center">
-                      No Movies Present
-                    </h1>
-                    <br></br>
-                    <button
-                      onClick={() => {
-                        navigate("/");
-                      }}
-                      className="flex justify-center items-center w-11/12 ml-2 bg-red-700 text-white font-medium sm:font-bold text-xl px-16 md:text-xl  py-3 rounded shadow hover:shadow-lg hover:bg-red-900 outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6 mr-2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-                        />
-                      </svg>
-                      Back to Home
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-export default UserMovieSection;
+                                key={`

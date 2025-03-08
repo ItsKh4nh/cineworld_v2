@@ -7,7 +7,8 @@ import toast, { Toaster } from "react-hot-toast";
 
 function useUpdateMyList() {
   const { User } = useContext(AuthContext);
-  const { openRatingModal } = useContext(RatingModalContext);
+  const ratingModalContext = useContext(RatingModalContext) || {};
+  const { openRatingModal } = ratingModalContext;
 
   function notify() {
     toast.success("  Movie added to MyList  ");
@@ -19,8 +20,12 @@ function useUpdateMyList() {
 
   const addToMyList = (movie) => {
     console.log("addToMyList called with:", movie);
-    // Use the context function to open the modal
-    openRatingModal(movie, User);
+    if (openRatingModal) {
+      openRatingModal(movie, User);
+    } else {
+      console.error("openRatingModal is not available");
+      alertError("Rating feature is not available right now");
+    }
   };
 
   const addRatedMovieToList = (ratedMovie) => {

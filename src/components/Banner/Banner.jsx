@@ -15,7 +15,7 @@ function Banner(props) {
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
   const { addToMyList, PopupMessage } = useUpdateMyList();
-  const { handleMoviePopup, formatDate } = useMoviePopup();
+  const { handleMoviePopup, formatDate, myListMovies } = useMoviePopup();
 
   const [movie, setMovie] = useState([]);
   const [moviePopupInfo, setMoviePopupInfo] = useState({});
@@ -32,11 +32,17 @@ function Banner(props) {
 
   useEffect(() => {
     axios.get(props.url).then((response) => {
-      setMovie(
-        response.data.results.sort(function (a, b) {
-          return 0.5 - Math.random();
-        })[0]
-      );
+      const randomMovie = response.data.results.sort(function (a, b) {
+        return 0.5 - Math.random();
+      })[0];
+      
+      // Check if movie is in MyList
+      const isInMyList = myListMovies.some(m => m.id === randomMovie.id);
+      setMovie({
+        ...randomMovie,
+        isInMyList
+      });
+      
       console.log(movie);
     });
 
@@ -46,7 +52,7 @@ function Banner(props) {
 
     window.addEventListener("resize", handleWindowResize);
     return () => window.removeEventListener("resize", handleWindowResize); // Cleanup
-  }, [props.url]); // Added dependency array
+  }, [props.url, myListMovies]); // Added myListMovies as dependency
 
   return (
     <>
