@@ -1,35 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import StarRatings from "../components/StarRatings";
-
 import axios from "../axios";
-import { movieVideos, movieDetails as getMovieDetails, movieRecommendations } from "../config/URLs";
+import { 
+  movieVideos, 
+  movieDetails as getMovieDetails, 
+  movieRecommendations,
+  collectionDetails
+} from "../config/URLs";
 import { imageURL, imageURL2 } from "../config/constants";
-
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
-
 import usePlayMovie from "../hooks/usePlayMovie";
 import useUpdateMyList from "../hooks/useUpdateMyList";
-
+import { ClipLoader } from "react-spinners";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 function Play() {
+  // State variables
   const [urlId, setUrlId] = useState("");
+  const [activeVideo, setActiveVideo] = useState(null);
   const [movieDetails, setMovieDetails] = useState({});
   const [isFromMyList, setIsFromMyList] = useState(false);
-  const [moreTrailerVideos, setMoreTrailerVideos] = useState([]);
+  const [trailerVideos, setTrailerVideos] = useState([]);
   const [similarMovies, setSimilarMovies] = useState([]);
+  const [collectionInfo, setCollectionInfo] = useState(null);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [loading, setLoading] = useState(true);
+  const [isInMyList, setIsInMyList] = useState(false);
+  const videoRef = useRef(null);
 
-  const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
+  // Hooks
+  const { addToMyList, removeFromMyList, PopupMessage, checkIfInMyList } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
-
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Helper functions
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -40,262 +49,631 @@ function Play() {
     });
   };
 
+  const formatMoney = (amount) => {
+    if (!amount) return "N/A";
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
+  const formatRuntime = (minutes) => {
+    if (!minutes) return "N/A";
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}h ${mins}m`;
+  };
+
+  // Scroll to video on play
+  const scrollToVideo = () => {
+    if (videoRef.current) {
+      videoRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Check if movie is in user's list
+  const checkMovieInList = async () => {
+    const result = await checkIfInMyList(id);
+    setIsInMyList(result);
+  };
+
+  // Data fetching
   useEffect(() => {
+    setLoading(true);
+    
     if (location.state?.From === "MyList") {
       setIsFromMyList(true);
     }
 
-    axios
-      .get(movieVideos(id))
+    // Check if movie is in user's list
+    checkMovieInList();
+
+    // Fetch movie videos
+    axios.get(movieVideos(id))
       .then((response) => {
-        console.log(response.data, "This is the data");
         if (response.data.results.length !== 0) {
-          setUrlId(response.data.results[0]);
-          setMoreTrailerVideos(response.data.results);
-        } else {
-          console.log("Array Empty");
+          // Set the first trailer as the active video
+          const trailers = response.data.results.filter(
+            video => video.type === "Trailer" || video.type === "Teaser"
+          );
+          if (trailers.length > 0) {
+            setActiveVideo(trailers[0]);
+            setUrlId(trailers[0].key);
+          }
+          setTrailerVideos(response.data.results);
         }
+      })
+      .catch(error => {
+        console.error("Error fetching videos:", error);
       });
 
-    axios
-      .get(getMovieDetails(id))
+    // Fetch movie details
+    axios.get(getMovieDetails(id))
       .then((response) => {
-        console.log(response.data, "Movie details");
         setMovieDetails(response.data);
-        console.log(response.data.genres[0]);
+        
+        // If movie belongs to a collection, fetch collection details
+        if (response.data.belongs_to_collection) {
+          axios.get(collectionDetails(response.data.belongs_to_collection.id))
+            .then(collectionResponse => {
+              setCollectionInfo(collectionResponse.data);
+            })
+            .catch(error => {
+              console.error("Error fetching collection:", error);
+            });
+        }
 
-        axios
-          .get(movieRecommendations(id))
+        // Fetch similar movies
+        axios.get(movieRecommendations(id))
           .then((res) => {
-            console.log(
-              res.data.results.slice(0, 8),
-              "ksdjfk ahdsfjksadhfjsdahf"
-            );
-            setSimilarMovies(res.data.results.slice(0, 8));
+            setSimilarMovies(res.data.results.slice(0, 12));
+            setLoading(false);
+          })
+          .catch(error => {
+            console.error("Error fetching recommendations:", error);
+            setLoading(false);
           });
+      })
+      .catch(error => {
+        console.error("Error fetching movie details:", error);
+        setLoading(false);
       });
-  }, []);
+  }, [id]);
+
+  // Handle movie list actions
+  const handleMyListAction = () => {
+    if (isInMyList) {
+      removeFromMyList(movieDetails);
+      setIsInMyList(false);
+    } else {
+      addToMyList(movieDetails);
+      setIsInMyList(true);
+    }
+  };
+
+  // Handle video selection
+  const handleVideoSelect = (video) => {
+    setActiveVideo(video);
+    setUrlId(video.key);
+    scrollToVideo();
+  };
 
   return (
-    <div>
-      <Navbar playPage></Navbar>
-
+    <div className="min-h-screen bg-black text-white">
+      <Navbar playPage />
       {PopupMessage}
 
-      <div className="mt-12 h-[31vh] sm:h-[42vh] md:h-[45vh] lg:h-[55vh] lg:mt-0 xl:h-[98vh]">
+      {loading ? (
+        <div className="flex flex-col items-center justify-center min-h-screen">
+          <ClipLoader color="#E50914" size={60} />
+          <p className="mt-4 text-xl">Loading movie details...</p>
+        </div>
+      ) : (
+        <>
+          {/* Hero Section with Video/Backdrop */}
+          <div 
+            ref={videoRef}
+            className="relative w-full h-[30vh] sm:h-[40vh] md:h-[50vh] lg:h-[65vh] xl:h-[85vh] bg-black"
+          >
         {urlId ? (
           <iframe
             width="100%"
-            style={{ height: "inherit" }}
-            src={`//www.youtube.com/embed/${urlId.key}?modestbranding=1&autoplay=1`}
+                height="100%"
+                src={`//www.youtube.com/embed/${urlId}?modestbranding=1&autoplay=1`}
             frameBorder="0"
-            allow="autoplay fullscreen"
+                allow="autoplay; encrypted-media"
             allowFullScreen
+                className="w-full h-full"
           ></iframe>
         ) : (
-          <img src={`${imageURL + movieDetails.backdrop_path}`} />
+              <div 
+                className="w-full h-full bg-cover bg-center flex items-end"
+                style={{
+                  backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8)), url(${imageURL + movieDetails.backdrop_path})`,
+                }}
+              >
+                <div className="container mx-auto px-4 py-8">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+                    {movieDetails.title || movieDetails.original_title}
+                  </h1>
+                </div>
+              </div>
         )}
       </div>
 
-      {movieDetails.id ? (
-        <>
-          {/* Movie details Section  */}
-          <section
-            style={{
-              backgroundImage: `linear-gradient(90deg, #000000f0 0%, #000000e6 35%, #000000c3 100%), url(${
-                imageURL + movieDetails.backdrop_path
-              })`,
-            }}
-            className="bg-cover bg-center object-contain flex flex-col p-5 sm:p-14 lg:flex-row lg:items-center lg:justify-center lg:gap-8 2xl:py-24"
-          >
-            <div className="lg:w-[45%]">
-              <h1 className="text-white font-bold text-3xl mb-2">
-                {movieDetails.original_title || movieDetails.title}
-              </h1>
-              <StarRatings rating={movieDetails.vote_average} />
-              <p className="text-neutral-400 mt-3">{movieDetails.overview}</p>
-              <div className="bg-neutral-600 w-full h-[0.1rem] my-5"></div>
-
-              <div className="hidden lg:grid">
-                <h1 className=" text-red-700 ">
-                  Released on:{" "}
-                  <a className="text-white ml-1">
-                    {formatDate(
-                      movieDetails.release_date || movieDetails.air_date
-                    )}
-                  </a>
-                </h1>
-                <h1 className="text-red-700">
-                  Language:{" "}
-                  <a className="text-white ml-1">
-                    {movieDetails.original_language}
-                  </a>
-                </h1>
-                <h1 className="text-red-700">
-                  Genres:{" "}
-                  {movieDetails.genres &&
-                    movieDetails.genres.map((genre) => {
-                      return (
-                        <>
-                          <span className="text-white ml-2">{genre.name}</span>
-                        </>
-                      );
-                    })}
-                </h1>
+          {/* Main Content */}
+          <div className="container mx-auto px-4 py-6 -mt-6 relative z-10">
+            {/* Info Bar */}
+            <div className="flex flex-wrap gap-4 items-center mb-6 bg-gray-900 bg-opacity-70 backdrop-blur-sm p-4 rounded-lg">
+              <div className="flex items-center">
+                <span className="font-bold text-xl bg-yellow-500 text-black py-1 px-3 rounded">
+                  {movieDetails.vote_average ? movieDetails.vote_average.toFixed(1) : 'N/A'}
+                </span>
+                <span className="ml-2 text-sm text-gray-300">
+                  {movieDetails.vote_count ? `${movieDetails.vote_count.toLocaleString()} votes` : ''}
+                </span>
               </div>
+              
+              <div className="h-6 border-l border-gray-500"></div>
+              
+              <div className="flex items-center">
+                <span className="text-sm md:text-base">
+                  {formatDate(movieDetails.release_date)}
+                </span>
+              </div>
+              
+              <div className="h-6 border-l border-gray-500"></div>
+              
+              <div className="flex items-center">
+                <span className="text-sm md:text-base">{formatRuntime(movieDetails.runtime)}</span>
             </div>
-            <div className="flex justify-between">
-              <div className="lg:hidden">
-                <div>
-                  <h1 className=" text-red-700 text-sm leading-7 sm:text-lg sm:leading-9 lg:text-2xl lg:leading-10">
-                    Released on:{" "}
-                    <a className="text-white ml-2">
-                      {formatDate(
-                        movieDetails.release_date || movieDetails.air_date
-                      )}
-                    </a>
-                  </h1>
-                  <h1 className=" text-red-700 text-sm leading-7 sm:text-lg sm:leading-9 lg:text-2xl lg:leading-10">
-                    Language:{" "}
-                    <a className="text-white ml-2">
-                      {movieDetails.original_language}
-                    </a>
-                  </h1>
-                  <h1 className="text-red-700 text-sm leading-7 sm:text-lg sm:leading-9 lg:text-2xl lg:leading-10">
-                    Genres:{" "}
-                    {movieDetails.genres &&
-                      movieDetails.genres.slice(0, 2).map((genre) => {
-                        return (
-                          <>
-                            <span className="text-white ml-2">
-                              {genre.name}
-                            </span>
-                          </>
-                        );
-                      })}
-                  </h1>
-                </div>
-                <div>
+              
+              {movieDetails.adult && (
+                <>
+                  <div className="h-6 border-l border-gray-500"></div>
+                  <div className="bg-red-600 text-white text-xs px-2 py-1 rounded">
+                    18+
+                  </div>
+                </>
+              )}
+              
+              <div className="ml-auto flex gap-2">
                   <button
-                    onClick={() => navigate("/")}
-                    className="group flex items-center justify-center w-full bg-red-600 border-white text-white font-medium sm:font-bold text-xs sm:mt-4 sm:px-12 sm:text-lg md:px-16 md:text-xl py-3 rounded shadow hover:shadow-lg hover:bg-white hover:border-white hover:text-red-700 outline-none focus:outline-none mb-3 ease-linear transition-all duration-150"
-                  >
+                  onClick={handleMyListAction}
+                  className={`flex items-center justify-center px-3 py-1 rounded-full ${
+                    isInMyList 
+                      ? "bg-gray-700 hover:bg-gray-600" 
+                      : "bg-yellow-600 hover:bg-yellow-500"
+                  } transition-colors`}
+                >
+                  {isInMyList ? (
+                    <>
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-5 w-5 mr-1" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M6 18L18 6M6 6l12 12" 
+                        />
+                      </svg>
+                      Remove
+                    </>
+                  ) : (
+                    <>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-1" 
                       fill="none"
                       viewBox="0 0 24 24"
-                      strokeWidth={1.5}
                       stroke="currentColor"
-                      className="w-6 h-6 mr-2 ml-2"
                     >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+                          strokeWidth={2} 
+                          d="M12 4v16m8-8H4" 
                       />
                     </svg>
-                    Back to Home
-                  </button>
-                </div>
+                      Add to My List
+                    </>
+                  )}
+                </button>
               </div>
-              <img
-                src={
-                  movieDetails.poster_path &&
-                  `${
-                    imageURL +
-                    (window.innerWidth > 1024
-                      ? movieDetails.backdrop_path
-                        ? movieDetails.backdrop_path
-                        : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
-                      : movieDetails.poster_path)
-                  }`
-                }
-                className="w-40 rounded-sm lg:w-[45rem] ml-4 lg:ml-0"
-                alt="Movie Poster"
+            </div>
+
+            {/* Movie Information Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+              {/* Left Column - Poster */}
+              <div className="hidden lg:block">
+                <img
+                  src={`${imageURL2}${movieDetails.poster_path}`}
+                  alt={movieDetails.title}
+                  className="w-full rounded-lg shadow-lg"
+                />
+              </div>
+
+              {/* Center/Right Columns - Details & Tabs */}
+              <div className="lg:col-span-2">
+                {/* Tabs Navigation */}
+                <div className="flex border-b border-gray-700 mb-6 overflow-x-auto">
+                  <button
+                    className={`px-4 py-2 font-medium ${
+                      activeTab === 'overview'
+                        ? 'text-yellow-500 border-b-2 border-yellow-500'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                    onClick={() => setActiveTab('overview')}
+                  >
+                    Overview
+                  </button>
+                  <button
+                    className={`px-4 py-2 font-medium ${
+                      activeTab === 'videos'
+                        ? 'text-yellow-500 border-b-2 border-yellow-500'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                    onClick={() => setActiveTab('videos')}
+                  >
+                    Videos
+                  </button>
+                  <button
+                    className={`px-4 py-2 font-medium ${
+                      activeTab === 'cast'
+                        ? 'text-yellow-500 border-b-2 border-yellow-500'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                    onClick={() => setActiveTab('cast')}
+                  >
+                    Cast & Crew
+                  </button>
+                  {collectionInfo && (
+                    <button
+                      className={`px-4 py-2 font-medium ${
+                        activeTab === 'collection'
+                          ? 'text-yellow-500 border-b-2 border-yellow-500'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                      onClick={() => setActiveTab('collection')}
+                    >
+                      Collection
+                    </button>
+                  )}
+                </div>
+
+                {/* Tab Content */}
+                <div className="tab-content">
+                  {/* Overview Tab */}
+                  {activeTab === 'overview' && (
+                    <div>
+                      <div className="lg:hidden mb-6 flex justify-center">
+                        <img
+                          src={`${imageURL2}${movieDetails.poster_path}`}
+                          alt={movieDetails.title}
+                          className="w-1/2 rounded-lg shadow-lg"
               />
             </div>
-          </section>
+                      
+                      <div className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">Storyline</h2>
+                        <p className="text-gray-300 leading-relaxed">
+                          {movieDetails.overview || "No overview available."}
+                        </p>
+                      </div>
 
-          {/* Similar movies section */}
-          {similarMovies.length !== 0 && (
-            <section>
-              <div className="flex flex-wrap justify-center bg-[#000000ac]">
-                <div className="p-4 sm:p-14">
-                  <h1 className="text-white text-4xl font-semibold my-10 border-l-4 border-red-800 pl-3">
-                    Similar Movies
-                  </h1>
-                  <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
-                    {similarMovies &&
-                      similarMovies.map((similarMovie) => {
-                        return (
-                          <div className="max-w-sm shadow mb-4">
-                            <img
-                              src={
-                                similarMovie.backdrop_path
-                                  ? imageURL2 + similarMovie.backdrop_path
-                                  : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
-                              }
-                              alt=""
-                              className="cursor-pointer"
-                              onClick={() => {
-                                playMovie(similarMovie);
-                                window.location.reload(true);
-                              }}
-                            />
-                            <div className="p-1">
-                              <h5 className="mt-1 mb-2 text-xl sm:text-2xl font-bold tracking-tight text-white dark:text-white">
-                                {similarMovie.original_title ||
-                                  similarMovie.title}
-                              </h5>
-                              <div className="flex justify-between items-center text-white mb-1">
-                                <div className="flex items-center">
-                                  <div className="flex sm:flex-col">
-                                    <h1 className="text-green-500 text-xs lg:text-base">
-                                      {Math.floor(
-                                        Math.random() * (100 - 60 + 1) + 60
-                                      )}
-                                      % match
-                                    </h1>
-                                    <h1 className="text-xs lg:text-base ml-2 sm:ml-0">
-                                      {similarMovie.release_date ||
-                                      similarMovie.first_air_date
-                                        ? formatDate(
-                                            similarMovie.release_date ||
-                                              similarMovie.first_air_date
-                                          )
-                                        : ""}
-                                    </h1>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        {/* Basic Details */}
+                        <div>
+                          <h2 className="text-xl font-semibold mb-4">Details</h2>
+                          
+                          <div className="space-y-2">
+                            <div className="flex">
+                              <span className="w-32 text-gray-400">Status:</span>
+                              <span>{movieDetails.status}</span>
+                            </div>
+                            
+                            <div className="flex">
+                              <span className="w-32 text-gray-400">Original Language:</span>
+                              <span>
+                                {movieDetails.original_language?.toUpperCase() || "N/A"}
+                              </span>
+                            </div>
+                            
+                            <div className="flex">
+                              <span className="w-32 text-gray-400">Budget:</span>
+                              <span>{formatMoney(movieDetails.budget)}</span>
+                            </div>
+                            
+                            <div className="flex">
+                              <span className="w-32 text-gray-400">Revenue:</span>
+                              <span>{formatMoney(movieDetails.revenue)}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Genres & Tags */}
+                        <div>
+                          <h2 className="text-xl font-semibold mb-4">Genres</h2>
+                          
+                          <div className="flex flex-wrap gap-2 mb-6">
+                            {movieDetails.genres?.map(genre => (
+                              <span 
+                                key={genre.id}
+                                className="bg-gray-800 px-3 py-1 rounded-full text-sm"
+                              >
+                                {genre.name}
+                              </span>
+                            ))}
+                          </div>
+                          
+                          {movieDetails.production_companies?.length > 0 && (
+                            <>
+                              <h2 className="text-xl font-semibold mb-4">Production</h2>
+                              <div className="flex flex-wrap gap-4">
+                                {movieDetails.production_companies.map(company => (
+                                  <div key={company.id} className="flex items-center">
+                                    {company.logo_path ? (
+                                      <img 
+                                        src={`${imageURL2}${company.logo_path}`}
+                                        alt={company.name}
+                                        className="h-8 mr-2 bg-white p-1 rounded"
+                                      />
+                                    ) : (
+                                      <span className="text-sm">{company.name}</span>
+                                    )}
                                   </div>
-                                  <h1 className="hidden sm:grid py-1 px-2 border-2 border-gray-800 rounded-md ml-2">
-                                    HD
-                                  </h1>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Videos Tab */}
+                  {activeTab === 'videos' && (
+                    <div>
+                      <h2 className="text-xl font-semibold mb-4">Videos & Trailers</h2>
+                      
+                      {trailerVideos.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                          {trailerVideos.map(video => (
+                            <div 
+                              key={video.id} 
+                              className={`cursor-pointer group relative ${
+                                activeVideo?.id === video.id 
+                                  ? 'ring-2 ring-yellow-500' 
+                                  : ''
+                              }`}
+                              onClick={() => handleVideoSelect(video)}
+                            >
+                              <div className="relative aspect-video">
+                                <img 
+                                  src={`https://img.youtube.com/vi/${video.key}/mqdefault.jpg`}
+                                  alt={video.name}
+                                  className="w-full h-full object-cover rounded"
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <svg 
+                                    className="w-12 h-12 text-white" 
+                                    fill="currentColor" 
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M8 5v14l11-7z" />
+                                  </svg>
                                 </div>
                               </div>
-                              <p className="mb-3 font-normal text-stone-400 line-clamp-3 text-xs sm:text-base">
-                                {similarMovie.overview}
+                              <div className="mt-2">
+                                <p className="font-medium text-sm truncate">{video.name}</p>
+                                <p className="text-xs text-gray-400">{video.type}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-400">No videos available for this movie.</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Cast Tab */}
+                  {activeTab === 'cast' && (
+                    <div>
+                      <h2 className="text-xl font-semibold mb-4">Cast</h2>
+                      
+                      {movieDetails.credits?.cast?.length > 0 ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
+                          {movieDetails.credits.cast.slice(0, 10).map(person => (
+                            <div key={person.id} className="text-center">
+                              <div className="aspect-square rounded-full overflow-hidden mb-2 mx-auto w-20 h-20">
+                                {person.profile_path ? (
+                                  <img 
+                                    src={`${imageURL2}${person.profile_path}`}
+                                    alt={person.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                                    <span className="text-2xl">👤</span>
+                                  </div>
+                                )}
+                              </div>
+                              <p className="font-medium text-sm">{person.name}</p>
+                              <p className="text-xs text-gray-400 truncate">{person.character}</p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-400 mb-8">No cast information available.</p>
+                      )}
+                      
+                      <h2 className="text-xl font-semibold mb-4">Crew</h2>
+                      
+                      {movieDetails.credits?.crew?.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                          {movieDetails.credits.crew
+                            .filter(person => 
+                              ['Director', 'Producer', 'Screenplay', 'Writer'].includes(person.job)
+                            )
+                            .slice(0, 9)
+                            .map(person => (
+                              <div key={`${person.id}-${person.job}`} className="flex items-center">
+                                <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                  {person.profile_path ? (
+                                    <img 
+                                      src={`${imageURL2}${person.profile_path}`}
+                                      alt={person.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                                      <span className="text-sm">👤</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="font-medium text-sm">{person.name}</p>
+                                  <p className="text-xs text-gray-400">{person.job}</p>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-400">No crew information available.</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Collection Tab */}
+                  {activeTab === 'collection' && collectionInfo && (
+                    <div>
+                      <div 
+                        className="w-full h-40 bg-cover bg-center rounded-lg mb-6"
+                        style={{
+                          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url(${imageURL}${collectionInfo.backdrop_path})`,
+                        }}
+                      >
+                        <div className="h-full flex items-center p-6">
+                          <h2 className="text-2xl font-bold">{collectionInfo.name}</h2>
+                        </div>
+                      </div>
+                      
+                      <p className="text-gray-300 mb-6">{collectionInfo.overview}</p>
+                      
+                      <h3 className="text-xl font-semibold mb-4">Movies in this collection</h3>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {collectionInfo.parts.map(movie => (
+                          <div 
+                            key={movie.id} 
+                            className={`cursor-pointer group relative ${
+                              movie.id === parseInt(id) ? 'ring-2 ring-yellow-500' : ''
+                            }`}
+                            onClick={() => navigate(`/play/${movie.id}`)}
+                          >
+                            <div className="relative aspect-[2/3]">
+                              <img 
+                                src={movie.poster_path ? `${imageURL2}${movie.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Poster'} 
+                                alt={movie.title} 
+                                className="w-full h-full object-cover rounded"
+                              />
+                              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <div className="text-white">
+                                  {movie.id === parseInt(id) ? 'Currently Viewing' : 'View Movie'}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="mt-2">
+                              <p className="font-medium text-sm">{movie.title}</p>
+                              <p className="text-xs text-gray-400">
+                                {movie.release_date ? formatDate(movie.release_date).split(',')[1] : 'TBA'}
                               </p>
                             </div>
                           </div>
-                        );
-                      })}
+                        ))}
+                      </div>
                   </div>
+                  )}
                 </div>
+              </div>
+            </div>
+
+            {/* Similar Movies Section */}
+            {similarMovies.length > 0 && (
+              <section className="mt-12 mb-8">
+                <h2 className="text-2xl font-bold mb-6 border-l-4 border-yellow-500 pl-3">
+                  Recommended Movies
+                </h2>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {similarMovies.map(movie => (
+                    <div 
+                      key={movie.id} 
+                      className="cursor-pointer group"
+                      onClick={() => {
+                        playMovie(movie);
+                        window.location.reload();
+                      }}
+                    >
+                      <div className="relative aspect-[2/3] mb-2">
+                        <img 
+                          src={movie.poster_path ? `${imageURL2}${movie.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Poster'} 
+                          alt={movie.title} 
+                          className="w-full h-full object-cover rounded transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            className="h-12 w-12" 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            stroke="currentColor"
+                          >
+                            <path 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                              strokeWidth={2} 
+                              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" 
+                            />
+                            <path 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round" 
+                              strokeWidth={2} 
+                              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                      <h3 className="font-medium text-sm truncate">{movie.title}</h3>
+                      <div className="flex items-center mt-1">
+                        <svg 
+                          className="w-4 h-4 text-yellow-500" 
+                          fill="currentColor" 
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <span className="text-xs text-gray-400 ml-1">
+                          {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </section>
           )}
-        </>
-      ) : (
-        <>
-          <div className="px-4 lg:px-10 xl:px-12 animate-pulse">
-            <div className="w-72 mt-4 sm:ml-0 sm:w-96 py-5 mb-7 xl:py-7 xl:w-45rem bg-neutral-900 rounded-md"></div>
-            <div className="w-full py-1 mb-3 xl:py-2 bg-neutral-900 rounded-md"></div>
-            <div className="w-full py-1 mb-3 xl:py-2 bg-neutral-900 rounded-md"></div>
-            <div className="w-full py-1 mb-3 xl:py-2 bg-neutral-900 rounded-md"></div>
-            <div className="w-full py-1 mb-8 xl:py-2 bg-neutral-900 rounded-md"></div>
           </div>
         </>
       )}
-      <Footer></Footer>
+      
+      <Footer />
     </div>
   );
 }

@@ -23,11 +23,13 @@ export const searchPerson = (query) =>
 
 // Movie details endpoints
 export const movieDetails = (movieId) => 
-  `movie/${movieId}?api_key=${API_KEY}&language=en-US`;
+  `movie/${movieId}?api_key=${API_KEY}&language=en-US&append_to_response=credits,images,watch/providers`;
 export const movieVideos = (movieId) => 
   `movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`;
 export const movieRecommendations = (movieId) => 
   `movie/${movieId}/recommendations?api_key=${API_KEY}&language=en-US&page=1`;
+export const collectionDetails = (collectionId) => 
+  `collection/${collectionId}?api_key=${API_KEY}&language=en-US`;
 
 // Discovery endpoints
 export const discoverByPeople = (peopleIds) => 
