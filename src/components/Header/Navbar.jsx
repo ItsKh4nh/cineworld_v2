@@ -3,14 +3,34 @@ import React, { useState, useEffect, useContext } from "react";
 import { Transition } from "@headlessui/react";
 import { getAuth, signOut } from "firebase/auth";
 import { Fade } from "react-awesome-reveal";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import { AuthContext } from "../../contexts/UserContext";
+import { genresList } from "../../config/constants";
 
 function Navbar(props) {
   const { User } = useContext(AuthContext);
   const [profilePic, setProfilePic] = useState("");
   const [username, setUsername] = useState("");
+  const [genreDropdownOpen, setGenreDropdownOpen] = useState(false);
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const location = useLocation();
+
+  // Country list
+  const countries = [
+    { code: "US", name: "United States" },
+    { code: "GB", name: "United Kingdom" },
+    { code: "CA", name: "Canada" },
+    { code: "AU", name: "Australia" },
+    { code: "FR", name: "France" },
+    { code: "DE", name: "Germany" },
+    { code: "IT", name: "Italy" },
+    { code: "IN", name: "India" },
+    { code: "JP", name: "Japan" },
+    { code: "KR", name: "South Korea" },
+    { code: "HK", name: "Hong Kong" },
+    { code: "CN", name: "China" }
+  ];
 
   const navigate = useNavigate();
 
@@ -26,6 +46,14 @@ function Navbar(props) {
       window.removeEventListener("scroll", transitionNavBar);
     };
   }, [User?.displayName]); // Add displayName as dependency to catch updates
+  
+  // Close mobile menu and dropdowns when location changes (user navigates)
+  useEffect(() => {
+    setIsOpen(false);
+    setGenreDropdownOpen(false);
+    setCountryDropdownOpen(false);
+  }, [location]);
+  
   const [isOpen, setIsOpen] = useState(false);
 
   const [show, handleShow] = useState(false);
@@ -83,12 +111,86 @@ function Navbar(props) {
                 </div>
                 <div className="hidden md:block">
                   <div className="flex items-center ml-10 space-x-4">
-                    <Link
-                      to={"/movies"}
-                      className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m"
-                    >
-                      Movies
-                    </Link>
+
+                    {/* Genre Dropdown */}
+                    <div className="relative group">
+                      <button
+                        onClick={() => {
+                          setGenreDropdownOpen(!genreDropdownOpen);
+                          setCountryDropdownOpen(false);
+                        }}
+                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m flex items-center"
+                      >
+                        Genre
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className="h-4 w-4 ml-1" 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      
+                      {/* Genre Dropdown Menu */}
+                      <div 
+                        className={`absolute left-0 mt-2 w-96 rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transition-opacity duration-150 ${genreDropdownOpen ? 'opacity-100' : 'opacity-0 invisible'}`}
+                      >
+                        <div className="py-1 max-h-96 overflow-y-auto grid grid-cols-3 gap-1">
+                          {genresList.map((genre) => (
+                            <Link
+                              key={genre.id}
+                              to={`/genre/${genre.name.toLowerCase().replace(/ /g, '-')}`}
+                              className="block px-4 py-2 text-sm text-white hover:bg-red-800 hover:text-white"
+                              onClick={() => setGenreDropdownOpen(false)}
+                            >
+                              {genre.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Country Dropdown */}
+                    <div className="relative group">
+                      <button
+                        onClick={() => {
+                          setCountryDropdownOpen(!countryDropdownOpen);
+                          setGenreDropdownOpen(false);
+                        }}
+                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m flex items-center"
+                      >
+                        Country
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className="h-4 w-4 ml-1" 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      
+                      {/* Country Dropdown Menu */}
+                      <div 
+                        className={`absolute left-0 mt-2 w-[28rem] rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transition-opacity duration-150 ${countryDropdownOpen ? 'opacity-100' : 'opacity-0 invisible'}`}
+                      >
+                        <div className="py-1 max-h-96 overflow-y-auto grid grid-cols-3 gap-2 px-2">
+                          {countries.map((country) => (
+                            <Link
+                              key={country.code}
+                              to={`/country/${country.name.toLowerCase().replace(/ /g, '-')}`}
+                              className="block px-4 py-2 text-sm text-white hover:bg-red-800 hover:text-white whitespace-nowrap"
+                              onClick={() => setCountryDropdownOpen(false)}
+                            >
+                              {country.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
 
                     <Link
                       to={"/mylist"}
@@ -220,24 +322,80 @@ function Navbar(props) {
             {(ref) => (
               <div className="md:hidden" id="mobile-menu">
                 <div ref={ref} className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                  <Link to={"/"}>
-                    <a className="block px-3 py-2 text-base font-medium text-white rounded-md hover:bg-red-800">
-                      Movies
-                    </a>
-                  </Link>
+                  {/* Mobile Genre Dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => {
+                        setGenreDropdownOpen(!genreDropdownOpen);
+                        setCountryDropdownOpen(false);
+                      }}
+                      className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white"
+                    >
+                      Genre
+                    </button>
+                    
+                    {genreDropdownOpen && (
+                      <div className="pl-4 space-y-1">
+                        <div className="grid grid-cols-2 gap-1">
+                          {genresList.map((genre) => (
+                            <Link
+                              key={genre.id}
+                              to={`/genre/${genre.name.toLowerCase().replace(/ /g, '-')}`}
+                              className="block px-3 py-1 text-sm text-gray-400 hover:text-white"
+                              onClick={() => {
+                                setGenreDropdownOpen(false);
+                                setIsOpen(false);
+                              }}
+                            >
+                              {genre.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Mobile Country Dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => {
+                        setCountryDropdownOpen(!countryDropdownOpen);
+                        setGenreDropdownOpen(false);
+                      }}
+                      className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white"
+                    >
+                      Country
+                    </button>
+                    
+                    {countryDropdownOpen && (
+                      <div className="pl-4 space-y-1">
+                        <div className="grid grid-cols-2 gap-2 pr-2">
+                          {countries.map((country) => (
+                            <Link
+                              key={country.code}
+                              to={`/country/${country.name.toLowerCase().replace(/ /g, '-')}`}
+                              className="block px-3 py-1 text-sm text-gray-400 hover:text-white whitespace-nowrap"
+                              onClick={() => {
+                                setCountryDropdownOpen(false);
+                                setIsOpen(false);
+                              }}
+                            >
+                              {country.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   <Link to={"/mylist"}>
-                    <a className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white">
+                    <a 
+                      className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white"
+                      onClick={() => setIsOpen(false)}
+                    >
                       MyList
                     </a>
                   </Link>
-
-                  <a
-                    onClick={SignOut}
-                    className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white"
-                  >
-                    Logout
-                  </a>
                 </div>
               </div>
             )}

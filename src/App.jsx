@@ -2,6 +2,8 @@ import { useContext, useEffect, lazy, Suspense } from "react";
 import "./App.css";
 
 const Home = lazy(() => import("./pages/Home"));
+const Genre = lazy(() => import("./pages/Genre"));
+const Country = lazy(() => import("./pages/Country"));
 const Search = lazy(() => import("./pages/Search"));
 const Profile = lazy(() => import("./pages/Profile"));
 const MyList = lazy(() => import("./pages/MyList"));
@@ -42,7 +44,8 @@ function App() {
               <Route index path="/" element={User ? <Home /> : <Welcome />} />
               {User ? (
                 <>
-                  <Route path="/home" element={<Home />} />
+                  <Route path="/genre/:genreName" element={<Genre />} />
+                  <Route path="/country/:countryName" element={<Country />} />
                   <Route path="/search" element={<Search />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/mylist" element={<MyList />} />

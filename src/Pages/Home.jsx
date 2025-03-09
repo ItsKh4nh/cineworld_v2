@@ -12,7 +12,6 @@ import {
   Trending,
   TopRated,
   NowPlaying,
-  GenreList,
   getGenreList
 } from "../config/URLs";
 import { discoverByPeople } from "../config/URLs";
@@ -93,7 +92,7 @@ function Home() {
           <RowPost
             key={`genre-${genre.id}`}
             title={genre.name}
-            url={getGenreList(genre.id) + '&sort_by=vote_average.desc&vote_count.gte=1000'}
+            url={getGenreList(genre.id) + '&sort_by=vote_average.desc&vote_count.gte=100'}
           ></RowPost>
         ))}
         
