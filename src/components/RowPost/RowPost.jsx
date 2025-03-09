@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 
 import { Fade } from "react-awesome-reveal";
-import YouTube from "react-youtube";
 import axios from "../../axios";
 import { API_KEY, imageURL, imageURL2 } from "../../config/constants";
 import { AuthContext } from "../../contexts/UserContext";

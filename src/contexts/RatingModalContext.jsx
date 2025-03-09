@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import RatingModal from "../components/Modals/RatingModal";
-import { updateDoc, doc, arrayUnion, getDoc } from "firebase/firestore";
+import { updateDoc, doc, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -58,24 +58,55 @@ export const RatingModalProvider = ({ children }) => {
     navigate("/mylist");
   };
 
-  const addRatedMovieToList = (ratedMovie) => {
+  const addRatedMovieToList = async (ratedMovie) => {
     if (!user) {
       toast.error("User not authenticated");
       return;
     }
 
     console.log("Adding rated movie to list:", ratedMovie);
-    updateDoc(doc(db, "MyList", user.uid), { movies: arrayUnion(ratedMovie) })
-      .then(() => {
+    
+    try {
+      // Check if the movie already exists in the list
+      const userDocRef = doc(db, "MyList", user.uid);
+      const docSnap = await getDoc(userDocRef);
+      
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        const movies = userData.movies || [];
+        const existingMovie = movies.find(m => m.id === ratedMovie.id);
+        
+        if (existingMovie) {
+          // Movie exists, update it instead of adding a duplicate
+          // First remove the existing movie
+          const filteredMovies = movies.filter(m => m.id !== ratedMovie.id);
+          
+          // Then add the updated movie
+          filteredMovies.push(ratedMovie);
+          
+          // Update the document with the new array
+          await updateDoc(userDocRef, { movies: filteredMovies });
+          console.log("Movie rating updated successfully");
+          toast.success("Rating updated successfully!");
+        } else {
+          // Movie doesn't exist, add it to the list
+          await updateDoc(userDocRef, { movies: arrayUnion(ratedMovie) });
+          console.log("Rated movie added to MyList");
+          toast.success("Movie added to MyList");
+        }
+      } else {
+        // Document doesn't exist, create it with the movie
+        await updateDoc(userDocRef, { movies: arrayUnion(ratedMovie) });
         console.log("Rated movie added to MyList");
         toast.success("Movie added to MyList");
-        closeRatingModal();
-      })
-      .catch((error) => {
-        console.log(error.code);
-        console.log(error.message);
-        toast.error(error.message);
-      });
+      }
+      
+      closeRatingModal();
+    } catch (error) {
+      console.log(error.code);
+      console.log(error.message);
+      toast.error(error.message);
+    }
   };
 
   return (

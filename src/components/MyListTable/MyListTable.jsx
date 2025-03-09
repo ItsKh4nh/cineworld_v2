@@ -231,15 +231,18 @@ function MyListTable() {
     setShowConfirmation(true);
   };
 
-  const confirmRemove = () => {
+  const confirmRemove = async () => {
     if (movieToRemove) {
-      removeFromMyList(movieToRemove);
+      const success = await removeFromMyList(movieToRemove);
       setShowConfirmation(false);
       setMovieToRemove(null);
-      // Refresh the list after a short delay to allow the update to complete
-      setTimeout(() => {
-        getMovies();
-      }, 1000);
+      
+      if (success) {
+        // Refresh the list after a short delay to allow the update to complete
+        setTimeout(() => {
+          getMovies();
+        }, 1000);
+      }
     }
   };
 
@@ -284,21 +287,32 @@ function MyListTable() {
     }
   };
 
-  const handleRemovePerson = (person) => {
+  const handleRemovePerson = async (person) => {
     // Get the current user's document
     const userDocRef = doc(db, "MyList", User.uid);
     
-    // Remove the person from the people array
-    updateDoc(userDocRef, {
-      people: arrayRemove(person)
-    }).then(() => {
-      // Update the local state
-      setMyPeople(myPeople.filter(p => p.id !== person.id));
-      toast.success(`${person.name} removed from your list`);
-    }).catch(error => {
+    try {
+      // Get the current list
+      const docSnap = await getDoc(userDocRef);
+      
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        const currentPeople = userData.people || [];
+        
+        // Filter out the person to remove by ID
+        const filteredPeople = currentPeople.filter(p => p.id !== person.id);
+        
+        // Update the document with the filtered list
+        await updateDoc(userDocRef, { people: filteredPeople });
+        
+        // Update the local state
+        setMyPeople(myPeople.filter(p => p.id !== person.id));
+        toast.success(`${person.name} removed from your list`);
+      }
+    } catch (error) {
       console.error("Error removing person:", error);
       toast.error("Failed to remove person from your list");
-    });
+    }
   };
 
   const formatRuntime = (minutes) => {
