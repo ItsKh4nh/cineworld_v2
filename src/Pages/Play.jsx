@@ -13,6 +13,8 @@ import Footer from "../components/Footer/Footer";
 import usePlayMovie from "../hooks/usePlayMovie";
 import useUpdateMyList from "../hooks/useUpdateMyList";
 import { ClipLoader } from "react-spinners";
+import ReactPlayer from 'react-player';
+import Papa from 'papaparse';
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -29,6 +31,7 @@ function Play() {
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
   const [isInMyList, setIsInMyList] = useState(false);
+  const [movieSource, setMovieSource] = useState(null);
   const videoRef = useRef(null);
 
   // Hooks
@@ -37,6 +40,28 @@ function Play() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Check movie source
+  const checkMovieSource = async () => {
+    try {
+      const response = await fetch('/movie_sources/OPhim.csv');
+      const csvText = await response.text();
+      
+      Papa.parse(csvText, {
+        header: true,
+        complete: (results) => {
+          const source = results.data.find(row => row.movie_id === id);
+          if (source && source.link_m3u8_1) {
+            setMovieSource(source.link_m3u8_1);
+            // If we have a direct source, don't load YouTube trailer
+            setUrlId("");
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error checking movie source:", error);
+    }
+  };
 
   // Helper functions
   const formatDate = (dateString) => {
@@ -89,7 +114,10 @@ function Play() {
     // Check if movie is in user's list
     checkMovieInList();
 
-    // Fetch movie videos
+    // Check for movie source
+    checkMovieSource();
+
+    // Fetch movie videos (for trailer if no direct source)
     axios.get(movieVideos(id))
       .then((response) => {
         if (response.data.results.length !== 0) {
@@ -176,17 +204,30 @@ function Play() {
             ref={videoRef}
             className="relative w-full h-[30vh] sm:h-[40vh] md:h-[50vh] lg:h-[65vh] xl:h-[85vh] bg-black"
           >
-        {urlId ? (
-          <iframe
-            width="100%"
+            {movieSource ? (
+              <ReactPlayer
+                url={movieSource}
+                width="100%"
+                height="100%"
+                playing={true}
+                controls={true}
+                config={{
+                  file: {
+                    forceHLS: true,
+                  }
+                }}
+              />
+            ) : urlId ? (
+              <iframe
+                width="100%"
                 height="100%"
                 src={`//www.youtube.com/embed/${urlId}?modestbranding=1&autoplay=1`}
-            frameBorder="0"
+                frameBorder="0"
                 allow="autoplay; encrypted-media"
-            allowFullScreen
+                allowFullScreen
                 className="w-full h-full"
-          ></iframe>
-        ) : (
+              ></iframe>
+            ) : (
               <div 
                 className="w-full h-full bg-cover bg-center flex items-end"
                 style={{
@@ -199,8 +240,8 @@ function Play() {
                   </h1>
                 </div>
               </div>
-        )}
-      </div>
+            )}
+          </div>
 
           {/* Main Content */}
           <div className="container mx-auto px-4 py-6 -mt-6 relative z-10">
