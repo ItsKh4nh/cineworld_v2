@@ -31,6 +31,16 @@ export const movieRecommendations = (movieId) =>
 export const collectionDetails = (collectionId) => 
   `collection/${collectionId}?api_key=${API_KEY}&language=en-US`;
 
+// New endpoints for additional movie information
+export const movieExternalIds = (movieId) =>
+  `movie/${movieId}/external_ids?api_key=${API_KEY}`;
+export const movieKeywords = (movieId) =>
+  `movie/${movieId}/keywords?api_key=${API_KEY}`;
+export const movieReviews = (movieId) =>
+  `movie/${movieId}/reviews?api_key=${API_KEY}&language=en-US&page=1`;
+export const configurationLanguages = 
+  `configuration/languages?api_key=${API_KEY}`;
+
 // Discovery endpoints
 export const discoverByPeople = (peopleIds) => 
   `discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&include_adult=false&include_video=false&page=1&with_people=${peopleIds}&vote_count.gte=100`;

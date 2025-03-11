@@ -5,9 +5,13 @@ import {
   movieVideos, 
   movieDetails as getMovieDetails, 
   movieRecommendations,
-  collectionDetails
+  collectionDetails,
+  movieExternalIds,
+  movieKeywords,
+  movieReviews,
+  configurationLanguages
 } from "../config/URLs";
-import { imageURL, imageURL2 } from "../config/constants";
+import { imageURL, imageURL2, languageMap } from "../config/constants";
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
 import usePlayMovie from "../hooks/usePlayMovie";
@@ -32,6 +36,10 @@ function Play() {
   const [loading, setLoading] = useState(true);
   const [isInMyList, setIsInMyList] = useState(false);
   const [movieSource, setMovieSource] = useState(null);
+  const [externalIds, setExternalIds] = useState({});
+  const [keywords, setKeywords] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [languages, setLanguages] = useState({});
   const videoRef = useRef(null);
 
   // Hooks
@@ -79,8 +87,26 @@ function Play() {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      maximumFractionDigits: 0
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const formatLanguage = (languageCode) => {
+    if (!languageCode) return "N/A";
+    
+    // First check our languages object from the API
+    if (languages[languageCode]) {
+      return languages[languageCode];
+    }
+    
+    // Fall back to our predefined map
+    if (languageMap[languageCode]) {
+      return languageMap[languageCode];
+    }
+    
+    // If no match found, return the code in uppercase
+    return languageCode.toUpperCase();
   };
 
   const formatRuntime = (minutes) => {
@@ -105,19 +131,46 @@ function Play() {
 
   // Data fetching
   useEffect(() => {
+    // Reset states
+    setUrlId("");
+    setActiveVideo(null);
+    setMovieDetails({});
+    setTrailerVideos([]);
+    setSimilarMovies([]);
+    setCollectionInfo(null);
     setLoading(true);
-    
+    setMovieSource(null);
+    setExternalIds({});
+    setKeywords([]);
+    setReviews([]);
+
     if (location.state?.From === "MyList") {
       setIsFromMyList(true);
     }
 
-    // Check if movie is in user's list
+    // Check if movie is in My List
     checkMovieInList();
-
-    // Check for movie source
+    
+    // Check for direct movie sources
     checkMovieSource();
 
-    // Fetch movie videos (for trailer if no direct source)
+    // Fetch language configurations if not already loaded
+    if (Object.keys(languages).length === 0) {
+      axios.get(configurationLanguages)
+        .then(response => {
+          // Convert array to object with ISO_639_1 as keys
+          const languagesObj = {};
+          response.data.forEach(lang => {
+            languagesObj[lang.iso_639_1] = lang.english_name;
+          });
+          setLanguages(languagesObj);
+        })
+        .catch(error => {
+          console.error("Error fetching languages:", error);
+        });
+    }
+
+    // Fetch trailer videos
     axios.get(movieVideos(id))
       .then((response) => {
         if (response.data.results.length !== 0) {
@@ -151,6 +204,33 @@ function Play() {
               console.error("Error fetching collection:", error);
             });
         }
+
+        // Fetch external IDs (IMDB, social media, etc.)
+        axios.get(movieExternalIds(id))
+          .then(externalResponse => {
+            setExternalIds(externalResponse.data);
+          })
+          .catch(error => {
+            console.error("Error fetching external IDs:", error);
+          });
+
+        // Fetch movie keywords
+        axios.get(movieKeywords(id))
+          .then(keywordsResponse => {
+            setKeywords(keywordsResponse.data.keywords || []);
+          })
+          .catch(error => {
+            console.error("Error fetching keywords:", error);
+          });
+
+        // Fetch movie reviews
+        axios.get(movieReviews(id))
+          .then(reviewsResponse => {
+            setReviews(reviewsResponse.data.results || []);
+          })
+          .catch(error => {
+            console.error("Error fetching reviews:", error);
+          });
 
         // Fetch similar movies
         axios.get(movieRecommendations(id))
@@ -374,6 +454,16 @@ function Play() {
                   >
                     Cast & Crew
                   </button>
+                  <button
+                    className={`px-4 py-2 font-medium ${
+                      activeTab === 'reviews'
+                        ? 'text-yellow-500 border-b-2 border-yellow-500'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                    onClick={() => setActiveTab('reviews')}
+                  >
+                    Reviews
+                  </button>
                   {collectionInfo && (
                     <button
                       className={`px-4 py-2 font-medium ${
@@ -418,13 +508,53 @@ function Play() {
                               <span className="w-32 text-gray-400">Status:</span>
                               <span>{movieDetails.status}</span>
                             </div>
+
+                            {movieDetails.tagline && (
+                              <div className="flex">
+                                <span className="w-32 text-gray-400">Tagline:</span>
+                                <span>{movieDetails.tagline}</span>
+                              </div>
+                            )}
+                            
+                            {movieDetails.original_title && movieDetails.original_title !== movieDetails.title && (
+                              <div className="flex">
+                                <span className="w-32 text-gray-400">Original Title:</span>
+                                <span>{movieDetails.original_title}</span>
+                              </div>
+                            )}
                             
                             <div className="flex">
                               <span className="w-32 text-gray-400">Original Language:</span>
-                              <span>
-                                {movieDetails.original_language?.toUpperCase() || "N/A"}
-                              </span>
+                              <span>{formatLanguage(movieDetails.original_language)}</span>
                             </div>
+
+                            {movieDetails.homepage && (
+                              <div className="flex">
+                                <span className="w-32 text-gray-400">Homepage:</span>
+                                <a 
+                                  href={movieDetails.homepage} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-400 hover:underline"
+                                >
+                                  Official Website
+                                </a>
+                              </div>
+                            )}
+
+                            {externalIds.imdb_id && (
+                              <div className="flex">
+                                <span className="w-32 text-gray-400">IMDb:</span>
+                                <a 
+                                  href={`https://imdb.com/title/${externalIds.imdb_id}`} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-400 hover:underline"
+                                >
+                                  View on IMDb
+                                </a>
+                              </div>
+                            )}
                             
                             <div className="flex">
                               <span className="w-32 text-gray-400">Budget:</span>
@@ -435,6 +565,24 @@ function Play() {
                               <span className="w-32 text-gray-400">Revenue:</span>
                               <span>{formatMoney(movieDetails.revenue)}</span>
                             </div>
+
+                            {movieDetails.production_countries?.length > 0 && (
+                              <div className="flex">
+                                <span className="w-32 text-gray-400">Origin:</span>
+                                <span>
+                                  {movieDetails.production_countries.map(country => country.name).join(', ')}
+                                </span>
+                              </div>
+                            )}
+
+                            {movieDetails.spoken_languages?.length > 0 && (
+                              <div className="flex">
+                                <span className="w-32 text-gray-400">Spoken Languages:</span>
+                                <span>
+                                  {movieDetails.spoken_languages.map(lang => formatLanguage(lang.iso_639_1)).join(', ')}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -453,21 +601,40 @@ function Play() {
                             ))}
                           </div>
                           
+                          {keywords?.length > 0 && (
+                            <>
+                              <h2 className="text-xl font-semibold mb-4">Keywords</h2>
+                              <div className="flex flex-wrap gap-2 mb-6">
+                                {keywords.map(keyword => (
+                                  <span 
+                                    key={keyword.id}
+                                    className="bg-gray-700 px-3 py-1 rounded-full text-xs"
+                                  >
+                                    {keyword.name}
+                                  </span>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                          
                           {movieDetails.production_companies?.length > 0 && (
                             <>
                               <h2 className="text-xl font-semibold mb-4">Production</h2>
                               <div className="flex flex-wrap gap-4">
                                 {movieDetails.production_companies.map(company => (
-                                  <div key={company.id} className="flex items-center">
+                                  <div key={company.id} className="flex flex-col items-center text-center max-w-[150px]">
                                     {company.logo_path ? (
                                       <img 
                                         src={`${imageURL2}${company.logo_path}`}
                                         alt={company.name}
-                                        className="h-8 mr-2 bg-white p-1 rounded"
+                                        className="h-12 mb-2 bg-white p-1 rounded"
                                       />
                                     ) : (
-                                      <span className="text-sm">{company.name}</span>
+                                      <div className="h-12 mb-2 flex items-center justify-center">
+                                        <span className="text-sm text-gray-400">[No Logo]</span>
+                                      </div>
                                     )}
+                                    <span className="text-sm text-center">{company.name}</span>
                                   </div>
                                 ))}
                               </div>
@@ -524,7 +691,7 @@ function Play() {
                     </div>
                   )}
 
-                  {/* Cast Tab */}
+                  {/* Cast & Crew Tab */}
                   {activeTab === 'cast' && (
                     <div>
                       <h2 className="text-xl font-semibold mb-4">Cast</h2>
@@ -559,35 +726,126 @@ function Play() {
                       
                       {movieDetails.credits?.crew?.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                          {movieDetails.credits.crew
-                            .filter(person => 
-                              ['Director', 'Producer', 'Screenplay', 'Writer'].includes(person.job)
-                            )
-                            .slice(0, 9)
-                            .map(person => (
-                              <div key={`${person.id}-${person.job}`} className="flex items-center">
-                                <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                                  {person.profile_path ? (
+                          {/* Group the crew by their primary roles */}
+                          {[
+                            {title: 'Directors', jobs: ['Director']},
+                            {title: 'Writers', jobs: ['Screenplay', 'Writer', 'Story', 'Script']},
+                            {title: 'Producers', jobs: ['Producer', 'Executive Producer']}
+                          ].map(roleGroup => {
+                            // Filter crew by the specified job roles
+                            const crewInRole = movieDetails.credits.crew
+                              .filter(person => roleGroup.jobs.includes(person.job));
+                            
+                            // Only display non-empty role groups
+                            return crewInRole.length > 0 ? (
+                              <div key={roleGroup.title} className="mb-4">
+                                <h3 className="text-lg font-medium text-yellow-500 mb-2">{roleGroup.title}</h3>
+                                {crewInRole.map(person => (
+                                  <div key={`${person.id}-${person.job}`} className="flex items-center mb-2">
+                                    <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                      {person.profile_path ? (
+                                        <img 
+                                          src={`${imageURL2}${person.profile_path}`}
+                                          alt={person.name}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      ) : (
+                                        <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                                          <span className="text-sm">👤</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div>
+                                      <p className="font-medium text-sm">{person.name}</p>
+                                      <p className="text-xs text-gray-400">{person.job}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : null;
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-gray-400">No crew information available.</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Reviews Tab */}
+                  {activeTab === 'reviews' && (
+                    <div>
+                      <h2 className="text-xl font-semibold mb-6">Critics Reviews</h2>
+                      
+                      {reviews?.length > 0 ? (
+                        <div className="space-y-6">
+                          {reviews.map(review => (
+                            <div key={review.id} className="bg-gray-800 rounded-lg p-4">
+                              <div className="flex items-center mb-3">
+                                <div className="w-12 h-12 rounded-full overflow-hidden mr-3">
+                                  {review.author_details?.avatar_path ? (
                                     <img 
-                                      src={`${imageURL2}${person.profile_path}`}
-                                      alt={person.name}
+                                      src={review.author_details.avatar_path.startsWith('/') && !review.author_details.avatar_path.startsWith('/https:') 
+                                          ? `${imageURL2}${review.author_details.avatar_path}` 
+                                          : review.author_details.avatar_path.replace(/^\//, '')}
+                                      alt={review.author}
                                       className="w-full h-full object-cover"
+                                      onError={(e) => {e.target.onerror = null; e.target.src = 'https://placehold.co/150x150?text=🧩';}}
                                     />
                                   ) : (
-                                    <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                                      <span className="text-sm">👤</span>
+                                    <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+                                      <span className="text-xl">🧩</span>
                                     </div>
                                   )}
                                 </div>
                                 <div>
-                                  <p className="font-medium text-sm">{person.name}</p>
-                                  <p className="text-xs text-gray-400">{person.job}</p>
+                                  <p className="font-semibold">{review.author}</p>
+                                  <div className="flex items-center">
+                                    {review.author_details?.rating && (
+                                      <div className="mr-3 flex items-center">
+                                        <span className="text-yellow-500 mr-1">★</span>
+                                        <span>{review.author_details.rating}/10</span>
+                                      </div>
+                                    )}
+                                    <span className="text-sm text-gray-400">
+                                      {formatDate(review.updated_at || review.created_at)}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                            ))}
+                              <div className="review-content">
+                                <p className="text-gray-300 leading-relaxed line-clamp-4">{review.content}</p>
+                                {review.content.length > 300 && (
+                                  <button 
+                                    className="text-blue-400 hover:underline mt-2"
+                                    onClick={(e) => {
+                                      const content = e.target.parentElement;
+                                      content.querySelector('p').classList.toggle('line-clamp-4');
+                                      e.target.textContent = e.target.textContent === 'Read more' 
+                                        ? 'Show less' 
+                                        : 'Read more';
+                                    }}
+                                  >
+                                    Read more
+                                  </button>
+                                )}
+                              </div>
+                              {review.url && (
+                                <div className="mt-2">
+                                  <a 
+                                    href={review.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-blue-400 hover:underline"
+                                  >
+                                    Read full review
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       ) : (
-                        <p className="text-gray-400">No crew information available.</p>
+                        <p className="text-gray-400">No reviews available for this movie.</p>
                       )}
                     </div>
                   )}

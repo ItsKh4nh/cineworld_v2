@@ -3,6 +3,25 @@ export const baseURL = "https://api.themoviedb.org/3";
 export const imageURL = "https://image.tmdb.org/t/p/original";
 export const imageURL2 = "https://image.tmdb.org/t/p/w500";
 
+// Languages mapping for common language codes
+export const languageMap = {
+  "en": "English",
+  "es": "Spanish",
+  "fr": "French",
+  "de": "German",
+  "it": "Italian",
+  "ja": "Japanese",
+  "ko": "Korean",
+  "zh": "Chinese",
+  "ru": "Russian",
+  "pt": "Portuguese",
+  "hi": "Hindi",
+  "ar": "Arabic",
+  "tr": "Turkish",
+  "th": "Thai"
+  // This is just a basic set. The complete list will be fetched from the API
+};
+
 export const genresList = [
       {
         "id": 28,
