@@ -8,6 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 .env
+########################
+*.pkl
+*.index
+*.csv
+*.py
+*.json
+########################
 node_modules
 dist
 dist-ssr
