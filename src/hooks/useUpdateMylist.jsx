@@ -4,11 +4,13 @@ import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 import { RatingModalContext } from "../contexts/RatingModalContext";
 import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function useUpdateMyList() {
-  const { User } = useContext(AuthContext);
+  const { User, isGuestMode } = useContext(AuthContext);
   const ratingModalContext = useContext(RatingModalContext) || {};
   const { openRatingModal } = ratingModalContext;
+  const navigate = useNavigate();
 
   function notify() {
     toast.success("  Movie added to MyList  ");
@@ -18,8 +20,22 @@ function useUpdateMyList() {
     toast.error(message);
   }
 
+  const showSignInPrompt = () => {
+    toast.error("Please sign in to add movies to your list", {
+      duration: 3000,
+      onClick: () => navigate("/signin")
+    });
+  };
+
   const addToMyList = (movie) => {
     console.log("addToMyList called with:", movie);
+    
+    // If not authenticated, show sign in prompt
+    if (!User) {
+      showSignInPrompt();
+      return;
+    }
+    
     if (openRatingModal) {
       openRatingModal(movie, User);
     } else {

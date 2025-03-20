@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import axios from "../axios";
 import { searchMovie } from "../config/URLs";
-import { imageURL2 } from "../config/constants";
+import { imageURL2, API_KEY } from "../config/constants";
 import { AuthContext } from "../contexts/UserContext";
 
 import StarRatings from "../components/StarRatings";

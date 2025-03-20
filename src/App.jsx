@@ -13,7 +13,7 @@ const Welcome = lazy(() => import("./pages/Welcome"));
 const ErrorPage = lazy(() => import("./pages/ErrorPage"));
 const Play = lazy(() => import("./pages/Play"));
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { AuthContext } from "./contexts/UserContext";
 import { RatingModalProvider } from "./contexts/RatingModalContext";
@@ -22,10 +22,13 @@ import { UserPreferencesProvider } from "./contexts/UserPreferencesContext";
 import Loading from "./components/Loading/Loading";
 import Navbar from "./components/Header/Navbar";
 import NavbarWithoutUser from "./components/Header/NavbarWithoutUser";
+import SimpleNavbar from "./components/Header/SimpleNavbar";
 import MoviePopUp from "./components/PopUp/MoviePopUp";
 
 function App() {
-  const { User, setUser } = useContext(AuthContext);
+  const { User, setUser, isGuestMode } = useContext(AuthContext);
+  const location = useLocation();
+  
   useEffect(() => {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
@@ -34,28 +37,49 @@ function App() {
     });
   }, []);
 
+  // Check if user has access to main content
+  const hasAccess = User || isGuestMode;
+  
+  // Determine which navbar to show
+  const renderNavbar = () => {
+    // On Welcome page, show simplified navbar
+    if (location.pathname === '/welcome') {
+      return <SimpleNavbar />;
+    }
+    
+    // On other pages, show appropriate navbar based on auth
+    return User ? <Navbar /> : <NavbarWithoutUser />;
+  };
+
   return (
     <RatingModalProvider>
       <UserPreferencesProvider>
         <div>
-          {User ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
+          {renderNavbar()}
           <Suspense replace fallback={<Loading />}>
             <Routes>
-              <Route index path="/" element={User ? <Home /> : <Welcome />} />
-              {User ? (
-                <>
-                  <Route path="/genre/:genreName" element={<Genre />} />
-                  <Route path="/country/:countryName" element={<Country />} />
-                  <Route path="/search" element={<Search />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/mylist" element={<MyList />} />
-                  <Route path="/play/:id" element={<Play />} />
-                </>
-              ) : null}
+              {/* Redirect root based on authentication/guest status */}
+              <Route path="/" element={hasAccess ? <Home /> : <Navigate to="/welcome" />} />
+              
+              {/* Welcome page at /welcome */}
+              <Route path="/welcome" element={<Welcome />} />
+              
+              {/* Public routes - accessible to all users */}
+              <Route path="/genre/:genreName" element={<Genre />} />
+              <Route path="/country/:countryName" element={<Country />} />
+              <Route path="/search" element={<Search />} />
               <Route path="/play/:id" element={<Play />} />
-
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
+              
+              {/* Protected routes - require authentication */}
+              {User && (
+                <>
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/mylist" element={<MyList />} />
+                </>
+              )}
+              
               <Route path="*" element={<ErrorPage />} />
             </Routes>
           </Suspense>

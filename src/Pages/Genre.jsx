@@ -166,7 +166,7 @@ function Genre() {
       <div className="pt-24 pb-8 px-8">
         <h1 className="text-white text-4xl font-bold">{displayName} Movies</h1>
       </div>
-
+      
       {/* Movies grid */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 md:px-8 pb-12">
         {loading ? (

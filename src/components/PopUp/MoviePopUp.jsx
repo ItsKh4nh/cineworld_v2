@@ -11,6 +11,7 @@ import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
 import useMoviePopup from "../../hooks/useMoviePopup";
+import useGuestMode from "../../hooks/useGuestMode";
 import { RatingModalContext } from "../../contexts/RatingModalContext";
 import axios from "../../axios";
 
@@ -19,6 +20,7 @@ function MoviePopUp() {
   const { showModal, setShowModal, movieInfo, trailerUrl } = useContext(PopUpContext);
   const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
   const { openRatingModal } = useContext(RatingModalContext) || {};
+  const { isAuthenticated } = useGuestMode();
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
   const { formatDate } = useMoviePopup();
@@ -160,22 +162,27 @@ function MoviePopUp() {
                       
                       {/* Right column - 2 rows (with Cast taking more space) */}
                       <div className="flex flex-col space-y-4">
-                        <div>
-                          <div className="text-neutral-400 text-xs">Director</div>
-                          <div className="text-white text-sm">
-                            {director || "Not available"}
+                        {director && (
+                          <div>
+                            <div className="text-neutral-400 text-xs">Director</div>
+                            <div className="text-white text-sm">{director}</div>
                           </div>
-                        </div>
+                        )}
                         
-                        <div className="flex-grow">
-                          <div className="text-neutral-400 text-xs">Cast</div>
-                          <div className="text-white text-sm">
-                            {cast.length > 0 
-                              ? cast.map(actor => actor.name).join(', ') + 
-                                (hasMoreCast ? ' and more' : '')
-                              : "Not available"}
+                        {cast.length > 0 && (
+                          <div>
+                            <div className="text-neutral-400 text-xs">Cast</div>
+                            <div className="text-white text-sm flex flex-wrap mt-1">
+                              {cast.map((actor, index) => (
+                                <span key={actor.id} className="mr-1">
+                                  {actor.name}
+                                  {index < cast.length - 1 ? ", " : ""}
+                                </span>
+                              ))}
+                              {hasMoreCast && <span>...</span>}
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -205,14 +212,11 @@ function MoviePopUp() {
                         Play
                       </button>
                       
-                      {isInMyList ? (
+                      {isAuthenticated() && isInMyList ? (
                         <button
-                          className="flex items-center justify-center bg-cineworldYellow text-white font-medium py-2 px-4 rounded hover:bg-white hover:text-cineworldYellow transition-colors"
+                          className="flex items-center justify-center border border-white text-white font-medium py-2 px-4 rounded hover:bg-white hover:text-black transition-colors"
                           onClick={() => {
-                            setShowModal(false);
-                            if (openRatingModal) {
-                              openRatingModal(movieInfo, User);
-                            }
+                            removeFromMyList(movieInfo);
                           }}
                         >
                           <svg
@@ -222,10 +226,12 @@ function MoviePopUp() {
                             fill="currentColor"
                           >
                             <path
-                              d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                              fillRule="evenodd"
+                              d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                              clipRule="evenodd"
                             />
                           </svg>
-                          Edit
+                          Remove from MyList
                         </button>
                       ) : (
                         <button

@@ -1,12 +1,18 @@
-import React, { useState } from "react";
-
-import { Link } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
-
+import { AuthContext } from "../contexts/UserContext";
 import Footer from "../components/Footer/Footer";
 
 function Welcome() {
   const [email, setEmail] = useState("");
+  const { enableGuestMode } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleGuestMode = () => {
+    enableGuestMode();
+    navigate("/");
+  };
 
   return (
     <div>
@@ -47,6 +53,12 @@ function Welcome() {
                     </button>
                   </Link>
                 </div>
+                <button 
+                  onClick={handleGuestMode}
+                  className="mt-4 px-6 py-2 text-white bg-transparent border border-white rounded-sm hover:bg-white hover:text-black transition-colors"
+                >
+                  Continue as Guest
+                </button>
               </div>
             </Fade>
           </div>

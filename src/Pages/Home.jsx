@@ -36,41 +36,49 @@ function Home() {
   // Fetch user preferences when component mounts
   useEffect(() => {
     const fetchUserPreferences = async () => {
-      if (!User) return;
-
-      try {
-        // Fetch genre preferences
-        const preferencesDoc = await getDoc(doc(db, "UserPreferences", User.uid));
-        if (preferencesDoc.exists()) {
-          const data = preferencesDoc.data();
-          if (data.genres && data.genres.length > 0) {
-            setUserGenres(data.genres);
-          }
-        }
-
-        // Fetch favorite people
-        const myListDoc = await getDoc(doc(db, "MyList", User.uid));
-        if (myListDoc.exists() && myListDoc.data().people && myListDoc.data().people.length > 0) {
-          const people = myListDoc.data().people;
-          setFavoritePeople(people);
+      if (User) {
+        try {
+          // Fetch user preferences if authenticated
+          const userPrefsDoc = await getDoc(doc(db, "UserPreferences", User.uid));
           
-          if (people.length > 0) {
-            // Create a pipe-separated list of people IDs for OR logic
-            const peopleIds = people.map(person => person.id).join('|');
+          if (userPrefsDoc.exists()) {
+            const data = userPrefsDoc.data();
             
-            // Fetch movies with any of the favorite people using OR logic
-            const response = await axios.get(discoverByPeople(peopleIds));
-            
-            if (response.data && response.data.results) {
-              setFavoritePeopleMovies(response.data.results);
+            // Get preferred genres
+            if (data.preferredGenres && data.preferredGenres.length > 0) {
+              setUserGenres(data.preferredGenres);
+            } else {
+              setUserGenres([]);
             }
+            
+            // Get favorite people (cast/crew)
+            if (data.favoritePeople && data.favoritePeople.length > 0) {
+              setFavoritePeople(data.favoritePeople);
+              
+              // Fetch movies for favorite people
+              const peopleIds = data.favoritePeople.map(person => person.id).join('|');
+              const url = discoverByPeople(peopleIds);
+              
+              const response = await axios.get(url);
+              if (response.data.results && response.data.results.length > 0) {
+                setFavoritePeopleMovies(response.data.results);
+              }
+            }
+          } else {
+            // No preferences found
+            setUserGenres([]);
           }
+          
+        } catch (error) {
+          console.error("Error fetching user preferences:", error);
+          setUserGenres([]);
         }
-      } catch (error) {
-        console.error("Error fetching user preferences:", error);
-      } finally {
-        setLoading(false);
+      } else {
+        // For guest users, don't show personalized genres
+        setUserGenres([]);
       }
+      
+      setLoading(false);
     };
 
     fetchUserPreferences();
@@ -79,6 +87,7 @@ function Home() {
   return (
     <div>
       <Banner url={Trending}></Banner>
+      
       <div className="w-[99%] ml-1">
         <RowPost first title="Trending" islarge url={Trending} key={Trending}></RowPost>
         <RowPost
@@ -87,8 +96,8 @@ function Home() {
           key={NowPlaying}
         ></RowPost>
         
-        {/* Display genre-specific rows based on user preferences */}
-        {userGenres.map((genre) => (
+        {/* Display genre-specific rows based on user preferences - only for logged in users */}
+        {User && userGenres.map((genre) => (
           <RowPost
             key={`genre-${genre.id}`}
             title={genre.name}
@@ -96,8 +105,8 @@ function Home() {
           ></RowPost>
         ))}
         
-        {/* Display movies with favorite cast members */}
-        {favoritePeopleMovies.length > 0 && (
+        {/* Display movies with favorite cast members - only for logged in users */}
+        {User && favoritePeopleMovies.length > 0 && (
           <RowPost
             title="Looking for your favorite cast?"
             movieData={favoritePeopleMovies}
