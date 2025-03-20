@@ -4,7 +4,7 @@ import { db } from "../../firebase/FirebaseConfig";
 import { imageURL2, genresList } from "../../config/constants";
 import axios from "../../axios";
 import { searchMovie, searchPerson } from "../../config/URLs";
-import StarRatings from "../StarRatings";
+import ColoredStarRating from "../StarRating/ColoredStarRating";
 
 function UserPreferencesModal({ user, onClose }) {
   const [step, setStep] = useState(1);
@@ -297,7 +297,7 @@ function UserPreferencesModal({ user, onClose }) {
                             {movie.release_date ? movie.release_date.substring(0, 4) : "N/A"}
                           </p>
                           <div className="flex items-center mt-1">
-                            <StarRatings rating={movie.vote_average} />
+                            <ColoredStarRating rating={movie.vote_average} />
                           </div>
                         </div>
                       ))}

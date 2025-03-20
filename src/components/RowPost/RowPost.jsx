@@ -18,7 +18,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./RowPostStyles.scss";
-import StarRatings from "../StarRatings";
+import ColoredStarRating from "../StarRating/ColoredStarRating";
 
 function RowPost(props) {
   const { User } = useContext(AuthContext);
@@ -281,7 +281,7 @@ function RowPost(props) {
                       </h1>
 
                       <div className="ml-4">
-                        <StarRatings rating={obj.vote_average} />
+                        <ColoredStarRating rating={obj.vote_average} />
                       </div>
 
                       {converted &&

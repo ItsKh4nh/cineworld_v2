@@ -9,6 +9,7 @@ import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 import useUpdateMyList from "../hooks/useUpdateMyList";
 import { RatingModalContext } from "../contexts/RatingModalContext";
+import ColoredStarRating from "../components/StarRating/ColoredStarRating";
 
 function Country() {
   const { countryName } = useParams();
@@ -269,12 +270,7 @@ function Country() {
                 
                 {/* Star rating with number */}
                 <div className="flex items-center mb-3">
-                  <span className="text-yellow-400 text-lg mr-1">★</span>
-                  <span className="text-white text-lg">
-                    {movie.vote_average 
-                      ? Number(movie.vote_average).toFixed(2).replace(/\.?0+$/, '')
-                      : '0'}
-                  </span>
+                  <ColoredStarRating rating={movie.vote_average} />
                 </div>
                 
                 {/* Genres */}

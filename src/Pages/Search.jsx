@@ -6,7 +6,7 @@ import { searchMovie } from "../config/URLs";
 import { imageURL2, API_KEY } from "../config/constants";
 import { AuthContext } from "../contexts/UserContext";
 
-import StarRatings from "../components/StarRatings";
+import ColoredStarRating from "../components/StarRating/ColoredStarRating";
 import { PopUpContext } from "../contexts/moviePopUpContext";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
@@ -165,12 +165,7 @@ function Search() {
                 
                 {/* Star rating with number */}
                 <div className="flex items-center mb-3">
-                  <span className="text-yellow-400 text-lg mr-1">★</span>
-                  <span className="text-white text-lg">
-                    {movie.vote_average 
-                      ? Number(movie.vote_average).toFixed(2).replace(/\.?0+$/, '')
-                      : '0'}
-                  </span>
+                  <ColoredStarRating rating={movie.vote_average} />
                 </div>
                 
                 {/* Genres */}
