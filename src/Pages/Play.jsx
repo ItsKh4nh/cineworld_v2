@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "../axios";
 import { 
@@ -16,6 +16,8 @@ import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
 import usePlayMovie from "../hooks/usePlayMovie";
 import useUpdateMyList from "../hooks/useUpdateMyList";
+import useGenresConverter from "../hooks/useGenresConverter";
+import useMoviePopup from "../hooks/useMoviePopup";
 import { ClipLoader } from "react-spinners";
 import Papa from 'papaparse';
 import "swiper/css";
@@ -46,6 +48,8 @@ function Play() {
   // Hooks
   const { addToMyList, removeFromMyList, PopupMessage, checkIfInMyList } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
+  const { convertGenre } = useGenresConverter();
+  const { handleMoviePopup } = useMoviePopup();
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -678,7 +682,7 @@ function Play() {
                         <div>
                           <h2 className="text-xl font-semibold mb-4">Genres</h2>
                           
-                          <div className="flex flex-wrap gap-2 mb-6">
+                          <div className="flex flex-wrap gap-2">
                             {movieDetails.genres?.map(genre => (
                               <span 
                                 key={genre.id}
@@ -965,32 +969,105 @@ function Play() {
                       
                       <h3 className="text-xl font-semibold mb-4">Movies in this collection</h3>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {collectionInfo.parts.map(movie => (
                           <div 
                             key={movie.id} 
-                            className={`cursor-pointer group relative ${
+                            className={`cursor-pointer relative group bg-zinc-900 rounded-lg overflow-hidden ${
                               movie.id === parseInt(id) ? 'ring-2 ring-yellow-500' : ''
                             }`}
-                            onClick={() => navigate(`/play/${movie.id}`)}
+                            onClick={() => handleMoviePopup(movie)}
                           >
-                            <div className="relative aspect-[2/3]">
-                              <img 
-                                src={movie.poster_path ? `${imageURL2}${movie.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Poster'} 
-                                alt={movie.title} 
-                                className="w-full h-full object-cover rounded"
+                            {/* Movie poster/backdrop */}
+                            <div className="relative aspect-video">
+                              <img
+                                className="w-full h-full object-cover"
+                                src={
+                                  movie.backdrop_path
+                                    ? imageURL2 + movie.backdrop_path
+                                    : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
+                                }
+                                alt={movie.title || movie.name}
+                                loading="lazy"
                               />
-                              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <div className="text-white">
-                                  {movie.id === parseInt(id) ? 'Currently Viewing' : 'View'}
+                              
+                              {/* Play and Add buttons - always visible at top left */}
+                              <div className="absolute top-2 left-2 flex space-x-2">
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    playMovie(movie);
+                                    window.location.reload();
+                                  }}
+                                  className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                                  </svg>
                                 </div>
+                                
+                                {movie.isInMyList ? (
+                                  <div
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      addToMyList(movie);
+                                    }}
+                                    className="bg-cineworldYellow text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:bg-white hover:text-cineworldYellow transition-all duration-150"
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                    </svg>
+                                  </div>
+                                ) : (
+                                  <div
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      addToMyList(movie);
+                                    }}
+                                    className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                  </div>
+                                )}
                               </div>
                             </div>
-                            <div className="mt-2">
-                              <p className="font-medium text-sm">{movie.title}</p>
-                              <p className="text-xs text-gray-400">
-                                {movie.release_date ? formatDate(movie.release_date).split(',')[1] : 'TBA'}
+                            
+                            {/* Movie details */}
+                            <div className="p-3">
+                              {/* Movie title */}
+                              <h2 className="text-white text-lg font-bold mb-1 line-clamp-1">{movie.title || movie.name}</h2>
+                              
+                              {/* Release date */}
+                              <p className="text-white/80 text-sm mb-2">
+                                {movie.release_date ? new Date(movie.release_date).toLocaleDateString('en-US', {
+                                  month: 'long',
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                }) : 'Release date unknown'}
                               </p>
+                              
+                              {/* Star rating with number */}
+                              <div className="flex items-center mb-3">
+                                <span className="text-yellow-400 text-lg mr-1">★</span>
+                                <span className="text-white text-lg">
+                                  {movie.vote_average 
+                                    ? Number(movie.vote_average).toFixed(2).replace(/\.?0+$/, '')
+                                    : '0'}
+                                </span>
+                              </div>
+                              
+                              {/* Genres */}
+                              <div className="flex flex-wrap gap-2">
+                                {movie.genre_ids && movie.genre_ids.length > 0 ? 
+                                  convertGenre(movie.genre_ids).map((genre, idx) => (
+                                    <span key={idx} className="text-white/80 text-sm flex items-center">
+                                      {idx > 0 && <span className="mr-2">•</span>}
+                                      {genre}
+                                    </span>
+                                  )) : null}
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -1008,63 +1085,109 @@ function Play() {
                   Recommended Movies
                 </h2>
                 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                   {similarMovies.map(movie => (
                     <div 
                       key={movie.id} 
-                      className="cursor-pointer group"
-                      onClick={() => {
-                        playMovie(movie);
-                        window.location.reload();
-                      }}
+                      className="cursor-pointer relative group bg-zinc-900 rounded-lg overflow-hidden"
+                      onClick={() => handleMoviePopup(movie)}
                     >
-                      <div className="relative aspect-[2/3] mb-2">
-                        <img 
-                          src={movie.poster_path ? `${imageURL2}${movie.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Poster'} 
-                          alt={movie.title} 
-                          className="w-full h-full object-cover rounded transition-transform duration-300 group-hover:scale-105"
+                      {/* Movie poster/backdrop */}
+                      <div className="relative aspect-video">
+                        <img
+                          className="w-full h-full object-cover"
+                          src={
+                            movie.backdrop_path
+                              ? imageURL2 + movie.backdrop_path
+                              : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
+                          }
+                          alt={movie.title || movie.name}
+                          loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            className="h-12 w-12" 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
-                            stroke="currentColor"
+                        
+                        {/* Play and Add buttons - always visible at top left */}
+                        <div className="absolute top-2 left-2 flex space-x-2">
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              playMovie(movie);
+                              window.location.reload();
+                            }}
+                            className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
                           >
-                            <path 
-                              strokeLinecap="round" 
-                              strokeLinejoin="round" 
-                              strokeWidth={2} 
-                              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" 
-                            />
-                            <path 
-                              strokeLinecap="round" 
-                              strokeLinejoin="round" 
-                              strokeWidth={2} 
-                              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
-                            />
-                          </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                            </svg>
+                          </div>
+                          
+                          {movie.isInMyList ? (
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addToMyList(movie);
+                              }}
+                              className="bg-cineworldYellow text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:bg-white hover:text-cineworldYellow transition-all duration-150"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                              </svg>
+                            </div>
+                          ) : (
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addToMyList(movie);
+                              }}
+                              className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                              </svg>
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <h3 className="font-medium text-sm truncate">{movie.title}</h3>
-                      <div className="flex items-center mt-1">
-                        <svg 
-                          className="w-4 h-4 text-yellow-500" 
-                          fill="currentColor" 
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                        <span className="text-xs text-gray-400 ml-1">
-                          {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}
-                        </span>
+                      
+                      {/* Movie details */}
+                      <div className="p-3">
+                        {/* Movie title */}
+                        <h2 className="text-white text-lg font-bold mb-1 line-clamp-1">{movie.title || movie.name}</h2>
+                        
+                        {/* Release date */}
+                        <p className="text-white/80 text-sm mb-2">
+                          {movie.release_date ? new Date(movie.release_date).toLocaleDateString('en-US', {
+                            month: 'long',
+                            day: 'numeric',
+                            year: 'numeric'
+                          }) : 'Release date unknown'}
+                        </p>
+                        
+                        {/* Star rating with number */}
+                        <div className="flex items-center mb-3">
+                          <span className="text-yellow-400 text-lg mr-1">★</span>
+                          <span className="text-white text-lg">
+                            {movie.vote_average 
+                              ? Number(movie.vote_average).toFixed(2).replace(/\.?0+$/, '')
+                              : '0'}
+                          </span>
+                        </div>
+                        
+                        {/* Genres */}
+                        <div className="flex flex-wrap gap-2">
+                          {movie.genre_ids && movie.genre_ids.length > 0 ? 
+                            convertGenre(movie.genre_ids).map((genre, idx) => (
+                              <span key={idx} className="text-white/80 text-sm flex items-center">
+                                {idx > 0 && <span className="mr-2">•</span>}
+                                {genre}
+                              </span>
+                            )) : null}
+                        </div>
                       </div>
                     </div>
                   ))}
-              </div>
-            </section>
-          )}
+                </div>
+              </section>
+            )}
           </div>
         </>
       )}

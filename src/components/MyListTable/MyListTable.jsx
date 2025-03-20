@@ -599,7 +599,14 @@ function MyListTable() {
                           </td>
                           {isLargeScreen && (
                             <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
-                              {movie.genre_ids ? convertGenre(movie.genre_ids).join(', ') : "N/A"}
+                              <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-1">
+                                {movie.genre_ids ? convertGenre(movie.genre_ids).map((genre, idx) => (
+                                  <span key={idx} className="flex items-center">
+                                    {idx > 0 && <span className="mx-1 text-gray-600">•</span>}
+                                    {genre}
+                                  </span>
+                                )) : "N/A"}
+                              </div>
                             </td>
                           )}
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -717,8 +724,13 @@ function MyListTable() {
                         <div className="text-sm text-gray-400 mt-1">
                           {formatDate(movie.release_date_full || movie.release_date || movie.first_air_date)}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {movie.genre_ids ? convertGenre(movie.genre_ids).join(', ') : "N/A"}
+                        <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-1">
+                          {movie.genre_ids ? convertGenre(movie.genre_ids).map((genre, idx) => (
+                            <span key={idx} className="flex items-center">
+                              {idx > 0 && <span className="mx-1 text-gray-600">•</span>}
+                              {genre}
+                            </span>
+                          )) : "N/A"}
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center">

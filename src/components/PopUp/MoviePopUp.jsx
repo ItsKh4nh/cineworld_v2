@@ -179,7 +179,7 @@ function MoviePopUp() {
                                   {index < cast.length - 1 ? ", " : ""}
                                 </span>
                               ))}
-                              {hasMoreCast && <span>...</span>}
+                              {hasMoreCast && <span>and more</span>}
                             </div>
                           </div>
                         )}

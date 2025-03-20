@@ -184,7 +184,7 @@ function Country() {
       </div>
       
       {/* Movies grid */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 md:px-8 pb-12">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 md:px-8 pb-12">
         {loading ? (
           <div className="col-span-full flex justify-center items-center h-64">
             <p className="text-white text-lg">Loading...</p>
@@ -210,15 +210,15 @@ function Country() {
                 />
                 
                 {/* Play and Add buttons - always visible at top left */}
-                <div className="absolute top-3 left-3 flex space-x-2">
+                <div className="absolute top-2 left-2 flex space-x-2">
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/play/${movie.id}`);
                     }}
-                    className="text-white w-10 h-10 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
+                    className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
                     </svg>
                   </div>
@@ -231,9 +231,9 @@ function Country() {
                           openRatingModal(movie, User);
                         }
                       }}
-                      className="bg-cineworldYellow text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:bg-white hover:text-cineworldYellow transition-all duration-150"
+                      className="bg-cineworldYellow text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:bg-white hover:text-cineworldYellow transition-all duration-150"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                       </svg>
                     </div>
@@ -243,9 +243,9 @@ function Country() {
                         e.stopPropagation();
                         addToMyList(movie);
                       }}
-                      className="text-white w-10 h-10 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
+                      className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                       </svg>
                     </div>
@@ -254,9 +254,9 @@ function Country() {
               </div>
               
               {/* Movie details */}
-              <div className="p-4">
+              <div className="p-3">
                 {/* Movie title */}
-                <h2 className="text-white text-xl font-bold mb-1 line-clamp-1">{movie.title || movie.name}</h2>
+                <h2 className="text-white text-lg font-bold mb-1 line-clamp-1">{movie.title || movie.name}</h2>
                 
                 {/* Release date */}
                 <p className="text-white/80 text-sm mb-2">
@@ -280,8 +280,8 @@ function Country() {
                 {/* Genres */}
                 <div className="flex flex-wrap gap-2">
                   {convertGenre(movie.genre_ids)?.map((genre, idx) => (
-                    <span key={idx} className="text-white/80 text-sm">
-                      {idx > 0 && <span className="mx-1">•</span>}
+                    <span key={idx} className="text-white/80 text-sm flex items-center">
+                      {idx > 0 && <span className="mr-2">•</span>}
                       {genre}
                     </span>
                   ))}

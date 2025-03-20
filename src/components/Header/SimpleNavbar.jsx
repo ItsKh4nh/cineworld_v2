@@ -32,7 +32,7 @@ function SimpleNavbar() {
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <Link to="/welcome">
+                  <Link to="/">
                     <img
                       className="h-6 cursor-pointer w-18"
                       src="/cineworld-logo.png"
