@@ -8,6 +8,9 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
   
   // Check if this is an update (movie already has a userRating)
   const isUpdating = Boolean(movie.userRating);
+  
+  console.log("Movie in RatingModal:", movie);
+  console.log("Movie genres in RatingModal:", movie.genres);
 
   const statusOptions = ["Plan to Watch", "Completed", "Dropped"];
   const scoreOptions = [
@@ -49,6 +52,7 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
       userRating.score = score;
     }
     
+    // Make sure we keep all the movie properties including genres
     onSave({
       ...movie,
       userRating,
@@ -163,7 +167,7 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
             onClick={handleSave}
             className="px-4 py-2 text-white bg-red-700 rounded hover:bg-red-600 transition-colors"
           >
-            {isUpdating ? "Save" : "Add to MyList"}
+            {isUpdating ? "Save" : "Add"}
           </button>
         </div>
       </div>

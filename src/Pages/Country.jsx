@@ -214,7 +214,7 @@ function Country() {
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Play movie functionality
+                      navigate(`/play/${movie.id}`);
                     }}
                     className="text-white w-10 h-10 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
                   >

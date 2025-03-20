@@ -21,7 +21,7 @@ function GuestModeBanner({ message = "Create an account to save your favorites a
         <div className="flex gap-2">
           <Link to="/signin">
             <button className="bg-cineworldYellow hover:bg-yellow-600 text-white px-3 py-1 rounded text-xs">
-              Sign In
+              Login
             </button>
           </Link>
         </div>

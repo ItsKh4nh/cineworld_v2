@@ -21,6 +21,7 @@ function Search() {
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const { openRatingModal } = useContext(RatingModalContext) || {};
+  const navigate = useNavigate();
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -109,7 +110,7 @@ function Search() {
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Play movie functionality
+                      navigate(`/play/${movie.id}`);
                     }}
                     className="text-white w-10 h-10 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
                   >

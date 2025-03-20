@@ -21,7 +21,7 @@ function useUpdateMyList() {
   }
 
   const showSignInPrompt = () => {
-    toast.error("Please sign in to add movies to your list", {
+    toast.error("Please login to add movies to your list", {
       duration: 3000,
       onClick: () => navigate("/signin")
     });
@@ -30,7 +30,7 @@ function useUpdateMyList() {
   const addToMyList = (movie) => {
     console.log("addToMyList called with:", movie);
     
-    // If not authenticated, show sign in prompt
+    // If not authenticated, show login prompt
     if (!User) {
       showSignInPrompt();
       return;
@@ -46,6 +46,18 @@ function useUpdateMyList() {
 
   const addRatedMovieToList = async (ratedMovie) => {
     try {
+      console.log("Adding rated movie to list in useUpdateMyList:", ratedMovie);
+      console.log("Genres in useUpdateMyList:", ratedMovie.genres);
+      
+      // Convert genres array to genre_ids if needed
+      let movieToSave = { ...ratedMovie };
+      
+      // If movie has genres array of objects but not genre_ids, convert it
+      if (movieToSave.genres && Array.isArray(movieToSave.genres) && !movieToSave.genre_ids) {
+        movieToSave.genre_ids = movieToSave.genres.map(genre => genre.id);
+        console.log("Converted genres to genre_ids:", movieToSave.genre_ids);
+      }
+      
       // Check if the movie already exists in the list
       const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
@@ -53,15 +65,19 @@ function useUpdateMyList() {
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const movies = userData.movies || [];
-        const existingMovie = movies.find(m => m.id === ratedMovie.id);
+        const existingMovie = movies.find(m => m.id === movieToSave.id);
         
         if (existingMovie) {
           // Movie exists, update it instead of adding a duplicate
           // First remove the existing movie
-          const filteredMovies = movies.filter(m => m.id !== ratedMovie.id);
+          const filteredMovies = movies.filter(m => m.id !== movieToSave.id);
           
           // Then add the updated movie
-          filteredMovies.push(ratedMovie);
+          filteredMovies.push({
+            ...movieToSave,
+            // Ensure these properties are copied if they exist
+            genre_ids: movieToSave.genre_ids || existingMovie.genre_ids
+          });
           
           // Update the document with the new array
           await updateDoc(userDocRef, { movies: filteredMovies });
@@ -69,13 +85,15 @@ function useUpdateMyList() {
           notify();
         } else {
           // Movie doesn't exist, add it to the list
-          await updateDoc(userDocRef, { movies: arrayUnion(ratedMovie) });
+          // Using direct array update instead of arrayUnion to ensure all properties are preserved
+          const updatedMovies = [...movies, movieToSave];
+          await updateDoc(userDocRef, { movies: updatedMovies });
           console.log("Rated movie added to MyList");
           notify();
         }
       } else {
         // Document doesn't exist, create it with the movie
-        await updateDoc(userDocRef, { movies: arrayUnion(ratedMovie) });
+        await updateDoc(userDocRef, { movies: [movieToSave] });
         console.log("Rated movie added to MyList");
         notify();
       }

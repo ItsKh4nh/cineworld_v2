@@ -41,6 +41,18 @@ export const movieReviews = (movieId) =>
 export const configurationLanguages = 
   `configuration/languages?api_key=${API_KEY}`;
 
+// Person endpoints
+export const personDetails = (personId) =>
+  `person/${personId}?api_key=${API_KEY}&language=en-US&append_to_response=images`;
+export const personMovieCredits = (personId) =>
+  `person/${personId}/movie_credits?api_key=${API_KEY}&language=en-US`;
+export const personTvCredits = (personId) =>
+  `person/${personId}/tv_credits?api_key=${API_KEY}&language=en-US`;
+export const personExternalIds = (personId) =>
+  `person/${personId}/external_ids?api_key=${API_KEY}`;
+export const personTaggedImages = (personId) =>
+  `person/${personId}/tagged_images?api_key=${API_KEY}&language=en-US`;
+
 // Discovery endpoints
 export const discoverByPeople = (peopleIds) => 
   `discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&include_adult=false&include_video=false&page=1&with_people=${peopleIds}&vote_count.gte=100`;

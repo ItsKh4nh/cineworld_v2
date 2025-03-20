@@ -38,7 +38,7 @@ const createUserProfile = async (uid, data) => {
   );
 };
 
-// Sign In Email validation
+// Login Email validation
 export const validateSignInEmail = (email) => {
   // Required field check
   if (!email || email.length === 0) {
@@ -65,7 +65,7 @@ export const validateSignInEmail = (email) => {
   return { isValid: true, error: null };
 };
 
-// Sign In Password validation
+// Login Password validation
 export const validateSignInPassword = (password) => {
   // Required field check
   if (!password || password.length === 0) {
@@ -83,7 +83,7 @@ export const validateSignInPassword = (password) => {
   return { isValid: true, error: null };
 };
 
-// Email/Password Sign In
+// Email/Password Login
 export const emailSignIn = async (email, password) => {
   // Validate email
   const emailValidation = validateSignInEmail(email);
@@ -111,7 +111,7 @@ export const emailSignIn = async (email, password) => {
   }
 };
 
-// Google Sign In
+// Google Login
 export const googleSignIn = async () => {
   const auth = getAuth();
   const provider = new GoogleAuthProvider();

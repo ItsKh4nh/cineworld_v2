@@ -17,11 +17,12 @@ import Footer from "../components/Footer/Footer";
 import usePlayMovie from "../hooks/usePlayMovie";
 import useUpdateMyList from "../hooks/useUpdateMyList";
 import { ClipLoader } from "react-spinners";
-import ReactPlayer from 'react-player';
 import Papa from 'papaparse';
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { FaImdb, FaFacebook, FaInstagram, FaTwitter, FaWikipediaW } from "react-icons/fa";
+import StarRatings from "../components/StarRatings";
 
 function Play() {
   // State variables
@@ -59,8 +60,8 @@ function Play() {
         header: true,
         complete: (results) => {
           const source = results.data.find(row => row.movie_id === id);
-          if (source && source.link_m3u8_1) {
-            setMovieSource(source.link_m3u8_1);
+          if (source && source.link_embed_1) {
+            setMovieSource(source.link_embed_1);
             // If we have a direct source, don't load YouTube trailer
             setUrlId("");
           }
@@ -148,7 +149,7 @@ function Play() {
       setIsFromMyList(true);
     }
 
-    // Check if movie is in My List
+    // Check if movie is in MyList
     checkMovieInList();
     
     // Check for direct movie sources
@@ -174,11 +175,13 @@ function Play() {
     axios.get(movieVideos(id))
       .then((response) => {
         if (response.data.results.length !== 0) {
-          // Set the first trailer as the active video
+          // Set the first trailer as the active video for the page header
           const trailers = response.data.results.filter(
             video => video.type === "Trailer" || video.type === "Teaser"
           );
           if (trailers.length > 0) {
+            // Only set these for initial page load autoplay
+            // This won't affect the video tab click behavior
             setActiveVideo(trailers[0]);
             setUrlId(trailers[0].key);
           }
@@ -249,26 +252,37 @@ function Play() {
       });
   }, [id]);
 
+  // Add a separate effect to recheck if the movie is in MyList after PopupMessage changes
+  // (which happens when a movie is added or removed from the list)
+  useEffect(() => {
+    if (!loading) {
+      checkMovieInList();
+    }
+  }, [PopupMessage]);
+
   // Handle movie list actions
   const handleMyListAction = () => {
+    console.log("Movie details being passed:", movieDetails);
+    console.log("Does movie have genres?", movieDetails.genres);
+    
     if (isInMyList) {
-      removeFromMyList(movieDetails);
-      setIsInMyList(false);
+      // Instead of removing directly, open the rating modal to update the rating
+      addToMyList(movieDetails);
+      // The actual update will happen when the user saves from the modal
     } else {
       addToMyList(movieDetails);
-      setIsInMyList(true);
+      // Don't set isInMyList=true here - it will be updated when checkMovieInList runs after the rating is saved
     }
   };
 
   // Handle video selection
   const handleVideoSelect = (video) => {
-    setActiveVideo(video);
-    setUrlId(video.key);
-    scrollToVideo();
+    // Open the video directly in YouTube in a new tab
+    window.open(`https://www.youtube.com/watch?v=${video.key}`, '_blank');
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white pt-16">
       <Navbar playPage />
       {PopupMessage}
 
@@ -285,18 +299,14 @@ function Play() {
             className="relative w-full h-[30vh] sm:h-[40vh] md:h-[50vh] lg:h-[65vh] xl:h-[85vh] bg-black"
           >
             {movieSource ? (
-              <ReactPlayer
-                url={movieSource}
+              <iframe
+                src={movieSource}
                 width="100%"
                 height="100%"
-                playing={true}
-                controls={true}
-                config={{
-                  file: {
-                    forceHLS: true,
-                  }
-                }}
-              />
+                frameBorder="0"
+                allowFullScreen
+                className="w-full h-full"
+              ></iframe>
             ) : urlId ? (
               <iframe
                 width="100%"
@@ -328,17 +338,40 @@ function Play() {
             {/* Info Bar */}
             <div className="flex flex-wrap gap-4 items-center mb-6 bg-gray-900 bg-opacity-70 backdrop-blur-sm p-4 rounded-lg">
               <div className="flex items-center">
-                <span className="font-bold text-xl bg-yellow-500 text-black py-1 px-3 rounded">
-                  {movieDetails.vote_average ? movieDetails.vote_average.toFixed(1) : 'N/A'}
-                </span>
-                <span className="ml-2 text-sm text-gray-300">
-                  {movieDetails.vote_count ? `${movieDetails.vote_count.toLocaleString()} votes` : ''}
-                </span>
+                <div className="flex items-center">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    viewBox="0 0 24 24" 
+                    fill={
+                      movieDetails.vote_average <= 2 ? "#ff4545" : // Red
+                      movieDetails.vote_average <= 4 ? "#ffa534" : // Orange
+                      movieDetails.vote_average <= 6 ? "#ffe234" : // Yellow
+                      movieDetails.vote_average <= 8 ? "#b7dd29" : // Light green
+                      "#57e32c" // Bright green
+                    }
+                    className="w-7 h-7 mr-2"
+                    aria-hidden="true"
+                  >
+                    <path 
+                      fillRule="evenodd" 
+                      d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" 
+                      clipRule="evenodd" 
+                    />
+                  </svg>
+                  <span className="text-base text-white">
+                    <span className="font-bold">{movieDetails.vote_average ? parseFloat(movieDetails.vote_average.toFixed(2)) : 'N/A'}</span>
+                    <span>/10 </span>
+                    <span className="text-sm text-gray-300">
+                      ({movieDetails.vote_count ? movieDetails.vote_count.toLocaleString() : '0'} Votes)
+                    </span>
+                  </span>
+                </div>
               </div>
               
               <div className="h-6 border-l border-gray-500"></div>
               
               <div className="flex items-center">
+                <span className="font-medium text-gray-400 mr-2">Released:</span>
                 <span className="text-sm md:text-base">
                   {formatDate(movieDetails.release_date)}
                 </span>
@@ -347,8 +380,9 @@ function Play() {
               <div className="h-6 border-l border-gray-500"></div>
               
               <div className="flex items-center">
+                <span className="font-medium text-gray-400 mr-2">Runtime:</span>
                 <span className="text-sm md:text-base">{formatRuntime(movieDetails.runtime)}</span>
-            </div>
+              </div>
               
               {movieDetails.adult && (
                 <>
@@ -364,7 +398,7 @@ function Play() {
                   onClick={handleMyListAction}
                   className={`flex items-center justify-center px-3 py-1 rounded-full ${
                     isInMyList 
-                      ? "bg-gray-700 hover:bg-gray-600" 
+                      ? "bg-yellow-600 hover:bg-yellow-500" 
                       : "bg-yellow-600 hover:bg-yellow-500"
                   } transition-colors`}
                 >
@@ -381,10 +415,10 @@ function Play() {
                           strokeLinecap="round" 
                           strokeLinejoin="round" 
                           strokeWidth={2} 
-                          d="M6 18L18 6M6 6l12 12" 
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" 
                         />
                       </svg>
-                      Remove
+                      Update Your Rating
                     </>
                   ) : (
                     <>
@@ -402,7 +436,7 @@ function Play() {
                           d="M12 4v16m8-8H4" 
                       />
                     </svg>
-                      Add to My List
+                      Add to MyList
                     </>
                   )}
                 </button>
@@ -529,7 +563,7 @@ function Play() {
                             </div>
 
                             {movieDetails.homepage && (
-                              <div className="flex">
+                              <div className="flex items-center">
                                 <span className="w-32 text-gray-400">Homepage:</span>
                                 <a 
                                   href={movieDetails.homepage} 
@@ -542,20 +576,6 @@ function Play() {
                               </div>
                             )}
 
-                            {externalIds.imdb_id && (
-                              <div className="flex">
-                                <span className="w-32 text-gray-400">IMDb:</span>
-                                <a 
-                                  href={`https://imdb.com/title/${externalIds.imdb_id}`} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-blue-400 hover:underline"
-                                >
-                                  View on IMDb
-                                </a>
-                              </div>
-                            )}
-                            
                             <div className="flex">
                               <span className="w-32 text-gray-400">Budget:</span>
                               <span>{formatMoney(movieDetails.budget)}</span>
@@ -581,6 +601,74 @@ function Play() {
                                 <span>
                                   {movieDetails.spoken_languages.map(lang => formatLanguage(lang.iso_639_1)).join(', ')}
                                 </span>
+                              </div>
+                            )}
+
+                            {/* Social Media Links Section */}
+                            {(externalIds.imdb_id || externalIds.facebook_id || externalIds.instagram_id || externalIds.twitter_id || externalIds.wikidata_id) && (
+                              <div className="mt-4 mb-2">
+                                <h3 className="text-lg font-semibold text-white mb-2">Follow on Social Media</h3>
+                                <div className="flex space-x-4">
+                                  {externalIds.imdb_id && (
+                                    <a 
+                                      href={`https://imdb.com/title/${externalIds.imdb_id}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:opacity-80 transition-opacity"
+                                      title="IMDb"
+                                    >
+                                      <FaImdb className="text-yellow-400 text-3xl" />
+                                    </a>
+                                  )}
+                                  
+                                  {externalIds.facebook_id && (
+                                    <a 
+                                      href={`https://www.facebook.com/${externalIds.facebook_id}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:opacity-80 transition-opacity"
+                                      title="Facebook"
+                                    >
+                                      <FaFacebook className="text-[#1877F2] text-3xl" />
+                                    </a>
+                                  )}
+                                  
+                                  {externalIds.instagram_id && (
+                                    <a 
+                                      href={`https://www.instagram.com/${externalIds.instagram_id}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:opacity-80 transition-opacity"
+                                      title="Instagram"
+                                    >
+                                      <FaInstagram className="text-[#E4405F] text-3xl" />
+                                    </a>
+                                  )}
+                                  
+                                  {externalIds.twitter_id && (
+                                    <a 
+                                      href={`https://twitter.com/${externalIds.twitter_id}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:opacity-80 transition-opacity"
+                                      title="Twitter"
+                                    >
+                                      <FaTwitter className="text-[#1DA1F2] text-3xl" />
+                                    </a>
+                                  )}
+                                  
+                                  {externalIds.wikidata_id && (
+                                    <a 
+                                      href={`https://www.wikidata.org/wiki/${externalIds.wikidata_id}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:opacity-80 transition-opacity"
+                                      title="Wikidata"
+                                    >
+                                      <FaWikipediaW className="text-gray-200 text-3xl" />
+                                    </a>
+                                  )}
+                                </div>
                               </div>
                             )}
                           </div>
@@ -668,14 +756,15 @@ function Play() {
                                   alt={video.name}
                                   className="w-full h-full object-cover rounded"
                                 />
-                                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                   <svg 
-                                    className="w-12 h-12 text-white" 
+                                    className="w-12 h-12 text-red-600" 
                                     fill="currentColor" 
                                     viewBox="0 0 24 24"
                                   >
                                     <path d="M8 5v14l11-7z" />
                                   </svg>
+                                  <span className="text-white text-sm mt-2">Open in YouTube</span>
                                 </div>
                               </div>
                               <div className="mt-2">
@@ -699,7 +788,11 @@ function Play() {
                       {movieDetails.credits?.cast?.length > 0 ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
                           {movieDetails.credits.cast.slice(0, 10).map(person => (
-                            <div key={person.id} className="text-center">
+                            <div 
+                              key={person.id} 
+                              className="text-center cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={() => navigate(`/people/${person.id}`)}
+                            >
                               <div className="aspect-square rounded-full overflow-hidden mb-2 mx-auto w-20 h-20">
                                 {person.profile_path ? (
                                   <img 
@@ -741,7 +834,11 @@ function Play() {
                               <div key={roleGroup.title} className="mb-4">
                                 <h3 className="text-lg font-medium text-yellow-500 mb-2">{roleGroup.title}</h3>
                                 {crewInRole.map(person => (
-                                  <div key={`${person.id}-${person.job}`} className="flex items-center mb-2">
+                                  <div 
+                                    key={`${person.id}-${person.job}`} 
+                                    className="flex items-center mb-2 cursor-pointer hover:bg-gray-800 rounded p-1 transition-colors"
+                                    onClick={() => navigate(`/people/${person.id}`)}
+                                  >
                                     <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
                                       {person.profile_path ? (
                                         <img 
@@ -885,7 +982,7 @@ function Play() {
                               />
                               <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <div className="text-white">
-                                  {movie.id === parseInt(id) ? 'Currently Viewing' : 'View Movie'}
+                                  {movie.id === parseInt(id) ? 'Currently Viewing' : 'View'}
                                 </div>
                               </div>
                             </div>

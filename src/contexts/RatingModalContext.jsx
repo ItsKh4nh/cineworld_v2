@@ -65,8 +65,18 @@ export const RatingModalProvider = ({ children }) => {
     }
 
     console.log("Adding rated movie to list:", ratedMovie);
+    console.log("Genres being saved:", ratedMovie.genres);
     
     try {
+      // Convert genres array to genre_ids if needed
+      let movieToSave = { ...ratedMovie };
+      
+      // If movie has genres array of objects but not genre_ids, convert it
+      if (movieToSave.genres && Array.isArray(movieToSave.genres) && !movieToSave.genre_ids) {
+        movieToSave.genre_ids = movieToSave.genres.map(genre => genre.id);
+        console.log("Converted genres to genre_ids:", movieToSave.genre_ids);
+      }
+      
       // Check if the movie already exists in the list
       const userDocRef = doc(db, "MyList", user.uid);
       const docSnap = await getDoc(userDocRef);
@@ -74,15 +84,19 @@ export const RatingModalProvider = ({ children }) => {
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const movies = userData.movies || [];
-        const existingMovie = movies.find(m => m.id === ratedMovie.id);
+        const existingMovie = movies.find(m => m.id === movieToSave.id);
         
         if (existingMovie) {
           // Movie exists, update it instead of adding a duplicate
           // First remove the existing movie
-          const filteredMovies = movies.filter(m => m.id !== ratedMovie.id);
+          const filteredMovies = movies.filter(m => m.id !== movieToSave.id);
           
-          // Then add the updated movie
-          filteredMovies.push(ratedMovie);
+          // Then add the updated movie with preserved properties like genres
+          filteredMovies.push({
+            ...movieToSave,
+            // Ensure these properties are copied if they exist
+            genre_ids: movieToSave.genre_ids || existingMovie.genre_ids
+          });
           
           // Update the document with the new array
           await updateDoc(userDocRef, { movies: filteredMovies });
@@ -90,13 +104,16 @@ export const RatingModalProvider = ({ children }) => {
           toast.success("Rating updated successfully!");
         } else {
           // Movie doesn't exist, add it to the list
-          await updateDoc(userDocRef, { movies: arrayUnion(ratedMovie) });
+          // Using filteredMovies approach instead of arrayUnion to ensure all properties are preserved
+          const updatedMovies = [...movies, movieToSave];
+          await updateDoc(userDocRef, { movies: updatedMovies });
           console.log("Rated movie added to MyList");
           toast.success("Movie added to MyList");
         }
       } else {
         // Document doesn't exist, create it with the movie
-        await updateDoc(userDocRef, { movies: arrayUnion(ratedMovie) });
+        // Create a new array instead of using arrayUnion
+        await updateDoc(userDocRef, { movies: [movieToSave] });
         console.log("Rated movie added to MyList");
         toast.success("Movie added to MyList");
       }

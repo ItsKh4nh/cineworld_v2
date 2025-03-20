@@ -231,7 +231,7 @@ function MoviePopUp() {
                               clipRule="evenodd"
                             />
                           </svg>
-                          Remove from MyList
+                          Remove
                         </button>
                       ) : (
                         <button

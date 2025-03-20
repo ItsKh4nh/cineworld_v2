@@ -12,6 +12,7 @@ const SignUp = lazy(() => import("./pages/SignUp"));
 const Welcome = lazy(() => import("./pages/Welcome"));
 const ErrorPage = lazy(() => import("./pages/ErrorPage"));
 const Play = lazy(() => import("./pages/Play"));
+const People = lazy(() => import("./pages/People"));
 
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -69,6 +70,7 @@ function App() {
               <Route path="/country/:countryName" element={<Country />} />
               <Route path="/search" element={<Search />} />
               <Route path="/play/:id" element={<Play />} />
+              <Route path="/people/:id" element={<People />} />
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
               

@@ -24,13 +24,13 @@ function useGuestMode() {
   const hasAccess = () => !!User || isGuestMode;
 
   /**
-   * Prompts user to sign in if they're not authenticated
+   * Prompts user to login if they're not authenticated
    * Useful for features that require authentication
    * @param {string} feature - The name of the feature requiring authentication
    */
   const requireAuth = (feature = 'this feature') => {
     if (!User) {
-      toast.error(`Please sign in to use ${feature}`, {
+      toast.error(`Please login to use ${feature}`, {
         duration: 3000,
         onClick: () => navigate('/signin')
       });
