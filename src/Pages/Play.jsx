@@ -19,7 +19,8 @@ import useUpdateMyList from "../hooks/useUpdateMyList";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 import { ClipLoader } from "react-spinners";
-import Papa from 'papaparse';
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/FirebaseConfig";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -58,20 +59,20 @@ function Play() {
   // Check movie source
   const checkMovieSource = async () => {
     try {
-      const response = await fetch('/movie_sources/OPhim.csv');
-      const csvText = await response.text();
+      const movieSourceRef = doc(db, "MovieSources", id);
+      const movieSourceDoc = await getDoc(movieSourceRef);
       
-      Papa.parse(csvText, {
-        header: true,
-        complete: (results) => {
-          const source = results.data.find(row => row.movie_id === id);
-          if (source && source.link_embed_1) {
-            setMovieSource(source.link_embed_1);
-            // If we have a direct source, don't load YouTube trailer
-            setUrlId("");
-          }
+      if (movieSourceDoc.exists()) {
+        const sourceData = movieSourceDoc.data();
+        if (sourceData.link_embed_1) {
+          setMovieSource(sourceData.link_embed_1);
+          // If we have a direct source, don't load YouTube trailer
+          setUrlId("");
+        } else if (sourceData.link_m3u8_1) {
+          setMovieSource(sourceData.link_m3u8_1);
+          setUrlId("");
         }
-      });
+      }
     } catch (error) {
       console.error("Error checking movie source:", error);
     }
@@ -137,6 +138,9 @@ function Play() {
 
   // Data fetching
   useEffect(() => {
+    // Scroll to top when navigating to a new movie
+    window.scrollTo(0, 0);
+    
     // Reset states
     setUrlId("");
     setActiveVideo(null);
@@ -527,8 +531,10 @@ function Play() {
                           src={`${imageURL2}${movieDetails.poster_path}`}
                           alt={movieDetails.title}
                           className="w-1/2 rounded-lg shadow-lg"
-              />
-            </div>
+                        />
+                      </div>
+                      
+                      <h1 className="text-2xl font-bold mb-4">{movieDetails.title || movieDetails.original_title}</h1>
                       
                       <div className="mb-6">
                         <h2 className="text-xl font-semibold mb-2">Storyline</h2>
@@ -543,6 +549,13 @@ function Play() {
                           <h2 className="text-xl font-semibold mb-4">Details</h2>
                           
                           <div className="space-y-2">
+                            {movieDetails.original_title && movieDetails.original_title !== movieDetails.title && (
+                              <div className="flex">
+                                <span className="w-32 text-gray-400">Original Title:</span>
+                                <span>{movieDetails.original_title}</span>
+                              </div>
+                            )}
+
                             <div className="flex">
                               <span className="w-32 text-gray-400">Status:</span>
                               <span>{movieDetails.status}</span>
@@ -555,32 +568,6 @@ function Play() {
                               </div>
                             )}
                             
-                            {movieDetails.original_title && movieDetails.original_title !== movieDetails.title && (
-                              <div className="flex">
-                                <span className="w-32 text-gray-400">Original Title:</span>
-                                <span>{movieDetails.original_title}</span>
-                              </div>
-                            )}
-                            
-                            <div className="flex">
-                              <span className="w-32 text-gray-400">Original Language:</span>
-                              <span>{formatLanguage(movieDetails.original_language)}</span>
-                            </div>
-
-                            {movieDetails.homepage && (
-                              <div className="flex items-center">
-                                <span className="w-32 text-gray-400">Homepage:</span>
-                                <a 
-                                  href={movieDetails.homepage} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-blue-400 hover:underline"
-                                >
-                                  Official Website
-                                </a>
-                              </div>
-                            )}
-
                             <div className="flex">
                               <span className="w-32 text-gray-400">Budget:</span>
                               <span>{formatMoney(movieDetails.budget)}</span>
@@ -593,12 +580,17 @@ function Play() {
 
                             {movieDetails.production_countries?.length > 0 && (
                               <div className="flex">
-                                <span className="w-32 text-gray-400">Origin:</span>
+                                <span className="w-32 text-gray-400">Production Countries:</span>
                                 <span>
                                   {movieDetails.production_countries.map(country => country.name).join(', ')}
                                 </span>
                               </div>
                             )}
+                            
+                            <div className="flex">
+                              <span className="w-32 text-gray-400">Original Language:</span>
+                              <span>{formatLanguage(movieDetails.original_language)}</span>
+                            </div>
 
                             {movieDetails.spoken_languages?.length > 0 && (
                               <div className="flex">
@@ -606,6 +598,20 @@ function Play() {
                                 <span>
                                   {movieDetails.spoken_languages.map(lang => formatLanguage(lang.iso_639_1)).join(', ')}
                                 </span>
+                              </div>
+                            )}
+
+                            {movieDetails.homepage && (
+                              <div className="flex items-center">
+                                <span className="w-32 text-gray-400">Homepage:</span>
+                                <a 
+                                  href={movieDetails.homepage} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-400 hover:underline"
+                                >
+                                  Official Website
+                                </a>
                               </div>
                             )}
 
@@ -683,7 +689,7 @@ function Play() {
                         <div>
                           <h2 className="text-xl font-semibold mb-4">Genres</h2>
                           
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap gap-2 mb-6">
                             {movieDetails.genres?.map(genre => (
                               <span 
                                 key={genre.id}
@@ -696,7 +702,7 @@ function Play() {
                           
                           {keywords?.length > 0 && (
                             <>
-                              <h2 className="text-xl font-semibold mb-4">Keywords</h2>
+                              <h2 className="text-xl font-semibold mb-4 mt-8">Keywords</h2>
                               <div className="flex flex-wrap gap-2 mb-6">
                                 {keywords.map(keyword => (
                                   <span 
@@ -712,7 +718,7 @@ function Play() {
                           
                           {movieDetails.production_companies?.length > 0 && (
                             <>
-                              <h2 className="text-xl font-semibold mb-4">Production</h2>
+                              <h2 className="text-xl font-semibold mb-4 mt-8">Production</h2>
                               <div className="flex flex-wrap gap-4">
                                 {movieDetails.production_companies.map(company => (
                                   <div key={company.id} className="flex flex-col items-center text-center max-w-[150px]">

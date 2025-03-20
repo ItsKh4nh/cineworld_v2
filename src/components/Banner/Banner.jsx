@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Fade } from "react-awesome-reveal";
 import StarRatings from "../StarRatings";
+import ColoredStarRating from "../StarRating/ColoredStarRating";
 
 import axios from "../../axios";
 import { imageURL } from "../../config/constants";
@@ -35,14 +36,14 @@ function Banner(props) {
       const randomMovie = response.data.results.sort(function (a, b) {
         return 0.5 - Math.random();
       })[0];
-      
+
       // Check if movie is in MyList
       const isInMyList = myListMovies.some(m => m.id === randomMovie.id);
       setMovie({
         ...randomMovie,
         isInMyList
       });
-      
+
       console.log(movie);
     });
 
@@ -58,9 +59,8 @@ function Banner(props) {
     <>
       <div
         style={{
-          backgroundImage: `linear-gradient(90deg, hsl(0deg 0% 7% / 91%) 0%, hsl(0deg 0% 0% / 0%) 35%, hsl(220deg 26% 44% / 0%) 100%), url(${
-            movie ? imageURL + movie.backdrop_path : ""
-          })`,
+          backgroundImage: `linear-gradient(90deg, hsl(0deg 0% 7% / 91%) 0%, hsl(0deg 0% 0% / 0%) 35%, hsl(220deg 26% 44% / 0%) 100%), url(${movie ? imageURL + movie.backdrop_path : ""
+            })`,
         }}
         className="h-[50rem] md:h-[55rem] 3xl:h-[63rem] bg-cover bg-center object-contain grid items-center"
       >
@@ -68,12 +68,12 @@ function Banner(props) {
           <Fade direction="bottom">
             {movie.title || movie.name ? (
               <div className="flex flex-wrap items-center mb-5">
-              <div className="flex items-center">
-                <h1 className="text-white text-3xl font-semibold text-center py-2 sm:text-left sm:text-5xl sm:border-l-8 pl-4 border-red-700 md:text-6xl sm:font-bold drop-shadow-lg">
-                  {movie.title || movie.name}
-                </h1>
+                <div className="flex items-center">
+                  <h1 className="text-white text-3xl font-semibold text-center py-2 sm:text-left sm:text-5xl sm:border-l-8 pl-4 border-red-700 md:text-6xl sm:font-bold drop-shadow-lg">
+                    {movie.title || movie.name}
+                  </h1>
+                </div>
               </div>
-            </div>
             ) : (
               <div className="grid justify-center sm:justify-start">
                 <div className="animate-pulse w-72 ml-4 sm:ml-0 sm:w-96 py-5 mb-7 xl:py-7 xl:w-45rem bg-neutral-900 rounded-md"></div>
@@ -84,21 +84,7 @@ function Banner(props) {
               <div className="flex items-center">
                 <div className="flex justify-center sm:justify-start">
                   {movie.vote_average ? (
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      viewBox="0 0 24 24" 
-                      fill={
-                        movie.vote_average <= 2 ? "#ff4545" : // Red
-                        movie.vote_average <= 4 ? "#ffa534" : // Orange
-                        movie.vote_average <= 6 ? "#ffe234" : // Yellow
-                        movie.vote_average <= 8 ? "#b7dd29" : // Light green
-                        "#57e32c" // Bright green
-                      }
-                      className="w-6 h-6"
-                      aria-hidden="true"
-                    >
-                      <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                    </svg>
+                    <ColoredStarRating rating={movie.vote_average} size="large" showDenominator={true} />
                   ) : null}
                 </div>
                 <div className="flex justify-center sm:justify-start ml-6">
@@ -109,7 +95,7 @@ function Banner(props) {
                   ) : null}
                 </div>
               </div>
-              
+
               {movie.genre_ids && movie.genre_ids.length > 0 && (
                 <div className="flex items-center">
                   <div className="flex text-white text-lg">
