@@ -13,6 +13,7 @@ import { toast } from "react-hot-toast";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import axios from "../../axios";
 import { API_KEY } from "../../config/constants";
+import ColoredStarRating from "../StarRating/ColoredStarRating";
 
 function MyListTable() {
   const { User } = useContext(AuthContext);
@@ -599,13 +600,8 @@ function MyListTable() {
                           </td>
                           {isLargeScreen && (
                             <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
-                              <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-1">
-                                {movie.genre_ids ? convertGenre(movie.genre_ids).map((genre, idx) => (
-                                  <span key={idx} className="flex items-center">
-                                    {idx > 0 && <span className="mx-1 text-gray-600">•</span>}
-                                    {genre}
-                                  </span>
-                                )) : "N/A"}
+                              <div className="text-sm text-gray-300 mt-1">
+                                {movie.genre_ids ? convertGenre(movie.genre_ids).join(", ") : "N/A"}
                               </div>
                             </td>
                           )}
@@ -617,19 +613,7 @@ function MyListTable() {
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             {movie.userRating?.score ? (
-                              <svg 
-                                xmlns="http://www.w3.org/2000/svg" 
-                                viewBox="0 0 24 24" 
-                                fill={
-                                  movie.userRating.score <= 3 ? "#ff4545" : // Red
-                                  movie.userRating.score <= 6 ? "#ffa534" : // Orange
-                                  "#57e32c" // Green
-                                }
-                                className="w-5 h-5"
-                                aria-hidden="true"
-                              >
-                                <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                              </svg>
+                              <ColoredStarRating rating={movie.userRating.score} />
                             ) : (
                               <svg 
                                 xmlns="http://www.w3.org/2000/svg" 
@@ -737,31 +721,14 @@ function MyListTable() {
                         <div className="text-sm text-gray-400 mt-1">
                           {formatDate(movie.release_date_full || movie.release_date || movie.first_air_date)}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1 flex flex-wrap gap-1">
-                          {movie.genre_ids ? convertGenre(movie.genre_ids).map((genre, idx) => (
-                            <span key={idx} className="flex items-center">
-                              {idx > 0 && <span className="mx-1 text-gray-600">•</span>}
-                              {genre}
-                            </span>
-                          )) : "N/A"}
+                        <div className="text-sm text-gray-300 mt-1">
+                          {movie.genre_ids ? convertGenre(movie.genre_ids).join(", ") : "N/A"}
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center">
                             <div className="mr-3">
                               {movie.userRating?.score ? (
-                                <svg 
-                                  xmlns="http://www.w3.org/2000/svg" 
-                                  viewBox="0 0 24 24" 
-                                  fill={
-                                    movie.userRating.score <= 3 ? "#ff4545" : // Red
-                                    movie.userRating.score <= 6 ? "#ffa534" : // Orange
-                                    "#57e32c" // Green
-                                  }
-                                  className="w-5 h-5"
-                                  aria-hidden="true"
-                                >
-                                  <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                                </svg>
+                                <ColoredStarRating rating={movie.userRating.score} size="small" />
                               ) : (
                                 <svg 
                                   xmlns="http://www.w3.org/2000/svg" 

@@ -3,7 +3,7 @@ import React from 'react';
 function ColoredStarRating({ rating, size = "normal", showDenominator = false }) {
   // Format rating to display
   const safeRating = rating || 0;
-  const formattedRating = parseFloat(safeRating.toFixed(1)).toString();
+  const formattedRating = parseFloat(safeRating.toFixed(2)).toString();
   
   // Define size classes (making each size larger)
   const sizeClasses = {

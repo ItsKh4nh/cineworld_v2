@@ -2,20 +2,21 @@ import { genresList } from "../config/constants";
 
 const useGenresConverter = () => {
   const convertGenre = (genreIds) => {
-    const genresConvertedList = [];
-
-    // Check if genreIds exists before trying to use slice
-    if (genreIds && Array.isArray(genreIds)) {
-      genreIds
-        .slice(0, 3)
-        .map((genreId) =>
-          genresList
-            .filter((el) => el.id === genreId)
-            .map((el) => genresConvertedList.push(el.name))
-        );
+    // Check if genreIds exists before processing
+    if (!genreIds || !Array.isArray(genreIds)) {
+      return [];
     }
-
-    return genresConvertedList;
+    
+    // Take only first 3 genre IDs
+    const limitedGenreIds = genreIds.slice(0, 3);
+    
+    // Map each ID to its name
+    return limitedGenreIds
+      .map(genreId => {
+        const genre = genresList.find(g => g.id === genreId);
+        return genre ? genre.name : null;
+      })
+      .filter(Boolean); // Remove any null values
   };
 
   return { convertGenre };
