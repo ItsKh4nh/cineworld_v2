@@ -4,9 +4,7 @@ import axios from "../axios";
 import { 
   personDetails, 
   personMovieCredits, 
-  personExternalIds,
-  personTaggedImages
-} from "../config/URLs";
+  personExternalIds} from "../config/URLs";
 import { imageURL, imageURL2 } from "../config/constants";
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
@@ -86,32 +84,76 @@ function People() {
   // Add person to list
   const confirmAddToList = async () => {
     try {
+      // Close the modal first
+      setShowConfirmModal(false);
+      
+      // Generate a unique toast ID based on person ID and action
+      const toastId = `add-person-${person.id}`;
+      
+      // Start loading toast
+      toast.loading(`Adding ${person.name} to your list...`, { id: toastId });
+      
       const success = await addPersonToList(person);
+      
+      // Update the toast based on the result
       if (success) {
         setIsInList(true);
-        toast.success(`${person.name} added to your list`, { 
-          id: `add-person-${person.id}`,
+        toast.success(`${person.name} added to MyList`, { 
+          id: toastId,
+          duration: 2000 
+        });
+      } else {
+        toast.error(`Failed to add ${person.name} to your list`, { 
+          id: toastId,
           duration: 2000 
         });
       }
     } catch (error) {
       console.error("Error adding person to list:", error);
+      // Use a unique toast ID for the error case
+      const errorToastId = `error-add-person-${person.id}`;
+      toast.error(`Error: ${error.message || "Failed to add to list"}`, {
+        id: errorToastId,
+        duration: 2000
+      });
     }
   };
 
   // Remove person from list
   const confirmRemoveFromList = async () => {
     try {
+      // Close the modal first
+      setShowConfirmModal(false);
+      
+      // Generate a unique toast ID based on person ID and action
+      const toastId = `remove-person-${person.id}`;
+      
+      // Start loading toast
+      toast.loading(`Removing ${person.name} from your list...`, { id: toastId });
+      
       const success = await removePersonFromList(person);
+      
+      // Update the toast based on the result
       if (success) {
         setIsInList(false);
         toast.success(`${person.name} removed from your list`, { 
-          id: `remove-person-${person.id}`,
-          duration: 2000
+          id: toastId,
+          duration: 2000 
+        });
+      } else {
+        toast.error(`Failed to remove ${person.name} from your list`, { 
+          id: toastId,
+          duration: 2000 
         });
       }
     } catch (error) {
       console.error("Error removing person from list:", error);
+      // Use a unique toast ID for the error case
+      const errorToastId = `error-remove-person-${person.id}`;
+      toast.error(`Error: ${error.message || "Failed to remove from list"}`, {
+        id: errorToastId,
+        duration: 2000
+      });
     }
   };
 
@@ -600,11 +642,11 @@ function People() {
             </div>
           </div>
         </>
-      )}
+      )}  
       
       <Footer />
     </div>
   );
 }
 
-export default People; 
+export default People;
