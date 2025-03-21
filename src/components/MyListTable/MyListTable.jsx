@@ -14,6 +14,8 @@ import useGenresConverter from "../../hooks/useGenresConverter";
 import axios from "../../axios";
 import { API_KEY } from "../../config/constants";
 import ColoredStarRating from "../StarRating/ColoredStarRating";
+import { FaMinus } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 function MyListTable() {
   const { User } = useContext(AuthContext);
@@ -40,6 +42,8 @@ function MyListTable() {
   // Add states to track screen size
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1200);
+
+  const navigate = useNavigate();
 
   // Update event listener for window resize
   useEffect(() => {
@@ -74,10 +78,12 @@ function MyListTable() {
 
   function getMovies() {
     setLoading(true);
-    getDoc(doc(db, "MyList", User.uid)).then((result) => {
-      const data = result.data();
-      if (data) {
-        if (data.movies) {
+    
+    // Get movies from MyList collection
+    getDoc(doc(db, "MyList", User.uid))
+      .then((result) => {
+        const data = result.data();
+        if (data && data.movies) {
           // Get runtime for each movie
           const moviesWithRuntime = data.movies.map(async (movie) => {
             try {
@@ -98,22 +104,34 @@ function MyListTable() {
           Promise.all(moviesWithRuntime).then(updatedMovies => {
             setMyMovies(updatedMovies);
             setAllMovies(updatedMovies); // Store all movies for filtering
-            setLoading(false);
           });
         } else {
-          setLoading(false);
+          setMyMovies([]);
+          setAllMovies([]);
         }
-        
-        if (data.people) {
+      })
+      .catch(error => {
+        console.error("Error fetching movie data:", error);
+        setMyMovies([]);
+        setAllMovies([]);
+      });
+    
+    // Get people from PeopleList collection
+    getDoc(doc(db, "PeopleList", User.uid))
+      .then((result) => {
+        const data = result.data();
+        if (data && data.people) {
           setMyPeople(data.people || []);
+        } else {
+          setMyPeople([]);
         }
-      } else {
         setLoading(false);
-      }
-    }).catch(error => {
-      console.error("Error fetching data:", error);
-      setLoading(false);
-    });
+      })
+      .catch(error => {
+        console.error("Error fetching people data:", error);
+        setMyPeople([]);
+        setLoading(false);
+      });
   }
 
   const handleSort = (key) => {
@@ -289,30 +307,32 @@ function MyListTable() {
   };
 
   const handleRemovePerson = async (person) => {
-    // Get the current user's document
-    const userDocRef = doc(db, "MyList", User.uid);
-    
     try {
-      // Get the current list
+      const userDocRef = doc(db, "PeopleList", User.uid);
       const docSnap = await getDoc(userDocRef);
       
       if (docSnap.exists()) {
         const userData = docSnap.data();
-        const currentPeople = userData.people || [];
+        const people = userData.people || [];
         
-        // Filter out the person to remove by ID
-        const filteredPeople = currentPeople.filter(p => p.id !== person.id);
+        // Filter out the person to remove
+        const updatedPeople = people.filter(p => p.id !== person.id);
+        await updateDoc(userDocRef, { people: updatedPeople });
         
-        // Update the document with the filtered list
-        await updateDoc(userDocRef, { people: filteredPeople });
-        
-        // Update the local state
-        setMyPeople(myPeople.filter(p => p.id !== person.id));
         toast.success(`${person.name} removed from your list`);
+        
+        // Refresh the list to show the update
+        setTimeout(() => {
+          getMovies();
+        }, 500);
+        
+        return true;
       }
+      return false;
     } catch (error) {
-      console.error("Error removing person:", error);
-      toast.error("Failed to remove person from your list");
+      console.error("Error removing person from list:", error);
+      toast.error("Failed to remove person");
+      return false;
     }
   };
 
@@ -377,7 +397,7 @@ function MyListTable() {
               Are you sure you want to remove "{movieToRemove?.title || movieToRemove?.name}" from your list?
             </p>
             <div className="flex justify-end space-x-4">
-              <button
+              <button 
                 onClick={cancelRemove}
                 className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
               >
@@ -426,7 +446,7 @@ function MyListTable() {
         >
           Movies
         </button>
-        <button
+        <button 
           className={`px-6 py-3 font-medium text-sm ${
             activeTab === "people"
               ? "text-red-600 border-b-2 border-red-600"
@@ -438,95 +458,41 @@ function MyListTable() {
         </button>
       </div>
       
-      {/* Add Search, Filter and Sort Controls */}
-      {activeTab === "movies" && (
-        <div className="mb-6 flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Search movies..."
-              className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-red-600"
-              onChange={(e) => {
-                // Implement search functionality
-                const searchTerm = e.target.value.toLowerCase();
-                if (searchTerm === '') {
-                  setMyMovies(allMovies); // Reset to original list
-                } else {
-                  const filtered = allMovies.filter(movie => 
-                    (movie.title || movie.name).toLowerCase().includes(searchTerm) ||
-                    (movie.userRating?.note || '').toLowerCase().includes(searchTerm)
-                  );
-                  setMyMovies(filtered);
-                }
-              }}
-            />
-          </div>
-          <div>
-            <button
-              onClick={handleOpenFilterModal}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 w-full md:w-auto"
-            >
-              Filters {selectedGenres.length > 0 ? `(${selectedGenres.length})` : ''}
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {activeTab === "people" && (
-        <div className="mb-6 flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Search people..."
-              className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-red-600"
-              onChange={(e) => {
-                // Implement search functionality for people
-                const searchTerm = e.target.value.toLowerCase();
-                if (searchTerm === '') {
-                  getMovies(); // Reset to original list
-                } else {
-                  const filtered = myPeople.filter(person => 
-                    person.name.toLowerCase().includes(searchTerm) ||
-                    (person.known_for_department || '').toLowerCase().includes(searchTerm)
-                  );
-                  setMyPeople(filtered);
-                }
-              }}
-            />
-          </div>
-          <div className="flex gap-2">
-            <select 
-              className="px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-red-600"
-              onChange={(e) => {
-                // Implement sort for people
-                const sortBy = e.target.value;
-                let sortedPeople = [...myPeople];
-                
-                if (sortBy === 'name:asc') {
-                  sortedPeople.sort((a, b) => a.name.localeCompare(b.name));
-                } else if (sortBy === 'name:desc') {
-                  sortedPeople.sort((a, b) => b.name.localeCompare(a.name));
-                } else if (sortBy === 'dateAdded:desc') {
-                  sortedPeople.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-                } else if (sortBy === 'dateAdded:asc') {
-                  sortedPeople.sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
-                }
-                
-                setMyPeople(sortedPeople);
-              }}
-            >
-              <option value="name:asc">Name (A-Z)</option>
-              <option value="name:desc">Name (Z-A)</option>
-              <option value="dateAdded:desc">Date Added (Newest)</option>
-              <option value="dateAdded:asc">Date Added (Oldest)</option>
-            </select>
-          </div>
-        </div>
-      )}
-      
       {/* Movies Tab */}
-      {activeTab === "movies" && (
+      {activeTab === 'movies' && (
         <>
+          {/* Add Search, Filter and Sort Controls */}
+          <div className="mb-6 flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Search movies..."
+                className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-red-600"
+                onChange={(e) => {
+                  // Implement search functionality
+                  const searchTerm = e.target.value.toLowerCase();
+                  if (searchTerm === '') {
+                    setMyMovies(allMovies); // Reset to original list
+                  } else {
+                    const filtered = allMovies.filter(movie => 
+                      (movie.title || movie.name).toLowerCase().includes(searchTerm) ||
+                      (movie.userRating?.note || '').toLowerCase().includes(searchTerm)
+                    );
+                    setMyMovies(filtered);
+                  }
+                }}
+              />
+            </div>
+            <div>
+              <button
+                onClick={handleOpenFilterModal}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 w-full md:w-auto"
+              >
+                Filters {selectedGenres.length > 0 ? `(${selectedGenres.length})` : ''}
+              </button>
+            </div>
+          </div>
+          
           {myMovies.length === 0 ? (
             <div className="text-center py-10">
               <p className="text-xl text-gray-400">Your movie list is empty. Add some movies to get started!</p>
@@ -777,44 +743,69 @@ function MyListTable() {
       )}
       
       {/* People Tab */}
-      {activeTab === "people" && (
+      {activeTab === 'people' && (
         <>
-          {myPeople.length === 0 ? (
+          {/* Search for people */}
+          {myPeople.length > 0 && (
+            <div className="mb-6">
+              <input
+                type="text"
+                placeholder="Search people..."
+                className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-red-600"
+                onChange={(e) => {
+                  // Implement search functionality for people
+                  const searchTerm = e.target.value.toLowerCase();
+                  if (searchTerm === '') {
+                    getMovies(); // Reset to original list
+                  } else {
+                    const filtered = myPeople.filter(person => 
+                      person.name.toLowerCase().includes(searchTerm) ||
+                      (person.known_for_department || '').toLowerCase().includes(searchTerm)
+                    );
+                    setMyPeople(filtered);
+                  }
+                }}
+              />
+            </div>
+          )}
+          
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <ClipLoader color="#E50914" size={60} />
+            </div>
+          ) : myPeople.length === 0 ? (
             <div className="text-center py-10">
-              <p className="text-xl text-gray-400">Your people list is empty. Add some actors, directors, or other film personalities to get started!</p>
+              <p className="text-xl text-gray-400">You haven't added any people to your list yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {myPeople.map((person) => (
-                <div key={person.id} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
-                  {person.profile_path ? (
-                    <img 
-                      src={imageURL2 + person.profile_path} 
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
+              {myPeople.map(person => (
+                <div 
+                  key={person.id}
+                  className="bg-gray-900 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+                >
+                  <div className="relative cursor-pointer" onClick={() => navigate(`/people/${person.id}`)}>
+                    <img
+                      src={`${imageURL2}${person.profile_path}`}
                       alt={person.name}
-                      className="w-full h-64 object-cover"
+                      className="w-full aspect-[2/3] object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/300x450?text=No+Image';
+                      }}
                     />
-                  ) : (
-                    <div className="w-full h-64 bg-gray-700 flex items-center justify-center">
-                      <span className="text-gray-400">No Image</span>
-                    </div>
-                  )}
+                  </div>
+                  
                   <div className="p-4">
-                    <h3 className="text-white text-xl font-semibold mb-1">{person.name}</h3>
-                    <p className="text-gray-400 text-sm mb-3">{person.known_for_department || "Actor/Actress"}</p>
-                    <p className="text-gray-400 text-xs mb-4">
-                      Added on {formatDate(person.dateAdded)}
-                    </p>
-                    <div className="flex justify-between items-center">
-                      <button
-                        onClick={() => window.open(`https://www.themoviedb.org/person/${person.id}`, '_blank')}
-                        className="text-white bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm"
-                      >
-                        View Details
-                      </button>
+                    <h3 className="text-white text-lg font-bold line-clamp-1">{person.name}</h3>
+                    <p className="text-gray-400 text-sm mb-3">{person.known_for_department}</p>
+                    
+                    <div className="flex justify-end">
                       <button
                         onClick={() => handleRemovePerson(person)}
-                        className="text-white bg-red-700 hover:bg-red-600 px-3 py-1 rounded text-sm"
+                        className="bg-red-600 hover:bg-transparent hover:text-red-600 hover:border-red-600 border border-transparent text-white font-medium px-3 py-1 rounded-md transition duration-300 ease-in-out flex items-center justify-center text-sm"
                       >
+                        <FaMinus className="mr-1" />
                         Remove
                       </button>
                     </div>

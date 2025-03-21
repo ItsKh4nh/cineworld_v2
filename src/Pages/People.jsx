@@ -11,8 +11,12 @@ import { imageURL, imageURL2 } from "../config/constants";
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
 import { ClipLoader } from "react-spinners";
-import { FaImdb, FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
+import { FaImdb, FaFacebook, FaInstagram, FaTwitter, FaPlus, FaMinus } from "react-icons/fa";
 import ColoredStarRating from "../components/StarRating/ColoredStarRating";
+import useMoviePopup from "../hooks/useMoviePopup";
+import usePeopleList from "../hooks/usePeopleList";
+import ConfirmationModal from "../components/Modals/ConfirmationModal";
+import toast, { Toaster } from "react-hot-toast";
 
 function People() {
   // State variables
@@ -22,10 +26,15 @@ function People() {
   const [externalIds, setExternalIds] = useState({});
   const [taggedImages, setTaggedImages] = useState([]);
   const [activeTab, setActiveTab] = useState("about");
+  const [isInList, setIsInList] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState("");
 
   // Hooks
   const { id } = useParams();
   const navigate = useNavigate();
+  const { handleMoviePopup } = useMoviePopup();
+  const { isPersonInList, addPersonToList, removePersonFromList } = usePeopleList();
 
   // Helper functions
   const formatDate = (dateString) => {
@@ -52,6 +61,58 @@ function People() {
     }
     
     return age;
+  };
+
+  // Check if person is in list
+  const checkPersonInList = async () => {
+    if (id && isPersonInList) {
+      const result = await isPersonInList(id);
+      setIsInList(result);
+    }
+  };
+
+  // Handle add to list button click
+  const handleAddToListClick = () => {
+    setConfirmAction("add");
+    setShowConfirmModal(true);
+  };
+
+  // Handle remove from list button click
+  const handleRemoveFromListClick = () => {
+    setConfirmAction("remove");
+    setShowConfirmModal(true);
+  };
+
+  // Add person to list
+  const confirmAddToList = async () => {
+    try {
+      const success = await addPersonToList(person);
+      if (success) {
+        setIsInList(true);
+        toast.success(`${person.name} added to your list`, { 
+          id: `add-person-${person.id}`,
+          duration: 2000 
+        });
+      }
+    } catch (error) {
+      console.error("Error adding person to list:", error);
+    }
+  };
+
+  // Remove person from list
+  const confirmRemoveFromList = async () => {
+    try {
+      const success = await removePersonFromList(person);
+      if (success) {
+        setIsInList(false);
+        toast.success(`${person.name} removed from your list`, { 
+          id: `remove-person-${person.id}`,
+          duration: 2000
+        });
+      }
+    } catch (error) {
+      console.error("Error removing person from list:", error);
+    }
   };
 
   // Data fetching
@@ -91,11 +152,15 @@ function People() {
       });
 
     setLoading(false);
+    
+    // Check if person is in list
+    checkPersonInList();
   }, [id]);
 
   return (
     <div className="min-h-screen bg-black text-white">
       <Navbar />
+      <Toaster position="bottom-center" />
 
       {loading ? (
         <div className="flex flex-col items-center justify-center min-h-screen">
@@ -113,18 +178,36 @@ function People() {
             }}
           >
             <div className="container mx-auto px-4 h-full flex items-end">
-              <div className="pb-8">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-                  {person.name}
-                </h1>
+              <div className="pb-8 w-full">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
+                    {person.name}
+                  </h1>
+                </div>
+                
                 {person.known_for_department && (
-                  <p className="text-xl text-gray-300">
+                  <p className="text-xl text-gray-300 mt-2">
                     {person.known_for_department}
                   </p>
                 )}
               </div>
             </div>
           </div>
+
+          {/* Confirmation Modal */}
+          <ConfirmationModal
+            isOpen={showConfirmModal}
+            onClose={() => setShowConfirmModal(false)}
+            onConfirm={confirmAction === "add" ? confirmAddToList : confirmRemoveFromList}
+            title={confirmAction === "add" ? "Add to My List" : "Remove from My List"}
+            message={
+              confirmAction === "add"
+                ? `Are you sure you want to add ${person.name} to your list?`
+                : `Are you sure you want to remove ${person.name} from your list?`
+            }
+            confirmText={confirmAction === "add" ? "Add" : "Remove"}
+            confirmColor={confirmAction === "add" ? "green" : "red"}
+          />
 
           {/* Main Content */}
           <div className="container mx-auto px-4 py-8">
@@ -235,37 +318,58 @@ function People() {
               {/* Right Column - Tabs */}
               <div className="md:col-span-2">
                 {/* Tabs Navigation */}
-                <div className="flex border-b border-gray-700 mb-6 overflow-x-auto">
-                  <button
-                    className={`px-4 py-2 font-medium ${
-                      activeTab === 'about'
-                        ? 'text-yellow-500 border-b-2 border-yellow-500'
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setActiveTab('about')}
-                  >
-                    About
-                  </button>
-                  <button
-                    className={`px-4 py-2 font-medium ${
-                      activeTab === 'movies'
-                        ? 'text-yellow-500 border-b-2 border-yellow-500'
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setActiveTab('movies')}
-                  >
-                    Movies
-                  </button>
-                  <button
-                    className={`px-4 py-2 font-medium ${
-                      activeTab === 'photos'
-                        ? 'text-yellow-500 border-b-2 border-yellow-500'
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                    onClick={() => setActiveTab('photos')}
-                  >
-                    Photos
-                  </button>
+                <div className="flex border-b border-gray-700 mb-6 overflow-x-auto justify-between">
+                  <div className="flex">
+                    <button
+                      className={`px-4 py-2 font-medium ${
+                        activeTab === 'about'
+                          ? 'text-yellow-500 border-b-2 border-yellow-500'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                      onClick={() => setActiveTab('about')}
+                    >
+                      About
+                    </button>
+                    <button
+                      className={`px-4 py-2 font-medium ${
+                        activeTab === 'movies'
+                          ? 'text-yellow-500 border-b-2 border-yellow-500'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                      onClick={() => setActiveTab('movies')}
+                    >
+                      Movies
+                    </button>
+                    <button
+                      className={`px-4 py-2 font-medium ${
+                        activeTab === 'photos'
+                          ? 'text-yellow-500 border-b-2 border-yellow-500'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                      onClick={() => setActiveTab('photos')}
+                    >
+                      Photos
+                    </button>
+                  </div>
+                  
+                  {/* Add to MyList / Remove from MyList button */}
+                  {isInList ? (
+                    <button
+                      onClick={handleRemoveFromListClick}
+                      className="bg-red-600 hover:bg-transparent hover:text-red-600 hover:border-red-600 border border-transparent text-white font-medium px-4 py-1 rounded-md transition duration-300 ease-in-out flex items-center justify-center"
+                    >
+                      <FaMinus className="mr-2" />
+                      Remove from List
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleAddToListClick}
+                      className="bg-yellow-500 hover:bg-transparent hover:text-yellow-500 hover:border-yellow-500 border border-transparent text-white font-medium px-4 py-1 rounded-md transition duration-300 ease-in-out flex items-center justify-center"
+                    >
+                      <FaPlus className="mr-2" />
+                      Add to List
+                    </button>
+                  )}
                 </div>
                 
                 {/* Tab Content */}
@@ -301,7 +405,7 @@ function People() {
                                 <div
                                   key={movie.id}
                                   className="bg-gray-900 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-                                  onClick={() => navigate(`/play/${movie.id}`)}
+                                  onClick={() => handleMoviePopup(movie)}
                                 >
                                   {/* Movie poster */}
                                   <div className="relative">
@@ -310,24 +414,6 @@ function People() {
                                       alt={movie.title}
                                       className="w-full aspect-[2/3] object-cover"
                                     />
-                                    {/* Rating badge */}
-                                    <div className="absolute top-2 right-2 bg-black bg-opacity-70 rounded-full p-1">
-                                      <svg 
-                                        xmlns="http://www.w3.org/2000/svg" 
-                                        viewBox="0 0 24 24" 
-                                        fill={
-                                          movie.vote_average <= 2 ? "#ff4545" : // Red
-                                          movie.vote_average <= 4 ? "#ffa534" : // Orange
-                                          movie.vote_average <= 6 ? "#ffe234" : // Yellow
-                                          movie.vote_average <= 8 ? "#b7dd29" : // Light green
-                                          "#57e32c" // Bright green
-                                        }
-                                        className="w-5 h-5"
-                                        aria-hidden="true"
-                                      >
-                                        <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                                      </svg>
-                                    </div>
                                   </div>
                                   
                                   {/* Movie details */}
@@ -339,10 +425,17 @@ function People() {
                                     <p className="text-white/80 text-sm mb-2">
                                       {movie.release_date 
                                         ? new Date(movie.release_date).toLocaleDateString('en-US', {
-                                            year: 'numeric'
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
                                           }) 
                                         : 'Release date unknown'}
                                     </p>
+
+                                    {/* Rating/Score */}
+                                    <div className="mb-2">
+                                      <ColoredStarRating rating={movie.vote_average} size="small" showDenominator={false} />
+                                    </div>
                                     
                                     {/* Character or Job */}
                                     {movie.character ? (
@@ -381,7 +474,7 @@ function People() {
                                 <div 
                                   key={`${movie.id}-${movie.character}`} 
                                   className="flex items-center bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors cursor-pointer"
-                                  onClick={() => navigate(`/play/${movie.id}`)}
+                                  onClick={() => handleMoviePopup(movie)}
                                 >
                                   <div className="w-16 md:w-24 flex-shrink-0">
                                     {movie.poster_path ? (
@@ -437,7 +530,7 @@ function People() {
                                       <div 
                                         key={`${movie.id}-${movie.job}`} 
                                         className="flex items-center bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors cursor-pointer"
-                                        onClick={() => navigate(`/play/${movie.id}`)}
+                                        onClick={() => handleMoviePopup(movie)}
                                       >
                                         <div className="w-16 md:w-24 flex-shrink-0">
                                           {movie.poster_path ? (
