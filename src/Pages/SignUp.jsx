@@ -12,7 +12,7 @@ import {
 
 function SignUp() {
   const location = useLocation();
-  const { User, setUser } = useContext(AuthContext);
+  const { User } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +28,13 @@ function SignUp() {
   const [showPasswords, setShowPasswords] = useState(false);
 
   const navigate = useNavigate();
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (User) {
+      navigate("/");
+    }
+  }, [User, navigate]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);

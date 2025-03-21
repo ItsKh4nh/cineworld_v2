@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 //import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,3 +17,10 @@ const firebaseConfig = {
 export const FirebaseApp = initializeApp(firebaseConfig);
 export const db = getFirestore(FirebaseApp);
 //export const analytics = getAnalytics(FirebaseApp);
+
+// Set up persistent authentication
+export const auth = getAuth(FirebaseApp);
+setPersistence(auth, browserLocalPersistence)
+  .catch((error) => {
+    console.error("Error setting auth persistence:", error);
+  });

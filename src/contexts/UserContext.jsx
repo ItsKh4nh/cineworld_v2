@@ -18,9 +18,9 @@ export default function Context({ children }) {
     console.log("Guest mode disabled");
   };
 
-  // Add this to the useEffect that checks for existing user
-  // Check if guest mode was previously enabled
+  // Check for existing user session and guest mode on initial load
   useEffect(() => {
+    // Check if guest mode was previously enabled
     const storedGuestMode = localStorage.getItem("guestMode");
     if (storedGuestMode === "true") {
       setIsGuestMode(true);

@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
 
 import { Transition } from "@headlessui/react";
-import { getAuth, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { Fade } from "react-awesome-reveal";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import { AuthContext } from "../../contexts/UserContext";
 import { genresList } from "../../config/constants";
+import { auth } from "../../firebase/FirebaseConfig";
 
 function Navbar(props) {
-  const { User } = useContext(AuthContext);
+  const { User, isGuestMode, disableGuestMode } = useContext(AuthContext);
   const [profilePic, setProfilePic] = useState("");
   const [username, setUsername] = useState("");
   const [genreDropdownOpen, setGenreDropdownOpen] = useState(false);
@@ -73,14 +74,18 @@ function Navbar(props) {
   };
 
   const SignOut = () => {
-    const auth = getAuth();
-    signOut(auth)
-      .then(() => {
-        navigate("/");
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
+    if (isGuestMode) {
+      disableGuestMode();
+      navigate("/");
+    } else {
+      signOut(auth)
+        .then(() => {
+          navigate("/");
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    }
   };
 
   return (
@@ -225,37 +230,66 @@ function Navbar(props) {
                     <a className="items-center hidden pr-4 mt-auto mb-auto text-base font-medium text-white transition ease-in-out delay-150 cursor-pointer hover:text-red-800 md:flex">
                       {username}
                     </a>
+                  ) : isGuestMode ? (
+                    <a className="items-center hidden pr-4 mt-auto mb-auto text-base font-medium text-white transition ease-in-out delay-150 cursor-pointer hover:text-red-800 md:flex">
+                      Guest User
+                    </a>
                   ) : null}
 
                   <div className="group inline-block relative transition ease-in-out delay-300">
-                    <Link to={"/profile"}>
+                    <Link to={User ? "/profile" : isGuestMode ? "#" : "/signin"}>
                       <img
                         className="h-10 w-10 rounded-full cursor-pointer"
                         src={
-                          profilePic
+                          profilePic && User
                             ? `${User.photoURL}`
+                            : isGuestMode
+                            ? `https://static.vecteezy.com/system/resources/thumbnails/019/879/186/small/user-icon-on-transparent-background-free-png.png`
                             : `https://www.citypng.com/public/uploads/preview/profile-user-round-red-icon-symbol-download-png-11639594337tco5j3n0ix.png`
                         }
                         alt="Profile"
                       />
                     </Link>
                     <ul className="absolute hidden text-white pt-1 right-0 group-hover:block transition ease-in-out delay-150">
-                      <li>
-                        <Link
-                          to={"/profile"}
-                          className="cursor-pointer rounded-t bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
-                        >
-                          Profile
-                        </Link>
-                      </li>
-                      <li>
-                        <a
-                          onClick={SignOut}
-                          className="cursor-pointer rounded-b bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
-                        >
-                          Logout
-                        </a>
-                      </li>
+                      {User ? (
+                        <>
+                          <li>
+                            <Link
+                              to={"/profile"}
+                              className="cursor-pointer rounded-t bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
+                            >
+                              Profile
+                            </Link>
+                          </li>
+                          <li>
+                            <a
+                              onClick={SignOut}
+                              className="cursor-pointer rounded-b bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
+                            >
+                              Logout
+                            </a>
+                          </li>
+                        </>
+                      ) : isGuestMode ? (
+                        <>
+                          <li>
+                            <Link
+                              to={"/signin"}
+                              className="cursor-pointer rounded-t bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
+                            >
+                              Sign In
+                            </Link>
+                          </li>
+                          <li>
+                            <a
+                              onClick={SignOut}
+                              className="cursor-pointer rounded-b bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
+                            >
+                              Exit Guest Mode
+                            </a>
+                          </li>
+                        </>
+                      ) : null}
                     </ul>
                   </div>
                 </div>

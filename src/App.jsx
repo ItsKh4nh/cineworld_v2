@@ -1,4 +1,4 @@
-import { useContext, useEffect, lazy, Suspense } from "react";
+import { useContext, useEffect, lazy, Suspense, useState } from "react";
 import "./App.css";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -15,10 +15,11 @@ const Play = lazy(() => import("./pages/Play"));
 const People = lazy(() => import("./pages/People"));
 
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { AuthContext } from "./contexts/UserContext";
 import { RatingModalProvider } from "./contexts/RatingModalContext";
 import { UserPreferencesProvider } from "./contexts/UserPreferencesContext";
+import { auth } from "./firebase/FirebaseConfig";
 
 import Loading from "./components/Loading/Loading";
 import Navbar from "./components/Header/Navbar";
@@ -29,13 +30,17 @@ import MoviePopUp from "./components/PopUp/MoviePopUp";
 function App() {
   const { User, setUser, isGuestMode } = useContext(AuthContext);
   const location = useLocation();
+  const [authLoading, setAuthLoading] = useState(true);
   
   useEffect(() => {
-    const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
+      setAuthLoading(false);
       console.log(user);
     });
+    
+    // Clean up subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   // Check if user has access to main content
@@ -60,27 +65,23 @@ function App() {
           <Suspense replace fallback={<Loading />}>
             <Routes>
               {/* Redirect root based on authentication/guest status */}
-              <Route path="/" element={hasAccess ? <Home /> : <Navigate to="/welcome" />} />
+              <Route path="/" element={authLoading ? <Loading /> : (hasAccess ? <Home /> : <Navigate to="/welcome" />)} />
               
               {/* Welcome page at /welcome */}
               <Route path="/welcome" element={<Welcome />} />
               
               {/* Public routes - accessible to all users */}
-              <Route path="/genre/:genreName" element={<Genre />} />
-              <Route path="/country/:countryName" element={<Country />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/play/:id" element={<Play />} />
-              <Route path="/people/:id" element={<People />} />
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
+              <Route path="/genre/:genreName" element={hasAccess ? <Genre /> : <Navigate to="/welcome" />} />
+              <Route path="/country/:countryName" element={hasAccess ? <Country /> : <Navigate to="/welcome" />} />
+              <Route path="/search" element={hasAccess ? <Search /> : <Navigate to="/welcome" />} />
+              <Route path="/play/:id" element={hasAccess ? <Play /> : <Navigate to="/welcome" />} />
+              <Route path="/people/:id" element={hasAccess ? <People /> : <Navigate to="/welcome" />} />
+              <Route path="/signin" element={User ? <Navigate to="/" /> : <SignIn />} />
+              <Route path="/signup" element={User ? <Navigate to="/" /> : <SignUp />} />
               
               {/* Protected routes - require authentication */}
-              {User && (
-                <>
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/mylist" element={<MyList />} />
-                </>
-              )}
+              <Route path="/profile" element={User ? <Profile /> : <Navigate to="/signin" />} />
+              <Route path="/mylist" element={User ? <MyList /> : <Navigate to="/signin" />} />
               
               <Route path="*" element={<ErrorPage />} />
             </Routes>

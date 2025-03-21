@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
 import { AuthContext } from "../contexts/UserContext";
@@ -6,8 +6,15 @@ import Footer from "../components/Footer/Footer";
 
 function Welcome() {
   const [email, setEmail] = useState("");
-  const { enableGuestMode } = useContext(AuthContext);
+  const { User, isGuestMode, enableGuestMode } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Only redirect authenticated users, but not guest users
+  useEffect(() => {
+    if (User && !isGuestMode) {
+      navigate("/");
+    }
+  }, [User, isGuestMode, navigate]);
 
   const handleGuestMode = () => {
     enableGuestMode();

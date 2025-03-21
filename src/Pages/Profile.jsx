@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 
-import { getAuth, signOut, updateProfile } from "firebase/auth";
+import { signOut, updateProfile } from "firebase/auth";
 import {
   getDownloadURL,
   getStorage,
@@ -14,6 +14,7 @@ import toast, { Toaster } from "react-hot-toast";
 
 import { AuthContext } from "../contexts/UserContext";
 import WelcomePageBanner from "/WelcomePageBanner.jpg";
+import { auth } from "../firebase/FirebaseConfig";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -28,6 +29,8 @@ function Profile() {
   const [isUserNameChanged, setIsUserNameChanged] = useState(false);
   const [userName, setUserName] = useState("");
   const [IsMyListUpdated, setIsMyListUpdated] = useState(false);
+  const [changeUsernameLoading, setChangeUsernameLoading] = useState(false);
+  const [changeProfilePictureLoading, setChangeProfilePictureLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -65,79 +68,35 @@ function Profile() {
     event.target.value = null;
   };
 
-  const changeUserName = async (e) => {
-    e.preventDefault();
-    if (isUserNameChanged && userName.trim()) {
-      const auth = getAuth();
-      try {
-        // Update both Auth profile and Firestore
-        await updateProfile(auth.currentUser, {
-          displayName: userName.trim(),
-        });
+  const changeUsername = async () => {
+    setChangeUsernameLoading(true);
 
-        await setDoc(
-          doc(db, "Users", User.uid),
-          {
-            username: userName.trim(),
-            displayName: userName.trim(),
-          },
-          { merge: true }
-        );
-
-        notify();
-      } catch (error) {
-        alert(error.message);
-      }
-    }
-    if (newProfilePic != "") {
-      const storage = getStorage();
-      const storageRef = ref(storage, `/ProfilePics/${User.uid}`);
-      const uploadTask = uploadBytesResumable(storageRef, newProfilePic);
-
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const prog = Math.round(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
-        },
-        (error) => {
-          alert(error.message);
-          alert(error.code);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            console.log(url, "This is the new Url for Profile Pic");
-            setProfilePic(url);
-            const auth = getAuth();
-            updateProfile(auth.currentUser, { photoURL: url })
-              .then(() => {
-                notify();
-                setIsMyListUpdated(true);
-              })
-              .catch((error) => {
-                alert(error.message);
-              });
-          });
-        }
-      );
+    try {
+      await updateProfile(auth.currentUser, {
+        displayName: userName,
+      });
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating username:", error);
+      setChangeUsernameLoading(false);
     }
   };
 
-  const updateProfilePic = (imageURL) => {
-    const auth = getAuth();
-    updateProfile(auth.currentUser, { photoURL: imageURL })
-      .then(() => {
-        setProfilePic(User.photoURL);
-        notify();
-      })
-      .catch((error) => {
-        alert(error.message);
+  const changeProfilePicture = async () => {
+    setChangeProfilePictureLoading(true);
+
+    try {
+      await updateProfile(auth.currentUser, {
+        photoURL: newProfilePicURL,
       });
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating profile picture:", error);
+      setChangeProfilePictureLoading(false);
+    }
   };
 
   const SignOut = () => {
-    const auth = getAuth();
     signOut(auth)
       .then(() => {
         navigate("/");
@@ -213,36 +172,36 @@ function Profile() {
                 <div className="flex justify-between cursor-pointer mb-4 md:mb-8">
                   <img
                     onClick={() =>
-                      updateProfilePic(
-                        "https://i.pinimg.com/originals/ba/2e/44/ba2e4464e0d7b1882cc300feceac683c.png"
-                      )
+                      updateProfile(auth.currentUser, {
+                        photoURL: "https://i.pinimg.com/originals/ba/2e/44/ba2e4464e0d7b1882cc300feceac683c.png"
+                      })
                     }
                     className="w-16 h-16 rounded-md cursor-pointer"
                     src="https://i.pinimg.com/originals/ba/2e/44/ba2e4464e0d7b1882cc300feceac683c.png"
                   />
                   <img
                     onClick={() =>
-                      updateProfilePic(
-                        "https://i.pinimg.com/736x/db/70/dc/db70dc468af8c93749d1f587d74dcb08.jpg"
-                      )
+                      updateProfile(auth.currentUser, {
+                        photoURL: "https://i.pinimg.com/736x/db/70/dc/db70dc468af8c93749d1f587d74dcb08.jpg"
+                      })
                     }
                     className="w-16 h-16 rounded-md cursor-pointer"
                     src="https://i.pinimg.com/736x/db/70/dc/db70dc468af8c93749d1f587d74dcb08.jpg"
                   />
                   <img
                     onClick={() =>
-                      updateProfilePic(
-                        "https://upload.wikimedia.org/wikipedia/commons/0/0b/Cineworld-avatar.png"
-                      )
+                      updateProfile(auth.currentUser, {
+                        photoURL: "https://upload.wikimedia.org/wikipedia/commons/0/0b/Cineworld-avatar.png"
+                      })
                     }
                     className="w-16 h-16 rounded-md cursor-pointer"
                     src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Cineworld-avatar.png"
                   />
                   <img
                     onClick={() =>
-                      updateProfilePic(
-                        "https://ih0.redbubble.net/image.618363037.0853/flat,1000x1000,075,f.u2.jpg"
-                      )
+                      updateProfile(auth.currentUser, {
+                        photoURL: "https://ih0.redbubble.net/image.618363037.0853/flat,1000x1000,075,f.u2.jpg"
+                      })
                     }
                     className="w-16 h-16 rounded-md cursor-pointer"
                     src="https://ih0.redbubble.net/image.618363037.0853/flat,1000x1000,075,f.u2.jpg"
@@ -297,7 +256,7 @@ function Profile() {
               </button>
               {userName != "" || newProfilePic != "" ? (
                 <button
-                  onClick={changeUserName}
+                  onClick={changeUsername}
                   className="flex items-center bg-red-700 text-white font-medium sm:font-bold text-xs px-10 md:px-16 md:text-xl  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"
                 >
                   <svg

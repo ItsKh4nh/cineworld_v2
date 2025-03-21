@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
 import { ClipLoader } from "react-spinners";
@@ -7,7 +7,7 @@ import { emailSignIn, googleSignIn } from "../controllers/auth.controller";
 import ForgotPasswordModal from "../components/Modals/ForgotPasswordModal";
 
 function SignIn() {
-  const { User, setUser } = useContext(AuthContext);
+  const { User } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -16,6 +16,13 @@ function SignIn() {
   const [loader, setLoader] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (User) {
+      navigate("/");
+    }
+  }, [User, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
