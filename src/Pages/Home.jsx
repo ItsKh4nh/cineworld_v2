@@ -38,11 +38,11 @@ function Home() {
     const fetchUserPreferences = async () => {
       if (User) {
         try {
-          // Fetch user preferences if authenticated
-          const userPrefsDoc = await getDoc(doc(db, "UserPreferences", User.uid));
+          // Fetch all user preferences from MyList collection
+          const myListDoc = await getDoc(doc(db, "MyList", User.uid));
           
-          if (userPrefsDoc.exists()) {
-            const data = userPrefsDoc.data();
+          if (myListDoc.exists()) {
+            const data = myListDoc.data();
             
             // Get preferred genres
             if (data.preferredGenres && data.preferredGenres.length > 0) {
@@ -51,31 +51,42 @@ function Home() {
               setUserGenres([]);
             }
             
-            // Get favorite people (cast/crew)
-            if (data.favoritePeople && data.favoritePeople.length > 0) {
-              setFavoritePeople(data.favoritePeople);
+            // Get favorite people
+            if (data.people && data.people.length > 0) {
+              setFavoritePeople(data.people);
               
               // Fetch movies for favorite people
-              const peopleIds = data.favoritePeople.map(person => person.id).join('|');
+              const peopleIds = data.people.map(person => person.id).join('|');
               const url = discoverByPeople(peopleIds);
               
               const response = await axios.get(url);
               if (response.data.results && response.data.results.length > 0) {
                 setFavoritePeopleMovies(response.data.results);
+              } else {
+                setFavoritePeopleMovies([]);
               }
+            } else {
+              setFavoritePeople([]);
+              setFavoritePeopleMovies([]);
             }
           } else {
-            // No preferences found
+            // No data found
             setUserGenres([]);
+            setFavoritePeople([]);
+            setFavoritePeopleMovies([]);
           }
           
         } catch (error) {
           console.error("Error fetching user preferences:", error);
           setUserGenres([]);
+          setFavoritePeople([]);
+          setFavoritePeopleMovies([]);
         }
       } else {
-        // For guest users, don't show personalized genres
+        // For guest users, don't show personalized content
         setUserGenres([]);
+        setFavoritePeople([]);
+        setFavoritePeopleMovies([]);
       }
       
       setLoading(false);

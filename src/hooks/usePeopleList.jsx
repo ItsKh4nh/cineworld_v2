@@ -21,7 +21,7 @@ function usePeopleList() {
     try {
       if (!User || !User.uid) return false;
       
-      const userDocRef = doc(db, "PeopleList", User.uid);
+      const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
       
       if (docSnap.exists()) {
@@ -52,11 +52,11 @@ function usePeopleList() {
         known_for_department: person.known_for_department,
         popularity: person.popularity,
         gender: person.gender,
-        added_at: new Date().toISOString()
+        dateAdded: new Date().toISOString()
       };
 
       // Check if the person is already in the list
-      const userDocRef = doc(db, "PeopleList", User.uid);
+      const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
       
       if (docSnap.exists()) {
@@ -74,7 +74,11 @@ function usePeopleList() {
         await updateDoc(userDocRef, { people: updatedPeople });
       } else {
         // Create new document with person
-        await setDoc(userDocRef, { people: [personData] });
+        await setDoc(userDocRef, { 
+          people: [personData],
+          movies: [],
+          lastUpdated: new Date().toISOString()
+        });
       }
       
       // We don't show toast here to avoid duplication, as the caller will display their own toast
@@ -94,7 +98,7 @@ function usePeopleList() {
         return false;
       }
 
-      const userDocRef = doc(db, "PeopleList", User.uid);
+      const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
       
       if (docSnap.exists()) {
@@ -103,7 +107,10 @@ function usePeopleList() {
         
         // Filter out the person to remove
         const updatedPeople = people.filter(p => p.id !== person.id);
-        await updateDoc(userDocRef, { people: updatedPeople });
+        await updateDoc(userDocRef, { 
+          people: updatedPeople,
+          lastUpdated: new Date().toISOString() 
+        });
         
         // Don't show toast here as the confirmation modal already gives feedback
         return true;

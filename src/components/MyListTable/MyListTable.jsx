@@ -105,30 +105,24 @@ function MyListTable() {
             setMyMovies(updatedMovies);
             setAllMovies(updatedMovies); // Store all movies for filtering
           });
+
+          // Get people from the same MyList document
+          if (data.people) {
+            setMyPeople(data.people || []);
+          } else {
+            setMyPeople([]);
+          }
         } else {
           setMyMovies([]);
           setAllMovies([]);
-        }
-      })
-      .catch(error => {
-        console.error("Error fetching movie data:", error);
-        setMyMovies([]);
-        setAllMovies([]);
-      });
-    
-    // Get people from PeopleList collection
-    getDoc(doc(db, "PeopleList", User.uid))
-      .then((result) => {
-        const data = result.data();
-        if (data && data.people) {
-          setMyPeople(data.people || []);
-        } else {
           setMyPeople([]);
         }
         setLoading(false);
       })
       .catch(error => {
-        console.error("Error fetching people data:", error);
+        console.error("Error fetching data:", error);
+        setMyMovies([]);
+        setAllMovies([]);
         setMyPeople([]);
         setLoading(false);
       });
@@ -308,7 +302,7 @@ function MyListTable() {
 
   const handleRemovePerson = async (person) => {
     try {
-      const userDocRef = doc(db, "PeopleList", User.uid);
+      const userDocRef = doc(db, "MyList", User.uid)
       const docSnap = await getDoc(userDocRef);
       
       if (docSnap.exists()) {
@@ -317,22 +311,21 @@ function MyListTable() {
         
         // Filter out the person to remove
         const updatedPeople = people.filter(p => p.id !== person.id);
-        await updateDoc(userDocRef, { people: updatedPeople });
         
-        toast.success(`${person.name} removed from your list`);
+        // Update the document
+        await updateDoc(userDocRef, { 
+          people: updatedPeople,
+          lastUpdated: new Date().toISOString()
+        });
         
-        // Refresh the list to show the update
-        setTimeout(() => {
-          getMovies();
-        }, 500);
+        // Update local state
+        setMyPeople(prevPeople => prevPeople.filter(p => p.id !== person.id));
         
-        return true;
+        toast.success("Person removed from your list");
       }
-      return false;
     } catch (error) {
-      console.error("Error removing person from list:", error);
-      toast.error("Failed to remove person");
-      return false;
+      console.error("Error removing person:", error);
+      toast.error("Failed to remove person from your list");
     }
   };
 

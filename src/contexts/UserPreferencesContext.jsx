@@ -17,11 +17,11 @@ export const UserPreferencesProvider = ({ children }) => {
       if (!User) return;
 
       try {
-        // Check if user has preferences
-        const preferencesDoc = await getDoc(doc(db, "UserPreferences", User.uid));
+        // Check if user has preferences in MyList collection
+        const myListDoc = await getDoc(doc(db, "MyList", User.uid));
         
-        // If preferences don't exist, show the modal
-        if (!preferencesDoc.exists()) {
+        // If MyList doesn't exist or has no preferences, show the modal
+        if (!myListDoc.exists() || !myListDoc.data().preferredGenres) {
           setIsNewUser(true);
           setShowPreferencesModal(true);
         } else {

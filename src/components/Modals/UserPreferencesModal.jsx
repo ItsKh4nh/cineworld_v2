@@ -111,52 +111,43 @@ function UserPreferencesModal({ user, onClose }) {
   // Handle final submission
   const handleSubmit = async () => {
     try {
-      // Create user preferences document
-      await setDoc(doc(db, "UserPreferences", user.uid), {
-        genres: selectedGenres,
+      // Initialize MyList document if not exists
+      const myListRef = doc(db, "MyList", user.uid);
+      const myListDoc = await getDoc(myListRef);
+      const currentData = myListDoc.exists() ? myListDoc.data() : {};
+      
+      // Add movies to MyList with ratings if provided
+      const currentMovies = currentData.movies || [];
+      const moviesWithRatings = selectedMovies.map(movie => {
+        const userRating = {
+          status: "Completed",
+          dateAdded: new Date().toISOString()
+        };
+        
+        // Use provided rating or default to 10
+        userRating.score = movieRatings[movie.id] || 10;
+        
+        return {
+          ...movie,
+          userRating
+        };
+      });
+      
+      // Add people to MyList
+      const currentPeople = currentData.people || [];
+      const peopleWithDateAdded = selectedPeople.map(person => ({
+        ...person,
+        dateAdded: new Date().toISOString()
+      }));
+      
+      // Update MyList with all preferences
+      await setDoc(myListRef, {
+        ...currentData,
+        movies: [...currentMovies, ...moviesWithRatings],
+        people: [...currentPeople, ...peopleWithDateAdded],
+        preferredGenres: selectedGenres,
         lastUpdated: new Date().toISOString()
       });
-
-      // Add movies to MyList with ratings if provided
-      if (selectedMovies.length > 0) {
-        const myListDoc = await getDoc(doc(db, "MyList", user.uid));
-        const currentMovies = myListDoc.exists() ? myListDoc.data().movies || [] : [];
-        
-        const moviesWithRatings = selectedMovies.map(movie => {
-          const userRating = {
-            status: "Completed",
-            dateAdded: new Date().toISOString()
-          };
-          
-          // Use provided rating or default to 10
-          userRating.score = movieRatings[movie.id] || 10;
-          
-          return {
-            ...movie,
-            userRating
-          };
-        });
-        
-        await updateDoc(doc(db, "MyList", user.uid), {
-          movies: [...currentMovies, ...moviesWithRatings]
-        });
-      }
-
-      // Add people to MyList
-      if (selectedPeople.length > 0) {
-        const myListDoc = await getDoc(doc(db, "MyList", user.uid));
-        const currentData = myListDoc.exists() ? myListDoc.data() : {};
-        const currentPeople = currentData.people || [];
-        
-        const peopleWithDateAdded = selectedPeople.map(person => ({
-          ...person,
-          dateAdded: new Date().toISOString()
-        }));
-        
-        await updateDoc(doc(db, "MyList", user.uid), {
-          people: [...currentPeople, ...peopleWithDateAdded]
-        });
-      }
 
       onClose();
     } catch (error) {
