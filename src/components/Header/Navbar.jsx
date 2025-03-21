@@ -124,7 +124,7 @@ function Navbar(props) {
                           setGenreDropdownOpen(!genreDropdownOpen);
                           setCountryDropdownOpen(false);
                         }}
-                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m flex items-center"
+                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-cineworldYellow lg:px-3 text-m flex items-center"
                       >
                         Genre
                         <svg
@@ -147,7 +147,7 @@ function Navbar(props) {
                             <Link
                               key={genre.id}
                               to={`/genre/${genre.name.toLowerCase().replace(/ /g, '-')}`}
-                              className="block px-4 py-2 text-sm text-white hover:bg-red-800 hover:text-white"
+                              className="block px-4 py-2 text-sm text-white hover:bg-cineworldYellow hover:text-white"
                               onClick={() => setGenreDropdownOpen(false)}
                             >
                               {genre.name}
@@ -164,7 +164,7 @@ function Navbar(props) {
                           setCountryDropdownOpen(!countryDropdownOpen);
                           setGenreDropdownOpen(false);
                         }}
-                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m flex items-center"
+                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-cineworldYellow lg:px-3 text-m flex items-center"
                       >
                         Country
                         <svg
@@ -187,7 +187,7 @@ function Navbar(props) {
                             <Link
                               key={country.code}
                               to={`/country/${country.name.toLowerCase().replace(/ /g, '-')}`}
-                              className="block px-4 py-2 text-sm text-white hover:bg-red-800 hover:text-white whitespace-nowrap"
+                              className="block px-4 py-2 text-sm text-white hover:bg-cineworldYellow hover:text-white whitespace-nowrap"
                               onClick={() => setCountryDropdownOpen(false)}
                             >
                               {country.name}
@@ -199,7 +199,7 @@ function Navbar(props) {
 
                     <Link
                       to={"/mylist"}
-                      className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m"
+                      className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-cineworldYellow lg:px-3 text-m"
                     >
                       MyList
                     </Link>
@@ -363,7 +363,7 @@ function Navbar(props) {
                         setGenreDropdownOpen(!genreDropdownOpen);
                         setCountryDropdownOpen(false);
                       }}
-                      className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white"
+                      className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-cineworldYellow hover:text-white"
                     >
                       Genre
                     </button>
@@ -396,7 +396,7 @@ function Navbar(props) {
                         setCountryDropdownOpen(!countryDropdownOpen);
                         setGenreDropdownOpen(false);
                       }}
-                      className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white"
+                      className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-cineworldYellow hover:text-white"
                     >
                       Country
                     </button>
@@ -424,7 +424,7 @@ function Navbar(props) {
 
                   <Link to={"/mylist"}>
                     <a 
-                      className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white"
+                      className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-cineworldYellow hover:text-white"
                       onClick={() => setIsOpen(false)}
                     >
                       MyList

@@ -910,8 +910,11 @@ function Play() {
                                   <div className="flex items-center">
                                     {review.author_details?.rating && (
                                       <div className="mr-3 flex items-center">
-                                        <span className="text-yellow-500 mr-1">★</span>
-                                        <span>{review.author_details.rating}/10</span>
+                                        <ColoredStarRating 
+                                          rating={review.author_details.rating} 
+                                          size="small" 
+                                          showDenominator={true}
+                                        />
                                       </div>
                                     )}
                                     <span className="text-sm text-gray-400">

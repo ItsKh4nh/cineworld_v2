@@ -94,7 +94,7 @@ function NavbarWithoutUser() {
                           setGenreDropdownOpen(!genreDropdownOpen);
                           setCountryDropdownOpen(false);
                         }}
-                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m flex items-center"
+                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-cineworldYellow lg:px-3 text-m flex items-center"
                       >
                         Genre
                         <svg
@@ -117,7 +117,7 @@ function NavbarWithoutUser() {
                             <Link
                               key={genre.id}
                               to={`/genre/${genre.name.toLowerCase().replace(/ /g, '-')}`}
-                              className="block px-4 py-2 text-sm text-white hover:bg-red-800 hover:text-white"
+                              className="block px-4 py-2 text-sm text-white hover:bg-cineworldYellow hover:text-white"
                               onClick={() => setGenreDropdownOpen(false)}
                             >
                               {genre.name}
@@ -134,7 +134,7 @@ function NavbarWithoutUser() {
                           setCountryDropdownOpen(!countryDropdownOpen);
                           setGenreDropdownOpen(false);
                         }}
-                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m flex items-center"
+                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-cineworldYellow lg:px-3 text-m flex items-center"
                       >
                         Country
                         <svg
@@ -157,7 +157,7 @@ function NavbarWithoutUser() {
                             <Link
                               key={country.code}
                               to={`/country/${country.name.toLowerCase().replace(/ /g, '-')}`}
-                              className="block px-4 py-2 text-sm text-white hover:bg-red-800 hover:text-white whitespace-nowrap"
+                              className="block px-4 py-2 text-sm text-white hover:bg-cineworldYellow hover:text-white whitespace-nowrap"
                               onClick={() => setCountryDropdownOpen(false)}
                             >
                               {country.name}
@@ -265,7 +265,7 @@ function NavbarWithoutUser() {
                         setGenreDropdownOpen(!genreDropdownOpen);
                         setCountryDropdownOpen(false);
                       }}
-                      className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white"
+                      className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-cineworldYellow hover:text-white"
                     >
                       Genre
                     </button>
@@ -298,7 +298,7 @@ function NavbarWithoutUser() {
                         setCountryDropdownOpen(!countryDropdownOpen);
                         setGenreDropdownOpen(false);
                       }}
-                      className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white"
+                      className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-cineworldYellow hover:text-white"
                     >
                       Country
                     </button>
@@ -326,7 +326,7 @@ function NavbarWithoutUser() {
 
                   <Link to={"/signin"}>
                     <a 
-                      className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white"
+                      className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-cineworldYellow hover:text-white"
                       onClick={() => setIsOpen(false)}
                     >
                       Login
