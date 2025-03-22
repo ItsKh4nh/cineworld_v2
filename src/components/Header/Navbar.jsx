@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 
 import { Transition } from "@headlessui/react";
-import { signOut } from "firebase/auth";
+import { signOut, updateProfile } from "firebase/auth";
 import { Fade } from "react-awesome-reveal";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
@@ -38,9 +38,17 @@ function Navbar(props) {
   useEffect(() => {
     if (User != null) {
       setProfilePic(User.photoURL);
+      
+      // If user has no profile pic, set a random avatar
+      if (!User.photoURL) {
+        const avatarNum = Math.floor(Math.random() * 4) + 1;
+        const avatarFormat = avatarNum === 2 ? '.jpg' : '.png'; // avatar2 is jpg, others are png
+        const randomAvatar = `/avatar${avatarNum}${avatarFormat}`;
+        setProfilePic(randomAvatar);
+      }
+      
       // Add fallback to email prefix only if displayName is null/undefined
       setUsername(User.displayName);
-      console.log("User in Navbar:", User); // Add this for debugging
     }
     window.addEventListener("scroll", transitionNavBar);
     return () => {
@@ -242,10 +250,8 @@ function Navbar(props) {
                         className="h-10 w-10 rounded-full cursor-pointer"
                         src={
                           profilePic && User
-                            ? `${User.photoURL}`
-                            : isGuestMode
-                            ? `https://static.vecteezy.com/system/resources/thumbnails/019/879/186/small/user-icon-on-transparent-background-free-png.png`
-                            : `https://www.citypng.com/public/uploads/preview/profile-user-round-red-icon-symbol-download-png-11639594337tco5j3n0ix.png`
+                            ? `${profilePic}`
+                            : `/avatar${Math.floor(Math.random() * 4) + 1}${Math.floor(Math.random() * 4) + 1 === 2 ? '.jpg' : '.png'}`
                         }
                         alt="Profile"
                       />

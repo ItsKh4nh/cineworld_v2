@@ -136,7 +136,7 @@ function Search() {
                 onClick={() => toggleSearchType("movie")}
                 className={`px-4 py-2 rounded-md transition-all duration-200 ${
                   searchType === "movie" 
-                    ? "bg-red-600 text-white" 
+                    ? "bg-cineworldYellow text-white" 
                     : "text-gray-300 hover:bg-gray-700"
                 }`}
               >
@@ -146,7 +146,7 @@ function Search() {
                 onClick={() => toggleSearchType("person")}
                 className={`px-4 py-2 rounded-md transition-all duration-200 ${
                   searchType === "person" 
-                    ? "bg-red-600 text-white" 
+                    ? "bg-cineworldYellow text-white" 
                     : "text-gray-300 hover:bg-gray-700"
                 }`}
               >
