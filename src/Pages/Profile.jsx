@@ -40,6 +40,9 @@ function Profile() {
   const [passwordError, setPasswordError] = useState("");
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
   const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -48,8 +51,7 @@ function Profile() {
       // If user has no photo URL, assign a random avatar from public folder
       if (!User.photoURL) {
         const avatarNum = Math.floor(Math.random() * 4) + 1;
-        const avatarFormat = avatarNum === 2 ? '.jpg' : '.png'; // avatar2 is jpg, others are png
-        const randomAvatar = `/avatar${avatarNum}${avatarFormat}`;
+        const randomAvatar = `/avatar${avatarNum}.png`;
         
         // Set the profile pic locally
         setProfilePic(randomAvatar);
@@ -61,8 +63,8 @@ function Profile() {
           console.error("Error setting default avatar:", error);
         });
       } else {
-        setProfilePic(User.photoURL);
-      }
+      setProfilePic(User.photoURL);
+    }
       
       // Check if user is signed in with Google
       if (User.providerData && User.providerData.length > 0) {
@@ -235,7 +237,7 @@ function Profile() {
                   />
                   <button 
                     onClick={handleClick}
-                    className="absolute bottom-0 right-0 bg-white text-black p-1.5 rounded-full transition-colors"
+                    className="absolute bottom-0 right-0 bg-white text-black p-1.5 rounded-full hover:bg-yellow-400 transition-colors"
                     title="Change avatar"
                   >
                     <svg 
@@ -249,11 +251,11 @@ function Profile() {
                   </button>
                 </div>
                 
-                <input
-                  style={{ display: "none" }}
-                  ref={inputRef}
-                  type="file"
-                  onChange={handleFileChange}
+                  <input
+                    style={{ display: "none" }}
+                    ref={inputRef}
+                    type="file"
+                    onChange={handleFileChange}
                   accept="image/*"
                 />
                 
@@ -362,42 +364,99 @@ function Profile() {
                           <label className="text-white text-sm mb-1 block">
                             Current Password
                           </label>
-                          <input
-                            type="password"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            className="w-full rounded-md bg-stone-900 text-white border-gray-700 border p-2 text-sm"
-                          />
+                          <div className="relative">
+                            <input
+                              type={showCurrentPassword ? "text" : "password"}
+                              value={currentPassword}
+                              onChange={(e) => setCurrentPassword(e.target.value)}
+                              className="w-full rounded-md bg-stone-900 text-white border-gray-700 border p-2 text-sm"
+                            />
+                            <button
+                              type="button"
+                              className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-white"
+                              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                            >
+                              {showCurrentPassword ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                                </svg>
+                              ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </button>
+                          </div>
                         </div>
                         
                         <div className="mb-3">
                           <label className="text-white text-sm mb-1 block">
                             New Password
                           </label>
-                          <input
-                            type="password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            className="w-full rounded-md bg-stone-900 text-white border-gray-700 border p-2 text-sm"
-                          />
+                          <div className="relative">
+                            <input
+                              type={showNewPassword ? "text" : "password"}
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              className="w-full rounded-md bg-stone-900 text-white border-gray-700 border p-2 text-sm"
+                            />
+                            <button
+                              type="button"
+                              className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-white"
+                              onClick={() => setShowNewPassword(!showNewPassword)}
+                            >
+                              {showNewPassword ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                                </svg>
+                              ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </button>
+                          </div>
                         </div>
                         
                         <div className="mb-3">
                           <label className="text-white text-sm mb-1 block">
                             Confirm New Password
                           </label>
-                          <input
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full rounded-md bg-stone-900 text-white border-gray-700 border p-2 text-sm"
-                          />
+                          <div className="relative">
+                            <input
+                              type={showConfirmPassword ? "text" : "password"}
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              className="w-full rounded-md bg-stone-900 text-white border-gray-700 border p-2 text-sm"
+                            />
+                            <button
+                              type="button"
+                              className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-white"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
+                              {showConfirmPassword ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                                </svg>
+                              ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </button>
+                          </div>
                         </div>
                         
                         <button
                           onClick={changePassword}
                           disabled={changePasswordLoading}
-                          className="w-full mt-2 px-4 py-2 bg-cineworldYellow text-black rounded hover:bg-yellow-400 transition-colors text-sm"
+                          className="w-full mt-2 px-4 py-2 bg-cineworldYellow text-white rounded hover:bg-yellow-400 transition-colors text-sm"
                         >
                           {changePasswordLoading ? "Updating Password..." : "Update Password"}
                         </button>
@@ -433,26 +492,26 @@ function Profile() {
               </button>
               
               {/* Logout button on the right */}
-              <button
+                <button
                 onClick={SignOut}
                 className="flex items-center bg-red-700 border-white text-white px-6 py-2 rounded hover:bg-white hover:text-red-700 transition-colors"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-5 h-5 mr-2"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                  className="w-5 h-5 mr-2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
-                  />
-                </svg>
+                    />
+                  </svg>
                 Logout
-              </button>
+                </button>
             </div>
           </div>
         </Fade>

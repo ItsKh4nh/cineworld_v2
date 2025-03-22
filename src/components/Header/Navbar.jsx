@@ -8,6 +8,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../contexts/UserContext";
 import { genresList } from "../../config/constants";
 import { auth } from "../../firebase/FirebaseConfig";
+import GuestModeBanner from "../GuestModeBanner/GuestModeBanner";
 
 function Navbar(props) {
   const { User, isGuestMode, disableGuestMode } = useContext(AuthContext);
@@ -37,14 +38,21 @@ function Navbar(props) {
 
   useEffect(() => {
     if (User != null) {
-      setProfilePic(User.photoURL);
-      
-      // If user has no profile pic, set a random avatar
+      // If user has no photo URL, assign a random avatar from public folder
       if (!User.photoURL) {
         const avatarNum = Math.floor(Math.random() * 4) + 1;
-        const avatarFormat = avatarNum === 2 ? '.jpg' : '.png'; // avatar2 is jpg, others are png
-        const randomAvatar = `/avatar${avatarNum}${avatarFormat}`;
-        setProfilePic(randomAvatar);
+        const randomAvatar = `/avatar${avatarNum}.png`;
+        
+        // Update the user's profile with the random avatar
+        updateProfile(auth.currentUser, {
+          photoURL: randomAvatar
+        }).then(() => {
+          setProfilePic(randomAvatar);
+        }).catch(error => {
+          console.error("Error setting default avatar:", error);
+        });
+      } else {
+        setProfilePic(User.photoURL);
       }
       
       // Add fallback to email prefix only if displayName is null/undefined
@@ -54,7 +62,7 @@ function Navbar(props) {
     return () => {
       window.removeEventListener("scroll", transitionNavBar);
     };
-  }, [User?.displayName]); // Add displayName as dependency to catch updates
+  }, [User]); 
   
   // Close mobile menu and dropdowns when location changes (user navigates)
   useEffect(() => {
@@ -104,6 +112,7 @@ function Navbar(props) {
           : "fixed top-0 z-50 w-full"
       }
     >
+      <GuestModeBanner message="" />
       <Fade>
         <nav
           className={`transition duration-500 ease-in-out  ${
@@ -216,7 +225,7 @@ function Navbar(props) {
               </div>
 
               <div className="ml-auto">
-                <div className="flex">
+                <div className="flex items-center">
                   {/* Search Icon */}
                   <Link to={"/search"}>
                     <svg
@@ -234,28 +243,27 @@ function Navbar(props) {
                     </svg>
                   </Link>
 
-                  {User ? (
-                    <a className="items-center hidden pr-4 mt-auto mb-auto text-base font-medium text-white transition ease-in-out delay-150 cursor-pointer hover:text-red-800 md:flex">
-                      {username}
-                    </a>
-                  ) : isGuestMode ? (
-                    <a className="items-center hidden pr-4 mt-auto mb-auto text-base font-medium text-white transition ease-in-out delay-150 cursor-pointer hover:text-red-800 md:flex">
-                      Guest User
-                    </a>
-                  ) : null}
-
+                  {/* Username and Avatar as a group */}
                   <div className="group inline-block relative transition ease-in-out delay-300">
-                    <Link to={User ? "/profile" : isGuestMode ? "#" : "/signin"}>
-                      <img
-                        className="h-10 w-10 rounded-full cursor-pointer"
-                        src={
-                          profilePic && User
-                            ? `${profilePic}`
-                            : `/avatar${Math.floor(Math.random() * 4) + 1}${Math.floor(Math.random() * 4) + 1 === 2 ? '.jpg' : '.png'}`
-                        }
-                        alt="Profile"
-                      />
-                    </Link>
+                    {User ? (
+                      <Link to="/profile" className="flex items-center">
+                        <span className="hidden md:block pr-2 text-base font-medium text-white transition ease-in-out delay-150 cursor-pointer hover:text-cineworldYellow">
+                          {username}
+                        </span>
+                        <img
+                          className="h-10 w-10 rounded-full cursor-pointer"
+                          src={profilePic || `/avatar${Math.floor(Math.random() * 4) + 1}.png`}
+                          alt="Profile"
+                        />
+                      </Link>
+                    ) : (
+                      <Link to="/signin">
+                        <button className="bg-cineworldYellow px-8 rounded-sm py-2 text-white text-base font-bold mr-4 lg:mr-0">
+                          Login
+                        </button>
+                      </Link>
+                    )}
+                    
                     <ul className="absolute hidden text-white pt-1 right-0 group-hover:block transition ease-in-out delay-150">
                       {User ? (
                         <>
@@ -273,25 +281,6 @@ function Navbar(props) {
                               className="cursor-pointer rounded-b bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
                             >
                               Logout
-                            </a>
-                          </li>
-                        </>
-                      ) : isGuestMode ? (
-                        <>
-                          <li>
-                            <Link
-                              to={"/signin"}
-                              className="cursor-pointer rounded-t bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
-                            >
-                              Sign In
-                            </Link>
-                          </li>
-                          <li>
-                            <a
-                              onClick={SignOut}
-                              className="cursor-pointer rounded-b bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
-                            >
-                              Exit Guest Mode
                             </a>
                           </li>
                         </>

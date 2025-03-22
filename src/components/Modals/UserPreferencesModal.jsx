@@ -208,10 +208,10 @@ function UserPreferencesModal({ user, onClose }) {
 
         {/* Step indicators */}
         <div className="flex justify-center mb-6">
-          <div className={`w-3 h-3 rounded-full mx-1 ${step === 1 ? 'bg-red-600' : 'bg-gray-600'}`}></div>
-          <div className={`w-3 h-3 rounded-full mx-1 ${step === 2 ? 'bg-red-600' : 'bg-gray-600'}`}></div>
-          <div className={`w-3 h-3 rounded-full mx-1 ${step === 3 ? 'bg-red-600' : 'bg-gray-600'}`}></div>
-          <div className={`w-3 h-3 rounded-full mx-1 ${step === 4 ? 'bg-red-600' : 'bg-gray-600'}`}></div>
+          <div className={`w-3 h-3 rounded-full mx-1 ${step === 1 ? 'bg-cineworldYellow' : 'bg-gray-600'}`}></div>
+          <div className={`w-3 h-3 rounded-full mx-1 ${step === 2 ? 'bg-cineworldYellow' : 'bg-gray-600'}`}></div>
+          <div className={`w-3 h-3 rounded-full mx-1 ${step === 3 ? 'bg-cineworldYellow' : 'bg-gray-600'}`}></div>
+          <div className={`w-3 h-3 rounded-full mx-1 ${step === 4 ? 'bg-cineworldYellow' : 'bg-gray-600'}`}></div>
         </div>
 
         {/* Step 1: Introduction */}
@@ -311,7 +311,7 @@ function UserPreferencesModal({ user, onClose }) {
               <div className="md:w-1/3 bg-gray-800 rounded-lg p-4 border border-gray-700">
                 <h4 className="text-lg font-medium text-white mb-2 flex items-center">
                   <span className="mr-2">Your Selected Movies</span>
-                  <span className="bg-red-600 text-white text-xs px-2 py-1 rounded-full">
+                  <span className="bg-cineworldYellow text-white text-xs px-2 py-1 rounded-full">
                     {selectedMovies.length}
                   </span>
                 </h4>
@@ -461,7 +461,7 @@ function UserPreferencesModal({ user, onClose }) {
               <div className="md:w-1/3 bg-gray-800 rounded-lg p-4 border border-gray-700">
                 <h4 className="text-lg font-medium text-white mb-2 flex items-center">
                   <span className="mr-2">Your Selected People</span>
-                  <span className="bg-red-600 text-white text-xs px-2 py-1 rounded-full">
+                  <span className="bg-cineworldYellow text-white text-xs px-2 py-1 rounded-full">
                     {selectedPeople.length}
                   </span>
                 </h4>
@@ -531,7 +531,7 @@ function UserPreferencesModal({ user, onClose }) {
                   onClick={() => handleSelectGenre(genre)}
                   className={`p-3 rounded cursor-pointer transition-all ${
                     selectedGenres.some(g => g.id === genre.id) 
-                      ? 'bg-red-700 text-white' 
+                      ? 'bg-cineworldYellow text-white' 
                       : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                   }`}
                 >
@@ -546,7 +546,7 @@ function UserPreferencesModal({ user, onClose }) {
                 <h4 className="text-lg font-medium text-white mb-2">Your Selected Genres</h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedGenres.map((genre) => (
-                    <div key={genre.id} className="bg-red-700 text-white px-3 py-1 rounded-full flex items-center">
+                    <div key={genre.id} className="bg-cineworldYellow text-white px-3 py-1 rounded-full flex items-center">
                       {genre.name}
                       <button
                         className="ml-2 text-white"
@@ -583,14 +583,14 @@ function UserPreferencesModal({ user, onClose }) {
           {step < 4 ? (
             <button
               onClick={handleNextStep}
-              className="px-4 py-2 text-white bg-red-700 rounded hover:bg-red-600 transition-colors"
+              className="px-4 py-2 text-white bg-cineworldYellow rounded hover:bg-cineworldYellow transition-colors"
             >
               Next
             </button>
           ) : (
             <button
               onClick={handleSubmit}
-              className="px-4 py-2 text-white bg-red-700 rounded hover:bg-red-600 transition-colors"
+              className="px-4 py-2 text-white bg-cineworldYellow rounded hover:bg-cineworldYellow transition-colors"
             >
               Save Preferences
             </button>
