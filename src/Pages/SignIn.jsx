@@ -210,7 +210,7 @@ function SignIn() {
                       <button
                         type="button"
                         onClick={() => setShowForgotPasswordModal(true)}
-                        className="font-medium text-blue-400 hover:underline"
+                        className="font-medium text-white hover:underline"
                       >
                         Forgot password?
                       </button>
