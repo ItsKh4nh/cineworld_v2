@@ -7,6 +7,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import TQDMProgressBar
+import os
 
 np.random.seed(123)
 
@@ -225,78 +226,12 @@ for u, i in tqdm(test_user_item_set):
 
 print("The Hit Ratio @ 10 is {:.2f}".format(np.average(hits)))
 
+# Save the model for later use
+model_save_path = "saved_models/ncf_model.pt"
 
-# Test the model with specific users
-def get_movie_recommendations(user_id, top_n=10):
-    """
-    Generate movie recommendations for a user
+# Create directory if it doesn't exist
+os.makedirs(os.path.dirname(model_save_path), exist_ok=True)
 
-    Args:
-        user_id (int): ID of the user
-        top_n (int): Number of movies to recommend
-
-    Returns:
-        DataFrame: List of recommended movies with prediction scores
-    """
-    # Get list of movies that the user has already interacted with
-    interacted_items = user_interacted_items.get(user_id, [])
-
-    # Get list of movies that the user hasn't seen yet
-    not_interacted_items = list(set(all_movie_ids) - set(interacted_items))
-
-    # If there are too many movies, sample 1000 randomly to speed up computation
-    if len(not_interacted_items) > 1000:
-        not_interacted_items = list(np.random.choice(not_interacted_items, 1000))
-
-    # Predict the likelihood that the user will like each movie
-    user_tensor = torch.tensor([user_id] * len(not_interacted_items))
-    item_tensor = torch.tensor(not_interacted_items)
-
-    with torch.no_grad():
-        predicted_ratings = model(user_tensor, item_tensor).detach().numpy().flatten()
-
-    # Create DataFrame with movies and prediction scores
-    recommendations = pd.DataFrame(
-        {"movie_id": not_interacted_items, "predicted_rating": predicted_ratings}
-    )
-
-    # Sort by highest prediction score
-    recommendations = recommendations.sort_values("predicted_rating", ascending=False)
-
-    # Get top_n movies with highest prediction scores
-    top_recommendations = recommendations.head(top_n)
-
-    # Get movie title information from original dataset
-    movie_info = ratings[["movie_id", "title"]].drop_duplicates().set_index("movie_id")
-
-    # Add movie titles to results
-    top_recommendations["title"] = top_recommendations["movie_id"].map(
-        movie_info["title"]
-    )
-
-    return top_recommendations[["movie_id", "title", "predicted_rating"]]
-
-
-# Test with random users
-test_users = np.random.choice(ratings["user_id"].unique(), 3)
-print("Movie recommendations for 3 random users:")
-
-for user_id in test_users:
-    print(f"\nUser {user_id}:")
-
-    # Print some movies this user has already watched
-    user_movies = ratings[ratings["user_id"] == user_id][
-        ["movie_id", "title", "rating"]
-    ].drop_duplicates()
-    print(f"Some movies already watched (total of {len(user_movies)} movies):")
-    print(
-        user_movies.sample(min(5, len(user_movies)))[["title", "rating"]].to_string(
-            index=False
-        )
-    )
-
-    # Get movie recommendations
-    recommendations = get_movie_recommendations(user_id)
-    print("\nRecommended movies:")
-    print(recommendations[["title", "predicted_rating"]].to_string(index=False))
-    print("-" * 80)
+# Save the model
+torch.save(model.state_dict(), model_save_path)
+print(f"Model saved to {model_save_path}")
