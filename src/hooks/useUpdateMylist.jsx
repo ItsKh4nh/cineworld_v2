@@ -105,7 +105,7 @@ function useUpdateMyList() {
   };
 
   // Check if a movie is in the user's list
-  const checkIfInMyList = async (movieId) => {
+  const checkIfInMyList = async (movie_id) => {
     try {
       if (!User || !User.uid) return false;
       
@@ -115,7 +115,7 @@ function useUpdateMyList() {
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const movies = userData.movies || [];
-        return movies.some(movie => movie.id === parseInt(movieId) || movie.id === movieId);
+        return movies.some(movie => movie.id === parseInt(movie_id) || movie.id === movie_id);
       }
       return false;
     } catch (error) {

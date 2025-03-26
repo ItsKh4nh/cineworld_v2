@@ -45,8 +45,8 @@ function RowPost(props) {
   }, []);
 
   // Function to check if a movie is in the user's MyList
-  const checkIfInMyList = (movieId) => {
-    return myListMovies.some(movie => movie.id === movieId);
+  const checkIfInMyList = (movie_id) => {
+    return myListMovies.some(movie => movie.id === movie_id);
   };
 
   const customSettings = {

@@ -247,7 +247,7 @@ function Play() {
         // Fetch similar movies
         axios.get(movieRecommendations(id))
           .then((res) => {
-            setSimilarMovies(res.data.results.slice(0, 12));
+            setSimilarMovies(res.data.results.slice(0, 15));
             setLoading(false);
           })
           .catch(error => {

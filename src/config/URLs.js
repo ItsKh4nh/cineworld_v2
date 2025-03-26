@@ -22,22 +22,22 @@ export const searchPerson = (query) =>
   `search/person?api_key=${API_KEY}&language=en-US&query=${query}&page=1&include_adult=false`;
 
 // Movie details endpoints
-export const movieDetails = (movieId) => 
-  `movie/${movieId}?api_key=${API_KEY}&language=en-US&append_to_response=credits,images,watch/providers`;
-export const movieVideos = (movieId) => 
-  `movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`;
-export const movieRecommendations = (movieId) => 
-  `movie/${movieId}/recommendations?api_key=${API_KEY}&language=en-US&page=1`;
+export const movieDetails = (movie_id) => 
+  `movie/${movie_id}?api_key=${API_KEY}&language=en-US&append_to_response=credits,images,watch/providers`;
+export const movieVideos = (movie_id) => 
+  `movie/${movie_id}/videos?api_key=${API_KEY}&language=en-US`;
+export const movieRecommendations = (movie_id) => 
+  `movie/${movie_id}/recommendations?api_key=${API_KEY}&language=en-US&page=1`;
 export const collectionDetails = (collectionId) => 
   `collection/${collectionId}?api_key=${API_KEY}&language=en-US`;
 
 // New endpoints for additional movie information
-export const movieExternalIds = (movieId) =>
-  `movie/${movieId}/external_ids?api_key=${API_KEY}`;
-export const movieKeywords = (movieId) =>
-  `movie/${movieId}/keywords?api_key=${API_KEY}`;
-export const movieReviews = (movieId) =>
-  `movie/${movieId}/reviews?api_key=${API_KEY}&language=en-US&page=1`;
+export const movieExternalIds = (movie_id) =>
+  `movie/${movie_id}/external_ids?api_key=${API_KEY}`;
+export const movieKeywords = (movie_id) =>
+  `movie/${movie_id}/keywords?api_key=${API_KEY}`;
+export const movieReviews = (movie_id) =>
+  `movie/${movie_id}/reviews?api_key=${API_KEY}&language=en-US&page=1`;
 export const configurationLanguages = 
   `configuration/languages?api_key=${API_KEY}`;
 
