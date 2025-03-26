@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import pytorch_lightning as pl
+import os
 
 np.random.seed(123)
 
@@ -167,6 +168,13 @@ trainer = pl.Trainer(
 )
 
 trainer.fit(model)
+
+# Save the trained model
+# Create directory if it doesn't exist
+os.makedirs("saved_models", exist_ok=True)
+# Save the model state dictionary
+torch.save(model.state_dict(), "saved_models/ncf_model.pt")
+print("Model saved to saved_models/ncf_model.pt")
 
 # User-item pairs for testing
 test_user_item_set = set(zip(test_ratings["user_id"], test_ratings["movie_id"]))

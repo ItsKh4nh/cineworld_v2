@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# Content-based Filtering Movie Recommendation System
-
 # Import necessary libraries
 import pandas as pd
 import numpy as np
@@ -14,13 +11,9 @@ from sklearn.preprocessing import normalize
 import faiss
 import pickle
 import os
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 import warnings
 import gc
-
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-
 
 warnings.filterwarnings("ignore")
 
@@ -380,7 +373,7 @@ def recommend_movies(movie_id, top_n=10):
 # Test the recommendation function
 print("\nTesting recommendation function...")
 # Example: Avatar
-example_movie_id = 19995  # Avatar
+example_movie_id = 862  #
 if example_movie_id in df["movie_id"].values:
     print(
         f"Recommendations for movie ID {example_movie_id} ({df[df['movie_id'] == example_movie_id]['title'].values[0]}):"
@@ -391,50 +384,38 @@ else:
         f"Test movie ID {example_movie_id} not found in dataset, please use a valid movie_id for testing"
     )
 
-# Stage 3: Save the model
-print("\nStage 3: Saving model components...")
+# Stage 3: Save only necessary model components for recommendation
+print("\nStage 3: Saving only necessary model components...")
 
 # Create directory for models if it doesn't exist
 os.makedirs("models", exist_ok=True)
 
-# 1. Save TF-IDF Vectorizers
-print("Saving TF-IDF vectorizers...")
-with open("models/tfidf_vectorizers.pkl", "wb") as f:
-    pickle.dump(tfidf_vectorizers, f)
-
-# 2. Save Truncated SVD model
-print("Saving SVD model...")
-with open("models/svd_model.pkl", "wb") as f:
-    pickle.dump(svd, f)
-
-# 3. Save MultiLabelBinarizers
-print("Saving MultiLabelBinarizers...")
-with open("models/genres_mlb.pkl", "wb") as f:
-    pickle.dump(genres_mlb, f)
-
-with open("models/languages_mlb.pkl", "wb") as f:
-    pickle.dump(languages_mlb, f)
-
-with open("models/countries_mlb.pkl", "wb") as f:
-    pickle.dump(countries_mlb, f)
-
-# 4. Save FAISS index
+# 1. Save FAISS index (contains all embeddings for search)
 print("Saving FAISS index...")
 if using_gpu:
     print("Converting GPU index to CPU for serialization...")
-    # GPU indices cannot be directly serialized - convert to CPU first
     cpu_index = faiss.index_gpu_to_cpu(index)
-    print(f"CPU index type: {type(cpu_index).__name__}")
-
-    # Save the CPU version
     faiss.write_index(cpu_index, "models/movie_recommendations.index")
-    print("CPU index saved successfully")
 else:
-    # Already a CPU index, save directly
     faiss.write_index(index, "models/movie_recommendations.index")
 
-# 5. Save movie dataframe (for reference)
-print("Saving movie reference dataframe...")
-df[["movie_id", "title", "genres"]].to_csv("models/movie_reference.csv", index=False)
+# 2. Save movie_id to index mapping
+print("Saving movie ID to index mapping...")
+movie_id_to_idx = dict(zip(df["movie_id"], df.index))
+with open("models/movie_id_to_idx.pkl", "wb") as f:
+    pickle.dump(movie_id_to_idx, f)
 
-print("All model components saved successfully!")
+# 3. Save movie metadata for recommendations
+print("Saving movie metadata for recommendations...")
+movie_metadata = df[["movie_id", "title", "genres"]].copy()
+movie_metadata.to_pickle("models/movie_metadata.pkl")
+
+# 4. SAVE THE ACTUAL EMBEDDINGS - this is the key addition
+print("Saving embeddings matrix...")
+np.save("models/embeddings.npy", embeddings_float32)
+
+print("\nSaving complete. The following files are needed for recommendations:")
+print("1. models/movie_recommendations.index - FAISS index with movie embeddings")
+print("2. models/movie_id_to_idx.pkl - Mapping from movie_id to index in FAISS")
+print("3. models/movie_metadata.pkl - Basic movie information for recommendations")
+print("4. models/embeddings.npy - Actual embeddings for direct access")
