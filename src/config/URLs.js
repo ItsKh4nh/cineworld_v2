@@ -28,6 +28,8 @@ export const movieVideos = (movie_id) =>
   `movie/${movie_id}/videos?api_key=${API_KEY}&language=en-US`;
 export const movieRecommendations = (movie_id) => 
   `movie/${movie_id}/recommendations?api_key=${API_KEY}&language=en-US&page=1`;
+export const movieRecommendationsWithPage = (movie_id, page = 1) => 
+  `movie/${movie_id}/recommendations?api_key=${API_KEY}&language=en-US&page=${page}`;
 export const collectionDetails = (collectionId) => 
   `collection/${collectionId}?api_key=${API_KEY}&language=en-US`;
 

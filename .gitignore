@@ -7,11 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-.env
-venv
+
 ########################
-*.pkl
-*.npy
+*.py
+*.pt
 *.index
 *.csv
 *.json
@@ -34,3 +33,4 @@ tools/*
 *.sw?
 .cursorrules
 .cursorrules.txt
+.env
