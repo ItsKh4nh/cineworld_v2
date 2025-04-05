@@ -149,6 +149,35 @@ function UserPreferencesModal({ user, onClose }) {
         lastUpdated: new Date().toISOString()
       });
 
+      // Add movies to InteractionList
+      const interactionListRef = doc(db, "InteractionList", user.uid);
+      const interactionDoc = await getDoc(interactionListRef);
+      
+      if (interactionDoc.exists()) {
+        // Get existing movie IDs
+        const existingData = interactionDoc.data();
+        const existingMovieIds = existingData.movie_ids || [];
+        
+        // Get IDs of newly selected movies
+        const newMovieIds = selectedMovies.map(movie => movie.id);
+        
+        // Create a merged array of unique movie IDs
+        const uniqueMovieIds = Array.from(new Set([...existingMovieIds, ...newMovieIds]));
+        
+        // Update the InteractionList
+        await updateDoc(interactionListRef, {
+          movie_ids: uniqueMovieIds,
+          lastUpdated: new Date().toISOString()
+        });
+      } else {
+        // Create a new InteractionList document
+        const movieIds = selectedMovies.map(movie => movie.id);
+        await setDoc(interactionListRef, {
+          movie_ids: movieIds,
+          lastUpdated: new Date().toISOString()
+        });
+      }
+
       onClose();
     } catch (error) {
       console.error("Error saving preferences:", error);

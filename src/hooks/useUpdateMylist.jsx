@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { updateDoc, doc, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
+import { updateDoc, doc, arrayUnion, arrayRemove, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 import { RatingModalContext } from "../contexts/RatingModalContext";
@@ -12,6 +12,44 @@ function useUpdateMyList() {
   const { openRatingModal } = ratingModalContext;
   const navigate = useNavigate();
 
+  // Track a movie interaction directly (no circular dependency)
+  const trackMovieInteraction = async (movie_id) => {
+    try {
+      if (!User || !User.uid) return false;
+      
+      const movie_id_number = typeof movie_id === 'string' ? parseInt(movie_id) : movie_id;
+      
+      // Reference to the user's interaction list document
+      const interactionDocRef = doc(db, "InteractionList", User.uid);
+      const docSnap = await getDoc(interactionDocRef);
+      
+      if (docSnap.exists()) {
+        // Document exists, check if movie_id is already in the list
+        const userData = docSnap.data();
+        const movieIds = userData.movie_ids || [];
+        
+        // Only add if not already in the list
+        if (!movieIds.includes(movie_id_number)) {
+          await updateDoc(interactionDocRef, {
+            movie_ids: arrayUnion(movie_id_number),
+            lastUpdated: new Date().toISOString()
+          });
+        }
+      } else {
+        // Document doesn't exist, create it
+        await setDoc(interactionDocRef, {
+          movie_ids: [movie_id_number],
+          lastUpdated: new Date().toISOString()
+        });
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Error tracking movie interaction:", error);
+      return false;
+    }
+  };
+  
   function notify() {
     toast.success("  Movie added to MyList  ");
   }
@@ -97,6 +135,9 @@ function useUpdateMyList() {
         console.log("Rated movie added to MyList");
         notify();
       }
+      
+      // Add movie to interaction list
+      trackMovieInteraction(movieToSave.id);
     } catch (error) {
       console.log(error.code);
       console.log(error.message);

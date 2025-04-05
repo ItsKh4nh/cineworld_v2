@@ -19,7 +19,7 @@ import useUpdateMyList from "../hooks/useUpdateMyList";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 import { ClipLoader } from "react-spinners";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion, setDoc } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -27,6 +27,7 @@ import "swiper/css/pagination";
 import { FaImdb, FaFacebook, FaInstagram, FaTwitter, FaWikipediaW } from "react-icons/fa";
 import StarRatings from "../components/StarRatings";
 import ColoredStarRating from "../components/StarRating/ColoredStarRating";
+import { AuthContext } from "../contexts/UserContext";
 
 function Play() {
   // State variables
@@ -45,9 +46,11 @@ function Play() {
   const [keywords, setKeywords] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [languages, setLanguages] = useState({});
+  const [hasInteracted, setHasInteracted] = useState(false);
   const videoRef = useRef(null);
 
   // Hooks
+  const { User } = useContext(AuthContext);
   const { addToMyList, removeFromMyList, PopupMessage, checkIfInMyList } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
@@ -55,6 +58,53 @@ function Play() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Track movie interaction directly to avoid circular dependency
+  const trackMovieInteraction = async (movie_id) => {
+    try {
+      if (!User || !User.uid) return false;
+
+      const movie_id_number = typeof movie_id === 'string' ? parseInt(movie_id) : movie_id;
+      
+      // Reference to the user's interaction list document
+      const interactionDocRef = doc(db, "InteractionList", User.uid);
+      const docSnap = await getDoc(interactionDocRef);
+      
+      if (docSnap.exists()) {
+        // Document exists, check if movie_id is already in the list
+        const userData = docSnap.data();
+        const movieIds = userData.movie_ids || [];
+        
+        // Only add if not already in the list
+        if (!movieIds.includes(movie_id_number)) {
+          await updateDoc(interactionDocRef, {
+            movie_ids: arrayUnion(movie_id_number),
+            lastUpdated: new Date().toISOString()
+          });
+        }
+      } else {
+        // Document doesn't exist, create it
+        await setDoc(interactionDocRef, {
+          movie_ids: [movie_id_number],
+          lastUpdated: new Date().toISOString()
+        });
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Error tracking movie interaction:", error);
+      return false;
+    }
+  };
+
+  // Track user interaction with video player
+  const handlePlayerInteraction = () => {
+    if (!hasInteracted) {
+      console.log("User interacted with movie player:", id);
+      trackMovieInteraction(id);
+      setHasInteracted(true);
+    }
+  };
 
   // Check movie source
   const checkMovieSource = async () => {
@@ -306,26 +356,31 @@ function Play() {
           <div 
             ref={videoRef}
             className="relative w-full h-[30vh] sm:h-[40vh] md:h-[50vh] lg:h-[65vh] xl:h-[85vh] bg-black"
+            onClick={handlePlayerInteraction}
           >
             {movieSource ? (
-              <iframe
-                src={movieSource}
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                allowFullScreen
-                className="w-full h-full"
-              ></iframe>
+              <div className="relative w-full h-full">
+                <iframe
+                  src={movieSource}
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  allowFullScreen
+                  className="w-full h-full"
+                ></iframe>
+              </div>
             ) : urlId ? (
-              <iframe
-                width="100%"
-                height="100%"
-                src={`//www.youtube.com/embed/${urlId}?modestbranding=1&autoplay=1`}
-                frameBorder="0"
-                allow="autoplay; encrypted-media"
-                allowFullScreen
-                className="w-full h-full"
-              ></iframe>
+              <div className="relative w-full h-full">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`//www.youtube.com/embed/${urlId}?modestbranding=1&autoplay=1`}
+                  frameBorder="0"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                  className="w-full h-full"
+                ></iframe>
+              </div>
             ) : (
               <div 
                 className="w-full h-full bg-cover bg-center flex items-end"

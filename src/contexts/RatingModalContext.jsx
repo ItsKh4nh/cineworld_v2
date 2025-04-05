@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import RatingModal from "../components/Modals/RatingModal";
-import { updateDoc, doc, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
+import { updateDoc, doc, arrayUnion, arrayRemove, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,44 @@ export const RatingModalProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userMovies, setUserMovies] = useState([]);
   const navigate = useNavigate();
+
+  // Track a movie interaction directly (no circular dependency)
+  const trackMovieInteraction = async (movie_id) => {
+    try {
+      if (!user || !user.uid) return false;
+      
+      const movie_id_number = typeof movie_id === 'string' ? parseInt(movie_id) : movie_id;
+      
+      // Reference to the user's interaction list document
+      const interactionDocRef = doc(db, "InteractionList", user.uid);
+      const docSnap = await getDoc(interactionDocRef);
+      
+      if (docSnap.exists()) {
+        // Document exists, check if movie_id is already in the list
+        const userData = docSnap.data();
+        const movieIds = userData.movie_ids || [];
+        
+        // Only add if not already in the list
+        if (!movieIds.includes(movie_id_number)) {
+          await updateDoc(interactionDocRef, {
+            movie_ids: arrayUnion(movie_id_number),
+            lastUpdated: new Date().toISOString()
+          });
+        }
+      } else {
+        // Document doesn't exist, create it
+        await setDoc(interactionDocRef, {
+          movie_ids: [movie_id_number],
+          lastUpdated: new Date().toISOString()
+        });
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Error tracking movie interaction:", error);
+      return false;
+    }
+  };
 
   const openRatingModal = async (movie, currentUser) => {
     console.log("Opening rating modal for:", movie);
@@ -117,6 +155,9 @@ export const RatingModalProvider = ({ children }) => {
         console.log("Rated movie added to MyList");
         toast.success("Movie added to MyList");
       }
+      
+      // Track the movie interaction
+      trackMovieInteraction(movieToSave.id);
       
       closeRatingModal();
     } catch (error) {
