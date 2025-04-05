@@ -325,15 +325,8 @@ function UserPreferencesModal({ user, onClose }) {
                   <div className="overflow-y-auto max-h-[45vh] space-y-3">
                     {selectedMovies.map((movie) => (
                       <div key={movie.id} className="bg-gray-700 rounded p-2 relative flex">
-                        <button 
-                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectMovie(movie);
-                          }}
-                        >
-                          ×
-                        </button>
+                        <button class="absolute top-1 right-1 bg-red-600 text-white text-sm rounded-full w-5 h-5 grid place-items-center leading-none">×</button>
+
                         
                         {movie.poster_path ? (
                           <img 
@@ -475,15 +468,8 @@ function UserPreferencesModal({ user, onClose }) {
                   <div className="overflow-y-auto max-h-[45vh] space-y-3">
                     {selectedPeople.map((person) => (
                       <div key={person.id} className="bg-gray-700 rounded p-2 relative flex">
-                        <button 
-                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectPerson(person);
-                          }}
-                        >
-                          ×
-                        </button>
+                        <button class="absolute top-1 right-1 bg-red-600 text-white text-sm rounded-full w-5 h-5 grid place-items-center leading-none">×</button>
+
                         
                         {person.profile_path ? (
                           <img 
