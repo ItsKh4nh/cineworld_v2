@@ -4,11 +4,14 @@ import { AuthContext } from "../../contexts/UserContext";
 import { Transition } from "@headlessui/react";
 import { Fade } from "react-awesome-reveal";
 import { genresList } from "../../config/constants";
+import GuestModeBanner from "../GuestModeBanner/GuestModeBanner";
+import useHasInteractions from "../../hooks/useHasInteractions";
 
-function NavbarWithoutUser() {
+function NavbarWithoutUser(props) {
   const { enableGuestMode } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const { hasInteractions, loading: interactionsLoading } = useHasInteractions();
   const location = useLocation();
+  const navigate = useNavigate();
   const [show, handleShow] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [genreDropdownOpen, setGenreDropdownOpen] = useState(false);
@@ -87,6 +90,16 @@ function NavbarWithoutUser() {
                 </div>
                 <div className="hidden md:block">
                   <div className="flex items-center ml-10 space-x-4">
+                    {/* Recommendations Link */}
+                    {hasInteractions && (
+                      <Link
+                        to={"/recommendations"}
+                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-cineworldYellow lg:px-3 text-m"
+                      >
+                        Recommendations
+                      </Link>
+                    )}
+
                     {/* Genre Dropdown */}
                     <div className="relative group">
                       <button
@@ -258,6 +271,17 @@ function NavbarWithoutUser() {
             {(ref) => (
               <div className="md:hidden" id="mobile-menu">
                 <div ref={ref} className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                  {/* Recommendations Link */}
+                  {hasInteractions && (
+                    <Link
+                      to={"/recommendations"}
+                      className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-cineworldYellow hover:text-white"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Recommendations
+                    </Link>
+                  )}
+                
                   {/* Mobile Genre Dropdown */}
                   <div className="relative">
                     <button

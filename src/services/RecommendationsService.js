@@ -75,6 +75,10 @@ export const getPersonalizedRecommendations = async (userId) => {
     // Flatten all recommendations into a single array
     let allRecommendations = recommendationsArrays.flat();
     
+    // Filter out movies that are already in the user's InteractionList
+    const interactionMovieIdsSet = new Set(movieIds);
+    allRecommendations = allRecommendations.filter(movie => !interactionMovieIdsSet.has(movie.id));
+    
     // Remove duplicates based on movie ID
     const uniqueRecommendations = [];
     const uniqueIds = new Set();

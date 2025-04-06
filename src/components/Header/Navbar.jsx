@@ -9,9 +9,11 @@ import { AuthContext } from "../../contexts/UserContext";
 import { genresList } from "../../config/constants";
 import { auth } from "../../firebase/FirebaseConfig";
 import GuestModeBanner from "../GuestModeBanner/GuestModeBanner";
+import useHasInteractions from "../../hooks/useHasInteractions";
 
 function Navbar(props) {
   const { User, isGuestMode, disableGuestMode } = useContext(AuthContext);
+  const { hasInteractions, loading: interactionsLoading } = useHasInteractions();
   const [profilePic, setProfilePic] = useState("");
   const [username, setUsername] = useState("");
   const [genreDropdownOpen, setGenreDropdownOpen] = useState(false);
@@ -133,6 +135,16 @@ function Navbar(props) {
                 </div>
                 <div className="hidden md:block">
                   <div className="flex items-center ml-10 space-x-4">
+
+                    {/* Recommendations Link */}
+                    {hasInteractions && (
+                      <Link
+                        to={"/recommendations"}
+                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-cineworldYellow lg:px-3 text-m"
+                      >
+                        Recommendations
+                      </Link>
+                    )}
 
                     {/* Genre Dropdown */}
                     <div className="relative group">
@@ -351,18 +363,27 @@ function Navbar(props) {
             {(ref) => (
               <div className="md:hidden" id="mobile-menu">
                 <div ref={ref} className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                  {/* Mobile menu items */}
+                  {hasInteractions && (
+                    <Link
+                      to={"/recommendations"}
+                      className="block px-3 py-2 text-base font-medium text-white hover:text-cineworldYellow"
+                    >
+                      Recommendations
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
+                      setGenreDropdownOpen(!genreDropdownOpen);
+                      setCountryDropdownOpen(false);
+                    }}
+                    className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-cineworldYellow hover:text-white"
+                  >
+                    Genre
+                  </button>
+
                   {/* Mobile Genre Dropdown */}
                   <div className="relative">
-                    <button
-                      onClick={() => {
-                        setGenreDropdownOpen(!genreDropdownOpen);
-                        setCountryDropdownOpen(false);
-                      }}
-                      className="w-full text-left block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-cineworldYellow hover:text-white"
-                    >
-                      Genre
-                    </button>
-                    
                     {genreDropdownOpen && (
                       <div className="pl-4 space-y-1">
                         <div className="grid grid-cols-2 gap-1">

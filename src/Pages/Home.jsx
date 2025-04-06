@@ -16,14 +16,12 @@ import {
 } from "../config/URLs";
 import { discoverByPeople } from "../config/URLs";
 import axios from "../axios";
-import { getPersonalizedRecommendations } from "../services/RecommendationsService";
 
 function Home() {
   const { User } = useContext(AuthContext);
   const [userGenres, setUserGenres] = useState([]);
   const [favoritePeopleMovies, setFavoritePeopleMovies] = useState([]);
   const [favoritePeople, setFavoritePeople] = useState([]);
-  const [recommendedMovies, setRecommendedMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Get current date in YYYY-MM-DD format for API filtering
@@ -78,23 +76,17 @@ function Home() {
             setFavoritePeopleMovies([]);
           }
           
-          // Fetch personalized recommendations
-          const recommendations = await getPersonalizedRecommendations(User.uid);
-          setRecommendedMovies(recommendations);
-          
         } catch (error) {
           console.error("Error fetching user preferences:", error);
           setUserGenres([]);
           setFavoritePeople([]);
           setFavoritePeopleMovies([]);
-          setRecommendedMovies([]);
         }
       } else {
         // For guest users, don't show personalized content
         setUserGenres([]);
         setFavoritePeople([]);
         setFavoritePeopleMovies([]);
-        setRecommendedMovies([]);
       }
       
       setLoading(false);
@@ -108,26 +100,7 @@ function Home() {
       <Banner url={Trending}></Banner>
       
       <div className="w-[99%] ml-1">
-        {/* Recommendations slider - only show if there are recommendations and user is logged in */}
-        {User && recommendedMovies.length > 0 && (
-          <RowPost 
-            first 
-            title="Recommendations for You" 
-            islarge 
-            movieData={recommendedMovies} 
-            key="recommendations"
-          ></RowPost>
-        )}
-        
-        {/* Only show "first" prop on Trending if Recommendations aren't shown */}
-        <RowPost 
-          first={!(User && recommendedMovies.length > 0)} 
-          title="Trending" 
-          islarge 
-          url={Trending} 
-          key={Trending}
-        ></RowPost>
-        
+        <RowPost first title="Trending" islarge url={Trending} key={Trending}></RowPost>
         <RowPost
           title="Now Playing"
           url={NowPlaying}
