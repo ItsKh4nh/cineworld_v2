@@ -21,19 +21,19 @@ import { AuthContext } from "./contexts/UserContext";
 import { RatingModalProvider } from "./contexts/RatingModalContext";
 import { UserPreferencesProvider } from "./contexts/UserPreferencesContext";
 import { auth } from "./firebase/FirebaseConfig";
-import useHasInteractions from "./hooks/useHasInteractions";
 
 import Loading from "./components/Loading/Loading";
 import Navbar from "./components/Header/Navbar";
 import NavbarWithoutUser from "./components/Header/NavbarWithoutUser";
 import SimpleNavbar from "./components/Header/SimpleNavbar";
 import MoviePopUp from "./components/PopUp/MoviePopUp";
+import useHasInteractions from "./hooks/useHasInteractions";
 
 function App() {
   const { User, setUser, isGuestMode } = useContext(AuthContext);
-  const { hasInteractions, loading: interactionsLoading } = useHasInteractions();
   const location = useLocation();
   const [authLoading, setAuthLoading] = useState(true);
+  const { hasInteractions, loading: interactionsLoading } = useHasInteractions();
   
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {

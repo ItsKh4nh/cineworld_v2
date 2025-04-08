@@ -13,12 +13,12 @@ function Recommendations() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  
+
   const { User } = useContext(AuthContext);
   const { handleMoviePopup, myListMovies } = useMoviePopup();
   const { convertGenre } = useGenresConverter();
   const { addToMyList, removeFromMyList } = useUpdateMyList();
-  
+
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [noMoviesMessage, setNoMoviesMessage] = useState("");
@@ -39,19 +39,19 @@ function Recommendations() {
       try {
         setLoading(true);
         const recommendations = await getPersonalizedRecommendations(User.uid);
-        
+
         // Add isInMyList property to each movie
         const moviesWithMyListStatus = recommendations.map(movie => ({
           ...movie,
           isInMyList: myListMovies.some(m => m.id === movie.id)
         }));
-        
+
         setMovies(moviesWithMyListStatus);
-        
+
         if (recommendations.length === 0) {
           setNoMoviesMessage("We don't have enough data to make personalized recommendations yet. Try watching more movies or adding some to your list!");
         }
-        
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching recommendations:", error);
@@ -69,7 +69,7 @@ function Recommendations() {
         <h1 className="text-white text-4xl font-bold">Recommendations for You</h1>
         <p className="text-gray-400 mt-2">Personalized movie suggestions based on your taste</p>
       </div>
-      
+
       {/* Movies grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 md:px-8 pb-12">
         {loading ? (
@@ -93,7 +93,7 @@ function Recommendations() {
           </div>
         )}
       </div>
-      
+
       <Footer />
     </div>
   );

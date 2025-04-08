@@ -13,7 +13,7 @@ import useHasInteractions from "../../hooks/useHasInteractions";
 
 function Navbar(props) {
   const { User, isGuestMode, disableGuestMode } = useContext(AuthContext);
-  const { hasInteractions, loading: interactionsLoading } = useHasInteractions();
+  const { hasInteractions } = useHasInteractions();
   const [profilePic, setProfilePic] = useState("");
   const [username, setUsername] = useState("");
   const [genreDropdownOpen, setGenreDropdownOpen] = useState(false);
@@ -136,7 +136,7 @@ function Navbar(props) {
                 <div className="hidden md:block">
                   <div className="flex items-center ml-10 space-x-4">
 
-                    {/* Recommendations Link */}
+                    {/* Recommendations Link - only show if user has interactions */}
                     {hasInteractions && (
                       <Link
                         to={"/recommendations"}
@@ -364,6 +364,7 @@ function Navbar(props) {
               <div className="md:hidden" id="mobile-menu">
                 <div ref={ref} className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                   {/* Mobile menu items */}
+                  {/* Recommendations - only show if user has interactions */}
                   {hasInteractions && (
                     <Link
                       to={"/recommendations"}
