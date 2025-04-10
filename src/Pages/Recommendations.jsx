@@ -49,7 +49,7 @@ function Recommendations() {
         setMovies(moviesWithMyListStatus);
 
         if (recommendations.length === 0) {
-          setNoMoviesMessage("We don't have enough data to make personalized recommendations yet. Try watching more movies or adding some to your list!");
+          setNoMoviesMessage("INTERNAL SERVER ERROR");
         }
 
         setLoading(false);
@@ -66,8 +66,7 @@ function Recommendations() {
   return (
     <div className="min-h-screen bg-black">
       <div className="pt-24 pb-8 px-8">
-        <h1 className="text-white text-4xl font-bold">Recommendations for You</h1>
-        <p className="text-gray-400 mt-2">Personalized movie suggestions based on your taste</p>
+        <h1 className="text-white text-4xl font-bold">You might want to give these a try</h1>
       </div>
 
       {/* Movies grid */}
