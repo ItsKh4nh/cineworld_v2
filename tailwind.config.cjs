@@ -12,7 +12,6 @@ module.exports = {
     },
     extend: {
       padding: {
-        "85vh": "85vh",
         "50vh": "50vh",
       },
       spacing: {
@@ -22,27 +21,8 @@ module.exports = {
         "63rem": "63rem",
         "70rem": "70rem",
       },
-      width: {
-        "96%": "96%",
-      },
-      background: {
-        avengers:
-          "linear-gradient(to right bottom, rgba('#7ed56f',0.8), rgba('#28b485',0.8)),url()",
-        fadeBottom:
-          "linear-gradient(180deg,hsl(0deg 0% 0% / 0%),#000000a2,hsl(0deg 0% 7%));",
-        fadeBlack:
-          "background: linear-gradient(1turn,hsl(0deg 0% 0% / 60%),hsl(0deg 0% 0% / 0%) 65%);",
-        fadeRed:
-          "linear-gradient(90deg, hsl(0deg 77% 42% / 44%) 0%, hsl(0deg 59% 46% / 51%) 35%, hsl(220deg 26% 44% / 0%) 100%) ",
-      },
       colors: {
         cineworldYellow: "#a47504",
-        transparentWhite: "#33333380",
-        transparentBlack: "#000000bf",
-      },
-      margin: {
-        "-6%": "-6%",
-        "50%": "50%",
       },
     },
   },

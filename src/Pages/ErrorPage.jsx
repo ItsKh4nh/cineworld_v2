@@ -7,10 +7,10 @@ function ErrorPage() {
     <div className="h-screen flex items-center justify-center">
       <div className="flex flex-col items-center">
         <h1 className="text-white text-center text-9xl font-black mb-2">
-          404 error
+          404 ERROR
         </h1>
         <h1 className="text-white text-center text-5xl font-bold mb-10">
-          Page not found
+          PAGE NOT FOUND
         </h1>
         <button
           onClick={() => {
