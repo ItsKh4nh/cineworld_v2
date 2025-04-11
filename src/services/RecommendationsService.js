@@ -1,7 +1,7 @@
 import axios from "../axios";
 import { db } from "../firebase/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import { movieRecommendationsWithPage } from "../config/URLs";
+import { movieRecommendationsWithPage, movieDetails } from "../config/URLs";
 
 /**
  * Gets personalized movie recommendations for a user
@@ -22,12 +22,55 @@ export const getPersonalizedRecommendations = async (userId) => {
     const interactionData = interactionDoc.data();
     const movieIds = interactionData.movie_ids || [];
 
-    // If user has 20 or more movies in InteractionList, return empty array for now
+    // If user has 20 or more movies in InteractionList, use recommendation API
     if (movieIds.length >= 20) {
-      console.log("User has 20+ movies in interaction list - using future recommendation algorithm");
-      return [];
+      console.log("User has 20+ movies - using recommendation API");
+      
+      try {
+        const userId = 1; // Set to 1 for demonstration purposes
+        const top_k = 20;
+
+        // Call the recommendation API
+        const response = await axios.get(
+          `https://api-cineworld.onrender.com/recommendations?user_id=${userId}&top_k=${top_k}`
+        );
+
+        // Process the recommendations from the API
+        const recommendationsFromAPI = response.data.recommendations;
+        
+        // Fetch detailed movie information from TMDB for each recommended movie
+        const detailedRecommendations = await Promise.all(
+          recommendationsFromAPI.map(async (rec) => {
+            try {
+              // Fetch movie details from TMDB
+              const movieResponse = await axios.get(movieDetails(rec.movie_id));
+              return {
+                id: rec.movie_id,
+                title: movieResponse.data.title,
+                poster_path: movieResponse.data.poster_path,
+                backdrop_path: movieResponse.data.backdrop_path,
+                overview: movieResponse.data.overview,
+                release_date: movieResponse.data.release_date,
+                vote_average: movieResponse.data.vote_average,
+                genre_ids: movieResponse.data.genres.map(genre => genre.id),
+                recommendation_score: rec.score
+              };
+            } catch (error) {
+              console.error(`Error fetching details for movie ${rec.movie_id}:`, error);
+              return null;
+            }
+          })
+        );
+
+        // Filter out null values (failed requests)
+        return detailedRecommendations.filter(movie => movie !== null);
+      } catch (error) {
+        console.error("Error calling recommendation API:", error);
+        // Fall back to the original recommendation method
+      }
     }
 
+    // Original recommendation logic for users with fewer than 20 movies
     // Check if user has movies in MyList
     const myListRef = doc(db, "MyList", userId);
     const myListDoc = await getDoc(myListRef);

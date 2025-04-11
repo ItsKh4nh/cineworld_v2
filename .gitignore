@@ -34,4 +34,3 @@ tools/*
 .cursorrules
 .cursorrules.txt
 .env
-*.pyc

@@ -11,13 +11,11 @@ import App from "./App";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <Router>
-      <Context>
-        <Context2>
-          <App />
-        </Context2>
-      </Context>
-    </Router>
-  </React.StrictMode>
+  <Router>
+    <Context>
+      <Context2>
+        <App />
+      </Context2>
+    </Context>
+  </Router>
 );

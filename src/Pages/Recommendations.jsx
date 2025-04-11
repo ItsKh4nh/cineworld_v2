@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../contexts/UserContext";
 import { RatingModalContext } from "../contexts/RatingModalContext";
@@ -23,6 +23,8 @@ function Recommendations() {
   const [loading, setLoading] = useState(true);
   const [noMoviesMessage, setNoMoviesMessage] = useState("");
 
+  const fetchedRef = useRef(false);
+
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -35,6 +37,9 @@ function Recommendations() {
         navigate("/signin");
         return;
       }
+      
+      if (fetchedRef.current) return;
+      fetchedRef.current = true;
 
       try {
         setLoading(true);
