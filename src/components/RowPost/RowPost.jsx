@@ -179,7 +179,7 @@ function RowPost(props) {
                           onClick={(e) => {
                             e.stopPropagation();
                             if (openRatingModal) {
-                              openRatingModal(obj, User);
+                              openRatingModal({...obj, isInMyList: true}, User);
                             }
                           }}
                           className="bg-cineworldYellow text-white w-9 h-9 rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:bg-white hover:text-cineworldYellow"
@@ -201,9 +201,20 @@ function RowPost(props) {
                         </div>
                       ) : (
                         <div
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.stopPropagation();
-                            addToMyList({...obj, isInMyList: false});
+                            // Update the movies array with the updated isInMyList status
+                            const result = await addToMyList({...obj, isInMyList: false});
+                            if (result) {
+                              // If successful, update the movies state to reflect the change
+                              setMovies(prevMovies => 
+                                prevMovies.map(movie => 
+                                  movie.id === obj.id 
+                                    ? {...movie, isInMyList: true} 
+                                    : movie
+                                )
+                              );
+                            }
                           }}
                           className="text-white w-9 h-9 border-[2px] rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
                         >

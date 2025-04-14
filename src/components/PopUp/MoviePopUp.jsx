@@ -28,6 +28,7 @@ function MoviePopUp() {
   const [hasMoreCast, setHasMoreCast] = useState(false);
   const [director, setDirector] = useState("");
   const [isVisible, setIsVisible] = useState(false);
+  const [isInUserList, setIsInUserList] = useState(false);
 
   // YouTube player options with autoplay enabled
   const opts = {
@@ -80,11 +81,40 @@ function MoviePopUp() {
     }
   }, [movieInfo]);
 
+  // Update internal state when movieInfo changes
+  useEffect(() => {
+    if (movieInfo) {
+      setIsInUserList(movieInfo.isInMyList || false);
+    }
+  }, [movieInfo]);
+
   if (!movieInfo || Object.keys(movieInfo).length === 0) {
     return null;
   }
 
-  const isInMyList = movieInfo.isInMyList;
+  // Handle adding to MyList
+  const handleAddToMyList = async () => {
+    try {
+      const result = await addToMyList(movieInfo);
+      if (result === true) {
+        setIsInUserList(true);
+      }
+    } catch (error) {
+      console.error("Error adding movie to list:", error);
+    }
+  };
+
+  // Handle removing from MyList
+  const handleRemoveFromMyList = async () => {
+    try {
+      const result = await removeFromMyList(movieInfo);
+      if (result === true) {
+        setIsInUserList(false);
+      }
+    } catch (error) {
+      console.error("Error removing movie from list:", error);
+    }
+  };
 
   return (
     <>
@@ -210,12 +240,10 @@ function MoviePopUp() {
                         Play
                       </button>
                       
-                      {isAuthenticated() && isInMyList ? (
+                      {isAuthenticated() && isInUserList ? (
                         <button
                           className="flex items-center justify-center border border-white text-white font-medium py-2 px-4 rounded hover:bg-white hover:text-black transition-colors"
-                          onClick={() => {
-                            removeFromMyList(movieInfo);
-                          }}
+                          onClick={handleRemoveFromMyList}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -234,9 +262,7 @@ function MoviePopUp() {
                       ) : (
                         <button
                           className="flex items-center justify-center border border-white text-white font-medium py-2 px-4 rounded hover:bg-white hover:text-black transition-colors"
-                          onClick={() => {
-                            addToMyList(movieInfo);
-                          }}
+                          onClick={handleAddToMyList}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

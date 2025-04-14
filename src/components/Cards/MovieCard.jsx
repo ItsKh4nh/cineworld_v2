@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { imageURL2 } from "../../config/constants";
 import StarRating from "../StarRating/StarRating";
@@ -15,6 +15,64 @@ const MovieCard = ({
   const navigate = useNavigate();
   const { User } = useContext(AuthContext);
   const { openRatingModal } = useContext(RatingModalContext) || {};
+  const [isInUserList, setIsInUserList] = useState(movie.isInMyList || false);
+
+  // Update local state when movie props change
+  useEffect(() => {
+    setIsInUserList(movie.isInMyList || false);
+  }, [movie.isInMyList]);
+
+  const handleAddToMyList = async (e) => {
+    e.stopPropagation();
+    
+    try {
+      // Show loading indicator or disable button here if needed
+      
+      // Call addToMyList and await the result
+      const result = await addToMyList(movie);
+      
+      // Update local state based on the result
+      if (result === true) {
+        console.log("Movie added to MyList, updating UI");
+        setIsInUserList(true);
+      } else {
+        console.log("Failed to add movie to MyList or operation was cancelled");
+      }
+    } catch (error) {
+      console.error("Error adding movie to list:", error);
+    }
+  };
+
+  const handleEditRating = (e) => {
+    e.stopPropagation();
+    if (openRatingModal) {
+      // Pass the updated movie with isInMyList set to true to ensure correct state
+      openRatingModal({...movie, isInMyList: true}, User);
+    } else {
+      console.error("openRatingModal is not available");
+    }
+  };
+
+  const handleRemoveFromMyList = async (e) => {
+    e.stopPropagation();
+    
+    try {
+      // Show loading indicator or disable button here if needed
+      
+      // Call removeFromMyList and await the result
+      const result = await removeFromMyList(movie);
+      
+      // Update local state based on the result
+      if (result === true) {
+        console.log("Movie removed from MyList, updating UI");
+        setIsInUserList(false);
+      } else {
+        console.log("Failed to remove movie from MyList");
+      }
+    } catch (error) {
+      console.error("Error removing movie from list:", error);
+    }
+  };
 
   return (
     <div 
@@ -48,16 +106,9 @@ const MovieCard = ({
             </svg>
           </div>
           
-          {movie.isInMyList ? (
+          {isInUserList ? (
             <div
-              onClick={(e) => {
-                e.stopPropagation();
-                if (openRatingModal) {
-                  openRatingModal(movie, User);
-                } else {
-                  removeFromMyList(movie);
-                }
-              }}
+              onClick={handleEditRating}
               className="bg-cineworldYellow text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:bg-white hover:text-cineworldYellow transition-all duration-150"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
@@ -66,10 +117,7 @@ const MovieCard = ({
             </div>
           ) : (
             <div
-              onClick={(e) => {
-                e.stopPropagation();
-                addToMyList(movie);
-              }}
+              onClick={handleAddToMyList}
               className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">

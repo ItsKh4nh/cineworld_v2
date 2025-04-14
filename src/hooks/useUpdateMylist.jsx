@@ -71,14 +71,44 @@ function useUpdateMyList() {
     // If not authenticated, show login prompt
     if (!User) {
       showSignInPrompt();
-      return;
+      return Promise.resolve(false);
     }
     
     if (openRatingModal) {
-      openRatingModal(movie, User);
+      // Return a promise that resolves when the modal is closed with a successful rating
+      return new Promise((resolve) => {
+        // Store the original movie for reference
+        const originalMovie = movie;
+        
+        // Set up a one-time event listener to capture the result of the rating modal
+        const handleModalResult = (event) => {
+          if (event.detail && event.detail.movieId === originalMovie.id) {
+            // Remove the event listener
+            window.removeEventListener('ratingModalClosed', handleModalResult);
+            
+            // Resolve with the success status
+            resolve(event.detail.success);
+          }
+        };
+        
+        // Add event listener for the custom event
+        window.addEventListener('ratingModalClosed', handleModalResult);
+        
+        // Open the rating modal
+        openRatingModal(movie, User);
+        
+        // Add a timeout to resolve the promise if the event isn't fired within 30 seconds
+        // This ensures the UI doesn't get stuck if something goes wrong
+        setTimeout(() => {
+          window.removeEventListener('ratingModalClosed', handleModalResult);
+          console.log("RatingModal timeout - resolving promise as false");
+          resolve(false);
+        }, 30000);
+      });
     } else {
       console.error("openRatingModal is not available");
       alertError("Rating feature is not available right now");
+      return Promise.resolve(false);
     }
   };
 
@@ -114,26 +144,30 @@ function useUpdateMyList() {
           filteredMovies.push({
             ...movieToSave,
             // Ensure these properties are copied if they exist
-            genre_ids: movieToSave.genre_ids || existingMovie.genre_ids
+            genre_ids: movieToSave.genre_ids || existingMovie.genre_ids,
+            isInMyList: true // Explicitly mark as in MyList
           });
           
           // Update the document with the new array
           await updateDoc(userDocRef, { movies: filteredMovies });
           console.log("Movie rating updated successfully");
-          notify();
+          toast.success("Rating updated successfully!");
+          return true; // Explicitly return true on successful update
         } else {
           // Movie doesn't exist, add it to the list
           // Using direct array update instead of arrayUnion to ensure all properties are preserved
-          const updatedMovies = [...movies, movieToSave];
+          const updatedMovies = [...movies, { ...movieToSave, isInMyList: true }];
           await updateDoc(userDocRef, { movies: updatedMovies });
           console.log("Rated movie added to MyList");
-          notify();
+          toast.success("Movie added to MyList");
+          return true; // Explicitly return true on successful add
         }
       } else {
         // Document doesn't exist, create it with the movie
-        await updateDoc(userDocRef, { movies: [movieToSave] });
+        await setDoc(userDocRef, { movies: [{ ...movieToSave, isInMyList: true }] });
         console.log("Rated movie added to MyList");
-        notify();
+        toast.success("Movie added to MyList");
+        return true; // Explicitly return true on successful creation
       }
       
       // Add movie to interaction list
@@ -142,6 +176,7 @@ function useUpdateMyList() {
       console.log(error.code);
       console.log(error.message);
       alertError(error.message);
+      return false; // Return false on error
     }
   };
 
