@@ -14,8 +14,7 @@ import StarRating from "../components/StarRating/StarRating";
 import useMoviePopup from "../hooks/useMoviePopup";
 import usePeopleList from "../hooks/usePeopleList";
 import ConfirmationModal from "../components/Modals/ConfirmationModal";
-import toast, { Toaster } from "react-hot-toast";
-import { formatDate, calculateAge } from "../utils";
+import { formatDate, calculateAge, handleListAction } from "../utils";
 
 function People() {
   // State variables
@@ -57,34 +56,34 @@ function People() {
 
   // Add person to list
   const confirmAddToList = async () => {
-    try {
-      // Close the modal first
-      setShowConfirmModal(false);
-      
-      const success = await addPersonToList(person);
-      
-      if (success) {
-        setIsInList(true);
-      }
-    } catch (error) {
-      console.error("Error adding person to list:", error);
-    }
+    setShowConfirmModal(false);
+    
+    // Create a unique toast ID to prevent duplicates
+    const toastId = `add-person-${person.id}`;
+    
+    await handleListAction(
+      addPersonToList, 
+      person, 
+      "add", 
+      () => setIsInList(true),
+      toastId
+    );
   };
 
   // Remove person from list
   const confirmRemoveFromList = async () => {
-    try {
-      // Close the modal first
-      setShowConfirmModal(false);
-      
-      const success = await removePersonFromList(person);
-      
-      if (success) {
-        setIsInList(false);
-      }
-    } catch (error) {
-      console.error("Error removing person from list:", error);
-    }
+    setShowConfirmModal(false);
+    
+    // Create a unique toast ID to prevent duplicates
+    const toastId = `remove-person-${person.id}`;
+    
+    await handleListAction(
+      removePersonFromList, 
+      person, 
+      "remove", 
+      () => setIsInList(false),
+      toastId
+    );
   };
 
   // Data fetching
@@ -131,8 +130,6 @@ function People() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Toaster position="bottom-center" />
-
       {loading ? (
         <div className="flex flex-col items-center justify-center min-h-screen">
           <ClipLoader color="#E50914" size={60} />

@@ -38,6 +38,8 @@ function MyListTable() {
   const [availableGenres, setAvailableGenres] = useState([]);
   const [allMovies, setAllMovies] = useState([]); // Store all movies for filtering
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [peopleSearchTerm, setPeopleSearchTerm] = useState("");
 
   // Add states to track screen size
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -456,14 +458,16 @@ function MyListTable() {
         <>
           {/* Add Search, Filter and Sort Controls */}
           <div className="mb-6 flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <input
                 type="text"
                 placeholder="Search movies..."
                 className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-red-600"
+                value={searchTerm}
                 onChange={(e) => {
-                  // Implement search functionality
                   const searchTerm = e.target.value.toLowerCase();
+                  setSearchTerm(searchTerm);
+                  
                   if (searchTerm === '') {
                     setMyMovies(allMovies); // Reset to original list
                   } else {
@@ -475,6 +479,18 @@ function MyListTable() {
                   }
                 }}
               />
+              <button 
+                onClick={() => {
+                  setSearchTerm('');
+                  setMyMovies(allMovies); // Reset to original list
+                }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600 hover:text-red-500 focus:outline-none"
+                aria-label="Clear search"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </button>
             </div>
             <div>
               <button
@@ -739,28 +755,55 @@ function MyListTable() {
       {activeTab === 'people' && (
         <>
           {/* Search for people */}
-          {myPeople.length > 0 && (
-            <div className="mb-6">
-              <input
-                type="text"
-                placeholder="Search people..."
-                className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-red-600"
-                onChange={(e) => {
-                  // Implement search functionality for people
-                  const searchTerm = e.target.value.toLowerCase();
-                  if (searchTerm === '') {
-                    getMovies(); // Reset to original list
-                  } else {
-                    const filtered = myPeople.filter(person => 
-                      person.name.toLowerCase().includes(searchTerm) ||
-                      (person.known_for_department || '').toLowerCase().includes(searchTerm)
-                    );
-                    setMyPeople(filtered);
+          <div className="mb-6 relative">
+            <input
+              type="text"
+              placeholder="Search people..."
+              className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-red-600"
+              value={peopleSearchTerm}
+              onChange={(e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                setPeopleSearchTerm(searchTerm);
+                
+                // Implement search functionality for people
+                if (searchTerm === '') {
+                  // Just reset people to original list without reloading everything
+                  const docRef = doc(db, "MyList", User.uid);
+                  getDoc(docRef).then((result) => {
+                    const data = result.data();
+                    if (data && data.people) {
+                      setMyPeople(data.people || []);
+                    }
+                  });
+                } else {
+                  const filtered = myPeople.filter(person => 
+                    person.name.toLowerCase().includes(searchTerm) ||
+                    (person.known_for_department || '').toLowerCase().includes(searchTerm)
+                  );
+                  setMyPeople(filtered);
+                }
+              }}
+            />
+            <button 
+              onClick={() => {
+                setPeopleSearchTerm('');
+                // Just reset people to original list without reloading everything
+                const docRef = doc(db, "MyList", User.uid);
+                getDoc(docRef).then((result) => {
+                  const data = result.data();
+                  if (data && data.people) {
+                    setMyPeople(data.people || []);
                   }
-                }}
-              />
-            </div>
-          )}
+                });
+              }}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600 hover:text-red-500 focus:outline-none"
+              aria-label="Clear search"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </div>
           
           {loading ? (
             <div className="flex justify-center items-center h-64">

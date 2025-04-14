@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import "./App.css";
+import { Toaster } from "react-hot-toast";
 
 // Contexts
 import { AuthContext } from "./contexts/UserContext";
@@ -58,6 +59,9 @@ function App() {
     <RatingModalProvider>
       <UserPreferencesProvider>
         <div>
+          {/* Global Toaster for all notifications */}
+          <Toaster position="top-center" />
+          
           {renderNavbar()}
           <AppRoutes 
             authLoading={authLoading}

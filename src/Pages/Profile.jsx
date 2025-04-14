@@ -8,7 +8,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 import { AuthContext } from "../contexts/UserContext";
 import WelcomePageBanner from "/WelcomePageBanner.jpg";
@@ -190,17 +190,6 @@ function Profile() {
           backgroundImage: `linear-gradient(0deg, hsl(0deg 0% 0% / 73%) 0%, hsl(0deg 0% 0% / 73%) 35%), url(${WelcomePageBanner})`,
         }}
       >
-        {IsMyListUpdated ? (
-          <Toaster
-            toastOptions={{
-              style: {
-                padding: "1rem",
-                backgroundColor: "#f4fff4",
-                borderLeft: "6px solid green",
-              },
-            }}
-          />
-        ) : null}
         <Fade>
           <div className="max-w-3xl mx-auto bg-[#000000bf] p-5 md:p-8 rounded-md">
             <h1 className="text-4xl text-white font-bold mb-6">

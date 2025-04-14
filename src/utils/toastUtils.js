@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
  * @returns {string} - The toast ID
  */
 export const showLoadingToast = (message, id) => {
-  return toast.loading(message, { id });
+  return toast.loading(message, { id, position: 'top-center' });
 };
 
 /**
@@ -17,7 +17,7 @@ export const showLoadingToast = (message, id) => {
  * @param {number} duration - Duration in ms (default: 2000)
  */
 export const showSuccessToast = (message, id, duration = 2000) => {
-  toast.success(message, { id, duration });
+  toast.success(message, { id, duration, position: 'top-center' });
 };
 
 /**
@@ -27,7 +27,7 @@ export const showSuccessToast = (message, id, duration = 2000) => {
  * @param {number} duration - Duration in ms (default: 2000)
  */
 export const showErrorToast = (message, id, duration = 2000) => {
-  toast.error(message, { id, duration });
+  toast.error(message, { id, duration, position: 'top-center' });
 };
 
 /**
@@ -47,9 +47,10 @@ export const createToastId = (action, entityType, entityId) => {
  * @param {object} entity - Entity to act upon
  * @param {string} action - Action type ("add" or "remove")
  * @param {Function} onSuccess - Function to call on success
+ * @param {string} [customToastId] - Optional custom toast ID to use instead of auto-generated one
  * @returns {Promise<boolean>} - Success status
  */
-export const handleListAction = async (actionFn, entity, action, onSuccess) => {
+export const handleListAction = async (actionFn, entity, action, onSuccess, customToastId) => {
   const entityName = entity.title || entity.name || "Item";
   const entityId = entity.id;
   const entityType = entity.title ? "movie" : "person";
@@ -59,7 +60,7 @@ export const handleListAction = async (actionFn, entity, action, onSuccess) => {
   const actionPast = isAdding ? "added to" : "removed from";
   
   // Generate toast ID
-  const toastId = createToastId(action, entityType, entityId);
+  const toastId = customToastId || createToastId(action, entityType, entityId);
   
   try {
     // Show loading toast
@@ -84,7 +85,7 @@ export const handleListAction = async (actionFn, entity, action, onSuccess) => {
     console.error(`Error ${action}ing ${entityType}:`, error);
     
     // Show error toast with error message
-    const errorToastId = `error-${action}-${entityType}-${entityId}`;
+    const errorToastId = customToastId ? `error-${customToastId}` : `error-${action}-${entityType}-${entityId}`;
     showErrorToast(`Error: ${error.message || `Failed to ${action}`}`, errorToastId);
     
     return false;

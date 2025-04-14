@@ -1,3 +1,17 @@
+.SwiperStyle {
+  position: relative;
+  
+  .swiper-button-prev, 
+  .swiper-button-next {
+    opacity: 1;
+    z-index: 10;
+  }
+  
+  .swiper-pagination {
+    opacity: 1;
+  }
+}
+
 .SwiperStyle:hover {
   .swiper-button-prev {
     opacity: 1;
@@ -15,13 +29,41 @@
 
 .swiper-button-prev {
   color: white;
-  opacity: 0;
+  opacity: 1;
   transition: all 400ms ease-out 0s;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:after {
+    font-size: 18px;
+  }
 }
+
 .swiper-button-next {
   color: white;
-  opacity: 0;
+  opacity: 1;
   transition: all 400ms ease-out 0s;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:after {
+    font-size: 18px;
+  }
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .swiper-pagination {
@@ -165,6 +207,16 @@
 }
 
 @media only screen and (max-width: 1050px) {
+  .swiper-button-prev,
+  .swiper-button-next {
+    width: 30px;
+    height: 30px;
+    
+    &:after {
+      font-size: 12px;
+    }
+  }
+  
   .swiper-wrapper {
     padding: 0;
     &:hover.swiper-slide {

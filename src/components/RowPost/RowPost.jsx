@@ -114,7 +114,7 @@ function RowPost(props) {
             navigation={true}
             pagination={false}
             modules={[Navigation]}
-            className="mySwiper"
+            className="mySwiper SwiperStyle"
             slidesPerView={6.1}
             spaceBetween={8}
             breakpoints={customSettings.breakpoints}

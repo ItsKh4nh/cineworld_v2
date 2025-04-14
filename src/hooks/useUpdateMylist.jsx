@@ -3,7 +3,7 @@ import { updateDoc, doc, arrayUnion, arrayRemove, getDoc, setDoc } from "firebas
 import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 import { RatingModalContext } from "../contexts/RatingModalContext";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 function useUpdateMyList() {
@@ -309,26 +309,13 @@ function useUpdateMyList() {
     }
   };
 
-  const PopupMessage = (
-    <Toaster
-      toastOptions={{
-        style: {
-          padding: "1.5rem",
-          backgroundColor: "#f4fff4",
-          borderLeft: "6px solid lightgreen",
-        },
-      }}
-    />
-  );
-
   return { 
     addToMyList, 
     addRatedMovieToList,
     updateRatedMovie,
     removeFromMyList, 
     updateMovieNote,
-    checkIfInMyList,
-    PopupMessage
+    checkIfInMyList
   };
 }
 
