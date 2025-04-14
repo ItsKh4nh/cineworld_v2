@@ -6,7 +6,7 @@ import { searchMovie, searchPerson } from "../config/URLs";
 import { imageURL2 } from "../config/constants";
 import { AuthContext } from "../contexts/UserContext";
 
-import ColoredStarRating from "../components/StarRating/ColoredStarRating";
+import StarRating from "../components/StarRating/StarRating";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 import useUpdateMyList from "../hooks/useUpdateMyList";

@@ -4,7 +4,7 @@ import { db } from "../../firebase/FirebaseConfig";
 import { imageURL2, genresList } from "../../config/constants";
 import axios from "../../axios";
 import { searchMovie, searchPerson } from "../../config/URLs";
-import ColoredStarRating from "../StarRating/ColoredStarRating";
+import StarRating from "../StarRating/StarRating";
 
 function UserPreferencesModal({ user, onClose }) {
   const [step, setStep] = useState(1);
@@ -317,7 +317,7 @@ function UserPreferencesModal({ user, onClose }) {
                             {movie.release_date ? movie.release_date.substring(0, 4) : "N/A"}
                           </p>
                           <div className="flex items-center mt-1">
-                            <ColoredStarRating rating={movie.vote_average} />
+                            <StarRating rating={movie.vote_average} />
                           </div>
                         </div>
                       ))}
@@ -455,7 +455,12 @@ function UserPreferencesModal({ user, onClose }) {
                             />
                           ) : (
                             <div className="w-full h-36 bg-gray-700 rounded mb-2 flex items-center justify-center">
-                              <span className="text-gray-400 text-xs">No Image</span>
+                              <img 
+                                src="/placeholder.jpg" 
+                                alt={person.name} 
+                                className="w-full h-full object-cover rounded"
+                                loading="lazy"
+                              />
                             </div>
                           )}
                           <h5 className="text-white text-sm font-medium truncate">{person.name}</h5>
@@ -508,7 +513,12 @@ function UserPreferencesModal({ user, onClose }) {
                           />
                         ) : (
                           <div className="w-16 h-24 bg-gray-600 rounded mr-2 flex items-center justify-center flex-shrink-0">
-                            <span className="text-gray-400 text-xs">No Image</span>
+                            <img 
+                              src="/placeholder.jpg" 
+                              alt={person.name} 
+                              className="w-full h-full object-cover rounded"
+                              loading="lazy"
+                            />
                           </div>
                         )}
                         

@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Fade } from "react-awesome-reveal";
-import StarRatings from "../StarRatings";
 import YouTube from "react-youtube";
-import ColoredStarRating from '../StarRating/ColoredStarRating';
+import StarRating from '../StarRating/StarRating';
 
 import { imageURL } from "../../config/constants";
 import { API_KEY } from "../../config/constants";
@@ -140,7 +139,7 @@ function MoviePopUp() {
                         <div>
                           <div className="text-neutral-400 text-xs">Rating</div>
                           <div className="text-white">
-                            <ColoredStarRating rating={movieInfo.vote_average} size="large" />
+                            <StarRating rating={movieInfo.vote_average} size="large" />
                           </div>
                         </div>
                         

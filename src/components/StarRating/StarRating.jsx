@@ -1,11 +1,17 @@
 import React from 'react';
 
-function ColoredStarRating({ rating, size = "normal", showDenominator = false }) {
+/**
+ * Star rating component that changes color based on rating value
+ * @param {number} rating - Rating value from 0-10
+ * @param {string} size - Size of the star ('small', 'normal', 'large', 'extra-large')
+ * @param {boolean} showDenominator - Whether to show "/10" after the rating
+ */
+function StarRating({ rating, size = "normal", showDenominator = false }) {
   // Format rating to display
   const safeRating = rating || 0;
   const formattedRating = parseFloat(safeRating.toFixed(2)).toString();
   
-  // Define size classes (making each size larger)
+  // Define size classes
   const sizeClasses = {
     small: {
       star: "w-5 h-5",
@@ -27,6 +33,15 @@ function ColoredStarRating({ rating, size = "normal", showDenominator = false })
   
   // Get the appropriate size configuration
   const { star: starSizeClass, text: textSizeClass } = sizeClasses[size] || sizeClasses.normal;
+
+  // Get star color based on rating
+  const getStarColor = (rating) => {
+    if (rating <= 2) return "#ff4545"; // Red for very low ratings
+    if (rating <= 4) return "#ffa534"; // Orange for low ratings
+    if (rating <= 6) return "#ffe234"; // Yellow for medium ratings
+    if (rating <= 8) return "#b7dd29"; // Light green for good ratings
+    return "#57e32c"; // Bright green for excellent ratings
+  };
   
   // If no rating, return gray star with N/A
   if (!rating) {
@@ -51,13 +66,7 @@ function ColoredStarRating({ rating, size = "normal", showDenominator = false })
       <svg 
         xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 24 24" 
-        fill={
-          rating <= 2 ? "#ff4545" : // Red
-          rating <= 4 ? "#ffa534" : // Orange
-          rating <= 6 ? "#ffe234" : // Yellow
-          rating <= 8 ? "#b7dd29" : // Light green
-          "#57e32c" // Bright green
-        }
+        fill={getStarColor(safeRating)}
         className={`${starSizeClass} mr-1.5`}
         aria-hidden="true"
       >
@@ -76,4 +85,4 @@ function ColoredStarRating({ rating, size = "normal", showDenominator = false })
   );
 }
 
-export default ColoredStarRating; 
+export default StarRating; 

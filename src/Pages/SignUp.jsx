@@ -12,7 +12,7 @@ import {
 
 function SignUp() {
   const location = useLocation();
-  const { User } = useContext(AuthContext);
+  const { User, setUser } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

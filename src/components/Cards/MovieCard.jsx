@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { imageURL2 } from "../../config/constants";
-import ColoredStarRating from "../StarRating/ColoredStarRating";
+import StarRating from "../StarRating/StarRating";
 import { RatingModalContext } from "../../contexts/RatingModalContext";
 import { AuthContext } from "../../contexts/UserContext";
 
@@ -28,7 +28,7 @@ const MovieCard = ({
           src={
             movie.backdrop_path
               ? imageURL2 + movie.backdrop_path
-              : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
+              : "/placeholder.jpg"
           }
           alt={movie.title || movie.name}
           loading="lazy"
@@ -95,7 +95,7 @@ const MovieCard = ({
         
         {/* Star rating with number */}
         <div className="flex items-center mb-3">
-          <ColoredStarRating rating={movie.vote_average} />
+          <StarRating rating={movie.vote_average} />
         </div>
         
         {/* Genres */}

@@ -13,7 +13,7 @@ import { toast } from "react-hot-toast";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import axios from "../../axios";
 import { API_KEY } from "../../config/constants";
-import ColoredStarRating from "../StarRating/ColoredStarRating";
+import StarRating from "../StarRating/StarRating";
 import { FaMinus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
@@ -572,7 +572,7 @@ function MyListTable() {
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             {movie.userRating?.score ? (
-                              <ColoredStarRating rating={movie.userRating.score} />
+                              <StarRating rating={movie.userRating.score} />
                             ) : (
                               <svg 
                                 xmlns="http://www.w3.org/2000/svg" 
@@ -687,7 +687,7 @@ function MyListTable() {
                           <div className="flex items-center">
                             <div className="mr-3">
                               {movie.userRating?.score ? (
-                                <ColoredStarRating rating={movie.userRating.score} size="small" />
+                                <StarRating rating={movie.userRating.score} size="small" />
                               ) : (
                                 <svg 
                                   xmlns="http://www.w3.org/2000/svg" 
@@ -779,13 +779,9 @@ function MyListTable() {
                 >
                   <div className="relative cursor-pointer" onClick={() => navigate(`/people/${person.id}`)}>
                     <img
-                      src={`${imageURL2}${person.profile_path}`}
+                      src={person.profile_path ? `${imageURL2}${person.profile_path}` : '/placeholder.jpg'}
                       alt={person.name}
                       className="w-full aspect-[2/3] object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/300x450?text=No+Image';
-                      }}
                     />
                   </div>
                   

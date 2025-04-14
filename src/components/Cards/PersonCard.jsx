@@ -18,7 +18,12 @@ const PersonCard = ({ person, handlePersonClick }) => {
         />
       ) : (
         <div className="w-full h-48 bg-gray-800 flex items-center justify-center">
-          <span className="text-gray-400">No Image</span>
+          <img 
+            src="/placeholder.jpg" 
+            alt={person.name} 
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
         </div>
       )}
       
