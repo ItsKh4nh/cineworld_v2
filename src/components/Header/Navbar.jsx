@@ -11,7 +11,7 @@ import { auth } from "../../firebase/FirebaseConfig";
 import GuestModeBanner from "../GuestModeBanner/GuestModeBanner";
 import useHasInteractions from "../../hooks/useHasInteractions";
 
-// Add CSS for the glowing recommendation link
+// Add CSS for the glowing recommendation link and sparkle animation
 const recommendationGlowStyle = `
   @keyframes glowingEffect {
     0% {
@@ -25,6 +25,21 @@ const recommendationGlowStyle = `
     }
   }
   
+  @keyframes sparkle {
+    0% {
+      transform: scale(0.8) rotate(0deg);
+      opacity: 0.6;
+    }
+    50% {
+      transform: scale(1.2) rotate(10deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.8) rotate(0deg);
+      opacity: 0.6;
+    }
+  }
+  
   .recommendation-glow {
     color: #FFBB00;
     animation: glowingEffect 3s ease-in-out infinite;
@@ -34,6 +49,14 @@ const recommendationGlowStyle = `
   .recommendation-glow:hover {
     color: #FFDD00;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+
+  .sparkle-icon {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    color: #FFDD00;
+    animation: sparkle 2s ease-in-out infinite;
   }
 `;
 
@@ -170,6 +193,14 @@ function Navbar(props) {
                         className="py-2 font-medium text-white transition ease-in-out rounded-md cursor-pointer lg:px-3 text-m recommendation-glow relative"
                       >
                         Recommendations
+                        <svg 
+                          className="sparkle-icon w-4 h-4" 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          viewBox="0 0 24 24" 
+                          fill="currentColor"
+                        >
+                          <path fillRule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5z" clipRule="evenodd" />
+                        </svg>
                       </Link>
                     )}
 
