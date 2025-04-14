@@ -11,6 +11,32 @@ import { auth } from "../../firebase/FirebaseConfig";
 import GuestModeBanner from "../GuestModeBanner/GuestModeBanner";
 import useHasInteractions from "../../hooks/useHasInteractions";
 
+// Add CSS for the glowing recommendation link
+const recommendationGlowStyle = `
+  @keyframes glowingEffect {
+    0% {
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.2), 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+    50% {
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+    100% {
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.2), 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+  }
+  
+  .recommendation-glow {
+    color: #FFBB00;
+    animation: glowingEffect 3s ease-in-out infinite;
+    font-weight: 500;
+  }
+  
+  .recommendation-glow:hover {
+    color: #FFDD00;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+`;
+
 function Navbar(props) {
   const { User, isGuestMode, disableGuestMode } = useContext(AuthContext);
   const { hasInteractions } = useHasInteractions();
@@ -114,6 +140,7 @@ function Navbar(props) {
           : "fixed top-0 z-50 w-full"
       }
     >
+      <style>{recommendationGlowStyle}</style>
       <GuestModeBanner message="" />
       <Fade>
         <nav
@@ -140,7 +167,7 @@ function Navbar(props) {
                     {hasInteractions && (
                       <Link
                         to={"/recommendations"}
-                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-cineworldYellow lg:px-3 text-m"
+                        className="py-2 font-medium text-white transition ease-in-out rounded-md cursor-pointer lg:px-3 text-m recommendation-glow relative"
                       >
                         Recommendations
                       </Link>
@@ -368,7 +395,7 @@ function Navbar(props) {
                   {hasInteractions && (
                     <Link
                       to={"/recommendations"}
-                      className="block px-3 py-2 text-base font-medium text-white hover:text-cineworldYellow"
+                      className="block px-3 py-2 text-base font-medium recommendation-glow"
                     >
                       Recommendations
                     </Link>

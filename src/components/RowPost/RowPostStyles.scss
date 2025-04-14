@@ -96,7 +96,7 @@
 }
 
 .content {
-  transition: all 0.5;
+  transition: all 0.5s;
   background: linear-gradient(
     0.05turn,
     rgba(0, 0, 0, 0.871),
@@ -111,11 +111,24 @@
   box-sizing: border-box;
 }
 
+/* Add initial fade-in animation for content */
+@keyframes fadeInBottom {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .swiper-slide:hover {
   .content {
     transition: all 0.5s;
     display: initial;
     bottom: 0;
+    animation: fadeInBottom 0.3s ease-out forwards;
   }
 }
 

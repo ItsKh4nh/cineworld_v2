@@ -28,7 +28,7 @@ export const getPersonalizedRecommendations = async (userId) => {
       
       try {
         const userId = 1; // Set to 1 for demonstration purposes
-        const top_k = 20;
+        const top_k = 10;
 
         // Call the recommendation API
         const response = await axios.get(
@@ -137,8 +137,8 @@ export const getPersonalizedRecommendations = async (userId) => {
     // Shuffle the recommendations
     const shuffledRecommendations = uniqueRecommendations.sort(() => 0.5 - Math.random());
 
-    // Return up to 20 recommendations
-    return shuffledRecommendations.slice(0, 20);
+    // Return up to 10 recommendations
+    return shuffledRecommendations.slice(0, 10);
   } catch (error) {
     console.error("Error getting personalized recommendations:", error);
     return [];

@@ -71,7 +71,7 @@ function Recommendations() {
   return (
     <div className="min-h-screen bg-black">
       <div className="pt-24 pb-8 px-8">
-        <h1 className="text-white text-4xl font-bold">You might want to give these a try</h1>
+        <h1 className="text-white text-4xl font-bold">Explore this curated list of must-watch movies, just for you.</h1>
       </div>
 
       {/* Movies grid */}
