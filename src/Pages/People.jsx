@@ -61,35 +61,13 @@ function People() {
       // Close the modal first
       setShowConfirmModal(false);
       
-      // Generate a unique toast ID based on person ID and action
-      const toastId = `add-person-${person.id}`;
-      
-      // Start loading toast
-      toast.loading(`Adding ${person.name} to your list...`, { id: toastId });
-      
       const success = await addPersonToList(person);
       
-      // Update the toast based on the result
       if (success) {
         setIsInList(true);
-        toast.success(`${person.name} added to MyList`, { 
-          id: toastId,
-          duration: 2000 
-        });
-      } else {
-        toast.error(`Failed to add ${person.name} to your list`, { 
-          id: toastId,
-          duration: 2000 
-        });
       }
     } catch (error) {
       console.error("Error adding person to list:", error);
-      // Use a unique toast ID for the error case
-      const errorToastId = `error-add-person-${person.id}`;
-      toast.error(`Error: ${error.message || "Failed to add to list"}`, {
-        id: errorToastId,
-        duration: 2000
-      });
     }
   };
 
@@ -99,35 +77,13 @@ function People() {
       // Close the modal first
       setShowConfirmModal(false);
       
-      // Generate a unique toast ID based on person ID and action
-      const toastId = `remove-person-${person.id}`;
-      
-      // Start loading toast
-      toast.loading(`Removing ${person.name} from your list...`, { id: toastId });
-      
       const success = await removePersonFromList(person);
       
-      // Update the toast based on the result
       if (success) {
         setIsInList(false);
-        toast.success(`${person.name} removed from your list`, { 
-          id: toastId,
-          duration: 2000 
-        });
-      } else {
-        toast.error(`Failed to remove ${person.name} from your list`, { 
-          id: toastId,
-          duration: 2000 
-        });
       }
     } catch (error) {
       console.error("Error removing person from list:", error);
-      // Use a unique toast ID for the error case
-      const errorToastId = `error-remove-person-${person.id}`;
-      toast.error(`Error: ${error.message || "Failed to remove from list"}`, {
-        id: errorToastId,
-        duration: 2000
-      });
     }
   };
 
@@ -432,7 +388,7 @@ function People() {
                                       />
                                     ) : (
                                       <img
-                                        src="/placeholder.jpg"
+                                        src="/placeholderVertical.jpg"
                                         alt={movie.title}
                                         className="w-full aspect-[2/3] object-cover"
                                       />
@@ -509,7 +465,7 @@ function People() {
                                     ) : (
                                       <div className="bg-gray-800 w-full h-full flex items-center justify-center text-gray-500">
                                         <img 
-                                          src="/placeholder.jpg" 
+                                          src="/placeholderVertical.jpg" 
                                           alt={movie.title}
                                           className="w-full h-full object-cover"
                                         />
@@ -569,7 +525,7 @@ function People() {
                                           ) : (
                                             <div className="bg-gray-800 w-full h-full flex items-center justify-center text-gray-500">
                                               <img 
-                                                src="/placeholder.jpg" 
+                                                src="/placeholderVertical.jpg" 
                                                 alt={movie.title}
                                                 className="w-full h-full object-cover"
                                               />

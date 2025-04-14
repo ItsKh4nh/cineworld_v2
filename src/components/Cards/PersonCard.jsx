@@ -5,7 +5,7 @@ const PersonCard = ({ person, handlePersonClick }) => {
   return (
     <div 
       key={person.id} 
-      className="cursor-pointer bg-zinc-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-red-600 transition duration-200"
+      className="cursor-pointer bg-zinc-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-cineworldYellow transition duration-200"
       onClick={() => handlePersonClick(person)}
     >
       {/* Person profile image */}
