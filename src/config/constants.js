@@ -19,7 +19,6 @@ export const languageMap = {
   "ar": "Arabic",
   "tr": "Turkish",
   "th": "Thai"
-  // This is just a basic set. The complete list will be fetched from the API
 };
 
 export const genresList = [

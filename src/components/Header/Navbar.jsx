@@ -8,7 +8,6 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../contexts/UserContext";
 import { genresList } from "../../config/constants";
 import { auth } from "../../firebase/FirebaseConfig";
-import GuestModeBanner from "../GuestModeBanner/GuestModeBanner";
 import useHasInteractions from "../../hooks/useHasInteractions";
 
 // Add CSS for the glowing recommendation link and sparkle animation
@@ -164,7 +163,6 @@ function Navbar(props) {
       }
     >
       <style>{recommendationGlowStyle}</style>
-      <GuestModeBanner message="" />
       <Fade>
         <nav
           className={`transition duration-500 ease-in-out  ${
