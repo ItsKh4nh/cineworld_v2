@@ -32,7 +32,7 @@ export const getPersonalizedRecommendations = async (userId) => {
 
         // Call the recommendation API
         const response = await axios.get(
-          `https://api-cineworld.up.railway.app/recommendations?user_id=${userId}&top_k=${top_k}`
+          `https://api-cineworld.onrender.com/recommendations?user_id=${userId}&top_k=${top_k}`
           // `https://api-cineworld.onrender.com/recommendations?user_id=${userId}&top_k=${top_k}`
         );
 

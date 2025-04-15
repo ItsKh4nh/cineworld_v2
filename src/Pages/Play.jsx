@@ -227,11 +227,30 @@ function Play() {
       .then((response) => {
         setMovieDetails(response.data);
         
-        // If movie belongs to a collection, fetch collection details
+        // Fetch collection details
         if (response.data.belongs_to_collection) {
           axios.get(collectionDetails(response.data.belongs_to_collection.id))
             .then(collectionResponse => {
-              setCollectionInfo(collectionResponse.data);
+              const processedCollection = {
+                ...collectionResponse.data
+              };
+              
+              // Mark each movie in collection to check if it's in user's list
+              if (User && User.uid) {
+                // Check each movie in the collection
+                const checkPromises = processedCollection.parts.map(async (movie) => {
+                  const isInList = await checkIfInMyList(movie.id);
+                  return {...movie, isInMyList: isInList};
+                });
+                
+                // Wait for all checks to complete
+                Promise.all(checkPromises).then(updatedParts => {
+                  processedCollection.parts = updatedParts;
+                  setCollectionInfo(processedCollection);
+                });
+              } else {
+                setCollectionInfo(processedCollection);
+              }
             })
             .catch(error => {
               console.error("Error fetching collection:", error);
@@ -268,8 +287,26 @@ function Play() {
         // Fetch similar movies
         axios.get(movieRecommendations(id))
           .then((res) => {
-            setSimilarMovies(res.data.results.slice(0, 15));
-            setLoading(false);
+            const recommendedMovies = res.data.results.slice(0, 20);
+            
+            // Check which movies are in the user's list and filter them out
+            if (User && User.uid) {
+              const checkPromises = recommendedMovies.map(async (movie) => {
+                const isInList = await checkIfInMyList(movie.id);
+                return {...movie, isInMyList: isInList};
+              });
+              
+              Promise.all(checkPromises).then(checkedMovies => {
+                // Filter out movies already in MyList
+                const filteredMovies = checkedMovies.filter(movie => !movie.isInMyList);
+                // Take the first 10 after filtering
+                setSimilarMovies(filteredMovies.slice(0, 10));
+                setLoading(false);
+              });
+            } else {
+              setSimilarMovies(recommendedMovies.slice(0, 10));
+              setLoading(false);
+            }
           })
           .catch(error => {
             console.error("Error fetching recommendations:", error);
@@ -282,11 +319,24 @@ function Play() {
       });
   }, [id]);
 
-  // Add a separate effect to recheck if the movie is in MyList after PopupMessage changes
-  // (which happens when a movie is added or removed from the list)
+  // Check if movie is in user's list and handle collection movies
   useEffect(() => {
     if (!loading) {
       checkMovieInList();
+      
+      // Check if collection movies are in the user's list
+      if (collectionInfo && collectionInfo.parts) {
+        const checkCollectionMovies = async () => {
+          for (const movie of collectionInfo.parts) {
+            const isInList = await checkIfInMyList(movie.id);
+            movie.isInMyList = isInList;
+          }
+          // Force a re-render
+          setCollectionInfo({...collectionInfo});
+        };
+        
+        checkCollectionMovies();
+      }
     }
   }, [PopupMessage]);
 
@@ -915,11 +965,11 @@ function Play() {
                                           : review.author_details.avatar_path.replace(/^\//, '')}
                                       alt={review.author}
                                       className="w-full h-full object-cover"
-                                      onError={(e) => {e.target.onerror = null; e.target.src = 'https://placehold.co/150x150?text=🧩';}}
+                                      onError={(e) => {e.target.onerror = null; e.target.src = '/favicon.png';}}
                                     />
                                   ) : (
                                     <div className="w-full h-full bg-gray-700 flex items-center justify-center">
-                                      <span className="text-xl">🧩</span>
+                                      <img src="/favicon.png" alt="User" className="w-8 h-8" />
                                     </div>
                                   )}
                                 </div>
@@ -1095,7 +1145,7 @@ function Play() {
                           </div>
                         ))}
                       </div>
-                  </div>
+                    </div>
                   )}
                 </div>
               </div>
