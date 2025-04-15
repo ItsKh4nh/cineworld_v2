@@ -10,8 +10,8 @@ import {
   movieKeywords,
   movieReviews,
   configurationLanguages
-} from "../config/URLs";
-import { imageURL, imageURL2, languageMap } from "../config/constants";
+} from "../config";
+import { imageURL, imageURL2, languageMap } from "../config";
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
 import usePlayMovie from "../hooks/usePlayMovie";
@@ -25,9 +25,9 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { FaImdb, FaFacebook, FaInstagram, FaTwitter, FaWikipediaW } from "react-icons/fa";
-import StarRatings from "../components/StarRatings";
-import ColoredStarRating from "../components/StarRating/ColoredStarRating";
+import StarRating from "../components/StarRating/StarRating";
 import { AuthContext } from "../contexts/UserContext";
+import { formatDate, formatMoney, formatRuntime } from "../utils";
 
 function Play() {
   // State variables
@@ -100,7 +100,6 @@ function Play() {
   // Track user interaction with video player
   const handlePlayerInteraction = () => {
     if (!hasInteracted) {
-      console.log("User interacted with movie player:", id);
       trackMovieInteraction(id);
       setHasInteracted(true);
     }
@@ -128,27 +127,6 @@ function Play() {
     }
   };
 
-  // Helper functions
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  const formatMoney = (amount) => {
-    if (!amount) return "N/A";
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
   const formatLanguage = (languageCode) => {
     if (!languageCode) return "N/A";
     
@@ -164,13 +142,6 @@ function Play() {
     
     // If no match found, return the code in uppercase
     return languageCode.toUpperCase();
-  };
-
-  const formatRuntime = (minutes) => {
-    if (!minutes) return "N/A";
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
   };
 
   // Scroll to video on play
@@ -321,16 +292,20 @@ function Play() {
 
   // Handle movie list actions
   const handleMyListAction = () => {
-    console.log("Movie details being passed:", movieDetails);
-    console.log("Does movie have genres?", movieDetails.genres);
-    
     if (isInMyList) {
-      // Instead of removing directly, open the rating modal to update the rating
-      addToMyList(movieDetails);
-      // The actual update will happen when the user saves from the modal
+      removeFromMyList(movieDetails)
+        .then(result => {
+          if (result) {
+            setIsInMyList(false);
+          }
+        });
     } else {
-      addToMyList(movieDetails);
-      // Don't set isInMyList=true here - it will be updated when checkMovieInList runs after the rating is saved
+      addToMyList(movieDetails)
+        .then(result => {
+          if (result) {
+            setIsInMyList(true);
+          }
+        });
     }
   };
 
@@ -860,17 +835,11 @@ function Play() {
                               onClick={() => navigate(`/people/${person.id}`)}
                             >
                               <div className="aspect-square rounded-full overflow-hidden mb-2 mx-auto w-20 h-20">
-                                {person.profile_path ? (
-                                  <img 
-                                    src={`${imageURL2}${person.profile_path}`}
-                                    alt={person.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                                    <span className="text-2xl">👤</span>
-                                  </div>
-                                )}
+                                <img 
+                                  src={person.profile_path ? `${imageURL2}${person.profile_path}` : '/placeholder.jpg'}
+                                  alt={person.name}
+                                  className="w-full h-full object-cover"
+                                />
                               </div>
                               <p className="font-medium text-sm">{person.name}</p>
                               <p className="text-xs text-gray-400 truncate">{person.character}</p>
@@ -906,17 +875,11 @@ function Play() {
                                     onClick={() => navigate(`/people/${person.id}`)}
                                   >
                                     <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                                      {person.profile_path ? (
-                                        <img 
-                                          src={`${imageURL2}${person.profile_path}`}
-                                          alt={person.name}
-                                          className="w-full h-full object-cover"
-                                        />
-                                      ) : (
-                                        <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                                          <span className="text-sm">👤</span>
-                                        </div>
-                                      )}
+                                      <img 
+                                        src={person.profile_path ? `${imageURL2}${person.profile_path}` : '/placeholder.jpg'}
+                                        alt={person.name}
+                                        className="w-full h-full object-cover"
+                                      />
                                     </div>
                                     <div>
                                       <p className="font-medium text-sm">{person.name}</p>
@@ -965,7 +928,7 @@ function Play() {
                                   <div className="flex items-center">
                                     {review.author_details?.rating && (
                                       <div className="mr-3 flex items-center">
-                                        <ColoredStarRating 
+                                        <StarRating 
                                           rating={review.author_details.rating} 
                                           size="small" 
                                           showDenominator={true}
@@ -1050,7 +1013,7 @@ function Play() {
                                 src={
                                   movie.backdrop_path
                                     ? imageURL2 + movie.backdrop_path
-                                    : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
+                                    : "/placeholder.jpg"
                                 }
                                 alt={movie.title || movie.name}
                                 loading="lazy"
@@ -1115,7 +1078,7 @@ function Play() {
                               
                               {/* Star rating with number */}
                               <div className="flex items-center mb-3">
-                                <ColoredStarRating rating={movie.vote_average} />
+                                <StarRating rating={movie.vote_average} />
                               </div>
                               
                               {/* Genres */}
@@ -1159,7 +1122,7 @@ function Play() {
                           src={
                             movie.backdrop_path
                               ? imageURL2 + movie.backdrop_path
-                              : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
+                              : "/placeholder.jpg"
                           }
                           alt={movie.title || movie.name}
                           loading="lazy"
@@ -1224,7 +1187,7 @@ function Play() {
                         
                         {/* Star rating with number */}
                         <div className="flex items-center mb-3">
-                          <ColoredStarRating rating={movie.vote_average} />
+                          <StarRating rating={movie.vote_average} />
                         </div>
                         
                         {/* Genres */}

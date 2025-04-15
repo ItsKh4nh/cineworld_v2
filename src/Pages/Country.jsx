@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "../axios";
 import { API_KEY } from "../config/constants";
@@ -9,7 +9,7 @@ import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 import useUpdateMyList from "../hooks/useUpdateMyList";
 import { RatingModalContext } from "../contexts/RatingModalContext";
-import ColoredStarRating from "../components/StarRating/ColoredStarRating";
+import StarRating from "../components/StarRating/StarRating";
 import MovieCard from "../components/Cards/MovieCard";
 
 function Country() {
@@ -22,7 +22,8 @@ function Country() {
   const { User } = useContext(AuthContext);
   const { handleMoviePopup, myListMovies } = useMoviePopup();
   const { convertGenre } = useGenresConverter();
-  const { addToMyList, removeFromMyList } = useUpdateMyList();
+  const myListUtils = useUpdateMyList();
+  const { PopupMessage, addToMyList, removeFromMyList } = myListUtils;
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const { openRatingModal } = useContext(RatingModalContext) || {};
@@ -93,6 +94,71 @@ function Country() {
         });
     }
   }, [countryCode, currentPage, myListMovies]);
+
+  // Handle movies being added to MyList via the rating modal
+  useEffect(() => {
+    const handleRatingModalClosed = (event) => {
+      const { movieId, success, action } = event.detail;
+      
+      if (success && (action === 'add' || action === 'update')) {
+        // Update the movies state to show that the movie is now in MyList
+        setMovies(prevMovies => 
+          prevMovies.map(movie => 
+            movie.id === movieId 
+              ? { ...movie, isInMyList: true } 
+              : movie
+          )
+        );
+      }
+    };
+    
+    // Add event listener
+    window.addEventListener('ratingModalClosed', handleRatingModalClosed);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('ratingModalClosed', handleRatingModalClosed);
+    };
+  }, []);
+
+  // Create wrapped versions of list functions to update UI state
+  const handleAddToMyList = useCallback((movie) => {
+    const result = addToMyList(movie);
+    
+    // When the result resolves, update the UI
+    result.then(success => {
+      if (success) {
+        setMovies(prevMovies => 
+          prevMovies.map(m => 
+            m.id === movie.id 
+              ? { ...m, isInMyList: true } 
+              : m
+          )
+        );
+      }
+    });
+    
+    return result;
+  }, [addToMyList]);
+
+  const handleRemoveFromMyList = useCallback((movie) => {
+    const result = removeFromMyList(movie);
+    
+    // When the result resolves, update the UI
+    result.then(success => {
+      if (success) {
+        setMovies(prevMovies => 
+          prevMovies.map(m => 
+            m.id === movie.id 
+              ? { ...m, isInMyList: false } 
+              : m
+          )
+        );
+      }
+    });
+    
+    return result;
+  }, [removeFromMyList]);
 
   // Handle page change
   const handlePageChange = (newPage) => {
@@ -181,6 +247,7 @@ function Country() {
 
   return (
     <div className="min-h-screen bg-black">
+      {PopupMessage}
       <div className="pt-24 pb-8 px-8">
         <h1 className="text-white text-4xl font-bold">{displayName} Movies</h1>
       </div>
@@ -197,8 +264,8 @@ function Country() {
               key={movie.id}
               movie={movie}
               handleMoviePopup={handleMoviePopup}
-              addToMyList={addToMyList}
-              removeFromMyList={removeFromMyList}
+              addToMyList={handleAddToMyList}
+              removeFromMyList={handleRemoveFromMyList}
               convertGenre={convertGenre}
             />
           ))

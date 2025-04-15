@@ -18,7 +18,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./RowPostStyles.scss";
-import ColoredStarRating from "../StarRating/ColoredStarRating";
+import StarRating from "../StarRating/StarRating";
 
 function RowPost(props) {
   const { User } = useContext(AuthContext);
@@ -29,23 +29,45 @@ function RowPost(props) {
   const { openRatingModal } = useContext(RatingModalContext) || {};
 
   const [movies, setMovies] = useState([]);
-  const [shouldPop, setShouldPop] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    if (props.movieData != null) {
+    // If movieData prop is provided, use that instead of fetching from URL
+    if (props.movieData) {
       setMovies(props.movieData);
-    } else {
-      axios.get(props.url).then((response) => {
-        console.log(response.data.results);
-        setMovies(response.data.results);
-      });
+      setIsLoading(false);
+      return;
     }
-  }, []);
+
+    // Otherwise, fetch movies from the URL
+    if (props.url) {
+      setIsLoading(true);
+      axios.get(props.url)
+        .then((response) => {
+          if (response.data && response.data.results) {
+            setMovies(response.data.results);
+          } else {
+            // Handle case when results array is missing
+            setMovies([]);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching movies:", error);
+          setIsError(true);
+          setMovies([]); // Set movies to empty array on error
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [props.url, props.movieData]);
 
   // Function to check if a movie is in the user's MyList
   const checkIfInMyList = (movie_id) => {
+    if (!myListMovies || !Array.isArray(myListMovies)) {
+      return false;
+    }
     return myListMovies.some(movie => movie.id === movie_id);
   };
 
@@ -82,22 +104,20 @@ function RowPost(props) {
     >
       {PopupMessage}
 
-      {movies[0] ? (
+      {movies && movies.length > 0 ? (
         <>
           <h1 className="text-white pb-4 xl:pb-0 font-normal text-base sm:text-2xl md:text-4xl">
             {props.title}
           </h1>
 
           <Swiper
-            {...customSettings}
-            modules={[Navigation, Pagination]}
-            spaceBetween={8}
+            navigation={true}
+            pagination={false}
+            modules={[Navigation]}
+            className="mySwiper SwiperStyle"
             slidesPerView={6.1}
-            navigation
-            pagination={{ clickable: true }}
-            onSlideChange={() => console.log("slide change")}
-            onSwiper={(swiper) => console.log(swiper)}
-            className="SwiperStyle"
+            spaceBetween={8}
+            breakpoints={customSettings.breakpoints}
           >
             {movies.map((obj, index) => {
               const converted = convertGenre(obj.genre_ids);
@@ -124,20 +144,45 @@ function RowPost(props) {
                         src={
                           obj.backdrop_path
                             ? `${imageURL2 + obj.backdrop_path}`
-                            : "https://i.ytimg.com/vi/Mwf--eGs05U/maxresdefault.jpg"
+                            : "/placeholder.jpg"
                         }
-                        onClick={() => handleMoviePopup({...obj, isInMyList})}
                       />
                     </>
                   )}
-                  <Fade direction="bottom" duration={300}>
-                    <div className="content pt-16">
-                      <div className="flex transition ml-3 ease-in-out delay-150">
+                  <div className="content pt-16">
+                    <div className="flex transition ml-3 ease-in-out delay-150">
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          playMovie(obj);
+                        }}
+                        className="text-white w-9 h-9 border-[2px] rounded-full flex items-center justify-center mr-1 backdrop-blur-[2px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-5 h-5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
+                          />
+                        </svg>
+                      </div>
+
+                      {isInMyList ? (
                         <div
-                          onClick={() => playMovie(obj)}
-                          onMouseEnter={() => setShouldPop(false)}
-                          onMouseLeave={() => setShouldPop(true)}
-                          className="text-white w-9 h-9 border-[2px] rounded-full flex items-center justify-center mr-1 backdrop-blur-[2px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (openRatingModal) {
+                              openRatingModal({...obj, isInMyList: true}, User);
+                            }
+                          }}
+                          className="bg-cineworldYellow text-white w-9 h-9 rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:bg-white hover:text-cineworldYellow"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -150,153 +195,72 @@ function RowPost(props) {
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
-                              d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
+                              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
                             />
                           </svg>
                         </div>
-
-                        {props.movieData != null ? (
-                          <>
-                            {isInMyList ? (
-                              <div
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (openRatingModal) {
-                                    openRatingModal(obj, User);
-                                  }
-                                }}
-                                onMouseEnter={() => setShouldPop(false)}
-                                onMouseLeave={() => setShouldPop(true)}
-                                className="bg-cineworldYellow text-white w-9 h-9 rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:bg-white hover:text-cineworldYellow"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={1.5}
-                                  stroke="currentColor"
-                                  className="w-5 h-5"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                                  />
-                                </svg>
-                              </div>
-                            ) : (
-                              <div
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  addToMyList({...obj, isInMyList: false});
-                                }}
-                                onMouseEnter={() => setShouldPop(false)}
-                                onMouseLeave={() => setShouldPop(true)}
-                                className="text-white w-9 h-9 border-[2px] rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={1.5}
-                                  stroke="currentColor"
-                                  className="w-5 h-5"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M12 4.5v15m7.5-7.5h-15"
-                                  />
-                                </svg>
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            {isInMyList ? (
-                              <div
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (openRatingModal) {
-                                    openRatingModal(obj, User);
-                                  }
-                                }}
-                                onMouseEnter={() => setShouldPop(false)}
-                                onMouseLeave={() => setShouldPop(true)}
-                                className="bg-cineworldYellow text-white w-9 h-9 rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:bg-white hover:text-cineworldYellow"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={1.5}
-                                  stroke="currentColor"
-                                  className="w-5 h-5"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                                  />
-                                </svg>
-                              </div>
-                            ) : (
-                              <div
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  addToMyList({...obj, isInMyList: false});
-                                }}
-                                onMouseEnter={() => setShouldPop(false)}
-                                onMouseLeave={() => setShouldPop(true)}
-                                className="text-white w-9 h-9 border-[2px] rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={1.5}
-                                  stroke="currentColor"
-                                  className="w-5 h-5"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M12 4.5v15m7.5-7.5h-15"
-                                  />
-                                </svg>
-                              </div>
-                            )}
-                          </>
-                        )}
-
-                        {/* Down arrow button removed */}
-                      </div>
-
-                      <h1 className="text-white ml-4 font-medium w-4/5 xl:line-clamp-1">
-                        {obj.name || obj.title}
-                      </h1>
-
-                      <h1 className="text-white text-xs font-semibold ml-4 w-11/12">
-                        {formatDate(obj.release_date || obj.first_air_date)}
-                      </h1>
-
-                      <div className="ml-4">
-                        <ColoredStarRating rating={obj.vote_average} />
-                      </div>
-
-                      {converted &&
-                        converted.map((genre, idx) => {
-                          return (
-                            <span
-                              key={`${obj.id}-${idx}`}
-                              className="hidden text-white ml-4 font-thin text-xs lg:inline"
-                            >
-                              {genre}
-                            </span>
-                          );
-                        })}
+                      ) : (
+                        <div
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            // Update the movies array with the updated isInMyList status
+                            const result = await addToMyList({...obj, isInMyList: false});
+                            if (result) {
+                              // If successful, update the movies state to reflect the change
+                              setMovies(prevMovies => 
+                                prevMovies.map(movie => 
+                                  movie.id === obj.id 
+                                    ? {...movie, isInMyList: true} 
+                                    : movie
+                                )
+                              );
+                            }
+                          }}
+                          className="text-white w-9 h-9 border-[2px] rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:text-black hover:bg-white"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 4.5v15m7.5-7.5h-15"
+                            />
+                          </svg>
+                        </div>
+                      )}
                     </div>
-                  </Fade>
+
+                    <h1 className="text-white ml-4 font-medium w-4/5 xl:line-clamp-1">
+                      {obj.name || obj.title}
+                    </h1>
+
+                    <h1 className="text-white text-xs font-semibold ml-4 w-11/12">
+                      {formatDate(obj.release_date || obj.first_air_date)}
+                    </h1>
+
+                    <div className="ml-4">
+                      <StarRating rating={obj.vote_average} />
+                    </div>
+
+                    {converted && Array.isArray(converted) && converted.length > 0 && (
+                      converted.map((genre, idx) => {
+                        return (
+                          <span
+                            key={`${obj.id}-${idx}`}
+                            className="hidden text-white ml-4 font-thin text-xs lg:inline"
+                          >
+                            {genre}
+                          </span>
+                        );
+                      })
+                    )}
+                  </div>
                 </SwiperSlide>
               );
             })}

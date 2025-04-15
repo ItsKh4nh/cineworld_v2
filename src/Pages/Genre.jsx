@@ -8,7 +8,7 @@ import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 import useUpdateMyList from "../hooks/useUpdateMyList";
 import { RatingModalContext } from "../contexts/RatingModalContext";
-import ColoredStarRating from "../components/StarRating/ColoredStarRating";
+import StarRating from "../components/StarRating/StarRating";
 import MovieCard from "../components/Cards/MovieCard";
 
 function Genre() {

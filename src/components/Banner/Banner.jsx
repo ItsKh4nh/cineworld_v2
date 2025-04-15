@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Fade } from "react-awesome-reveal";
-import StarRatings from "../StarRatings";
-import ColoredStarRating from "../StarRating/ColoredStarRating";
+import StarRating from "../StarRating/StarRating";
 
 import axios from "../../axios";
 import { imageURL } from "../../config/constants";
@@ -31,8 +30,9 @@ function Banner(props) {
 
   const [windowSize, setWindowSize] = useState(getWindowSize());
 
-  useEffect(() => {
-    axios.get(props.url).then((response) => {
+  const fetchMovies = async () => {
+    try {
+      const response = await axios.get(props.url);
       const randomMovie = response.data.results.sort(function (a, b) {
         return 0.5 - Math.random();
       })[0];
@@ -43,9 +43,13 @@ function Banner(props) {
         ...randomMovie,
         isInMyList
       });
+    } catch (error) {
+      // Handle error
+    }
+  };
 
-      console.log(movie);
-    });
+  useEffect(() => {
+    fetchMovies();
 
     function handleWindowResize() {
       setWindowSize(getWindowSize());
@@ -84,7 +88,7 @@ function Banner(props) {
               <div className="flex items-center">
                 <div className="flex justify-center sm:justify-start">
                   {movie.vote_average ? (
-                    <ColoredStarRating rating={movie.vote_average} size="large" showDenominator={true} />
+                    <StarRating rating={movie.vote_average} size="large" showDenominator={true} />
                   ) : null}
                 </div>
                 <div className="flex justify-center sm:justify-start ml-6">

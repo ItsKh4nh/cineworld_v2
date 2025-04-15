@@ -5,6 +5,7 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
   const [status, setStatus] = useState(movie.userRating?.status || "Plan to Watch");
   const [score, setScore] = useState(movie.userRating?.score || 5);
   const [note, setNote] = useState(movie.userRating?.note || "");
+  const [isSaving, setIsSaving] = useState(false);
   
   // Check if this is an update (movie already has a userRating)
   const isUpdating = Boolean(movie.userRating);
@@ -36,7 +37,11 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
     // as it will be ignored when saving anyway
   }, [status]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (isSaving) return; // Prevent multiple submissions
+    
+    setIsSaving(true);
+    
     // Preserve the original dateAdded if it exists
     const dateAdded = movie.userRating?.dateAdded || new Date().toISOString();
     
@@ -53,10 +58,41 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
     }
     
     // Make sure we keep all the movie properties including genres
-    onSave({
+    const movieWithRating = {
       ...movie,
       userRating,
-    });
+      isInMyList: true // Explicitly mark as in MyList
+    };
+    
+    let success = false;
+    let error = null;
+    
+    try {
+      // Save the movie and await the result
+      const result = await onSave(movieWithRating);
+      success = result === true;
+    } catch (err) {
+      console.error("Error saving movie rating:", err);
+      error = err.message || "Unknown error";
+      success = false;
+    } finally {
+      // Always dispatch a custom event to notify listeners that a movie was added/updated
+      window.dispatchEvent(
+        new CustomEvent('ratingModalClosed', {
+          detail: {
+            movieId: movie.id,
+            success,
+            action: isUpdating ? 'update' : 'add',
+            error
+          }
+        })
+      );
+      
+      setIsSaving(false);
+    }
+    
+    // Return the success status
+    return success;
   };
 
   return (
@@ -159,15 +195,17 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
           <button
             onClick={onClose}
             className="mr-2 px-4 py-2 text-white bg-gray-700 rounded hover:bg-gray-600 transition-colors"
+            disabled={isSaving}
           >
             Cancel
           </button>
           
           <button
             onClick={handleSave}
-            className="px-4 py-2 text-white bg-red-700 rounded hover:bg-red-600 transition-colors"
+            className={`px-4 py-2 text-white ${isSaving ? 'bg-gray-500' : 'bg-red-700 hover:bg-red-600'} rounded transition-colors`}
+            disabled={isSaving}
           >
-            {isUpdating ? "Save" : "Add"}
+            {isSaving ? 'Saving...' : (isUpdating ? 'Save' : 'Add')}
           </button>
         </div>
       </div>

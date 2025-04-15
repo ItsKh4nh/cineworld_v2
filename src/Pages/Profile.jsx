@@ -1,6 +1,4 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-
-import { signOut, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import {
   getDownloadURL,
   getStorage,
@@ -10,15 +8,24 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 import { AuthContext } from "../contexts/UserContext";
 import WelcomePageBanner from "/WelcomePageBanner.jpg";
-import { auth } from "../firebase/FirebaseConfig";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+
+// Utilities
+import { 
+  signOutUser, 
+  updateUserName, 
+  updateProfilePicture, 
+  changeUserPassword, 
+  isGoogleAuthUser 
+} from "../utils";
+import { showSuccessToast, showErrorToast } from "../utils";
 
 function Profile() {
   const { User } = useContext(AuthContext);
@@ -57,22 +64,15 @@ function Profile() {
         setProfilePic(randomAvatar);
         
         // Update the user's profile with the random avatar
-        updateProfile(auth.currentUser, {
-          photoURL: randomAvatar
-        }).catch(error => {
+        updateProfilePicture(randomAvatar).catch(error => {
           console.error("Error setting default avatar:", error);
         });
       } else {
-      setProfilePic(User.photoURL);
-    }
+        setProfilePic(User.photoURL);
+      }
       
       // Check if user is signed in with Google
-      if (User.providerData && User.providerData.length > 0) {
-        const isGoogle = User.providerData.some(
-          (provider) => provider.providerId === "google.com"
-        );
-        setIsGoogleAccount(isGoogle);
-      }
+      setIsGoogleAccount(isGoogleAuthUser(User));
     }
   }, [User]);
 
@@ -88,10 +88,6 @@ function Profile() {
     inputRef.current.click();
   };
 
-  function notify(message) {
-    toast.success(message);
-  }
-
   const handleFileChange = (event) => {
     const fileObj = event.target.files[0];
     setNewProfilePic(fileObj);
@@ -99,7 +95,6 @@ function Profile() {
     if (!fileObj) {
       return;
     }
-    console.log("fileObj is", fileObj);
     event.target.value = null;
   };
 
@@ -107,15 +102,17 @@ function Profile() {
     setChangeUsernameLoading(true);
 
     try {
-      await updateProfile(auth.currentUser, {
-        displayName: userName,
-      });
-      notify("Username updated successfully");
-      setChangeUsernameLoading(false);
+      const success = await updateUserName(userName);
+      if (success) {
+        toast.success("Username updated successfully");
+      } else {
+        toast.error("Failed to update username");
+      }
     } catch (error) {
       console.error("Error updating username:", error);
-      setChangeUsernameLoading(false);
       toast.error("Failed to update username");
+    } finally {
+      setChangeUsernameLoading(false);
     }
   };
 
@@ -123,18 +120,20 @@ function Profile() {
     setChangeProfilePictureLoading(true);
 
     try {
-      await updateProfile(auth.currentUser, {
-        photoURL: newProfilePicURL,
-      });
-      setProfilePic(newProfilePicURL);
-      setNewProfilePicURL("");
-      setNewProfilePic("");
-      notify("Profile picture updated successfully");
-      setChangeProfilePictureLoading(false);
+      const success = await updateProfilePicture(newProfilePicURL);
+      if (success) {
+        setProfilePic(newProfilePicURL);
+        setNewProfilePicURL("");
+        setNewProfilePic("");
+        toast.success("Profile picture updated successfully");
+      } else {
+        toast.error("Failed to update profile picture");
+      }
     } catch (error) {
       console.error("Error updating profile picture:", error);
-      setChangeProfilePictureLoading(false);
       toast.error("Failed to update profile picture");
+    } finally {
+      setChangeProfilePictureLoading(false);
     }
   };
 
@@ -162,29 +161,17 @@ function Profile() {
     setChangePasswordLoading(true);
 
     try {
-      // Reauthenticate user before changing password
-      const credential = EmailAuthProvider.credential(
-        User.email, 
-        currentPassword
-      );
+      const result = await changeUserPassword(currentPassword, newPassword);
       
-      await reauthenticateWithCredential(User, credential);
-      
-      // Update password
-      await updatePassword(User, newPassword);
-      
-      // Clear fields and show success
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setShowPasswordFields(false);
-      notify("Password updated successfully");
-    } catch (error) {
-      console.error("Error updating password:", error);
-      if (error.code === "auth/wrong-password") {
-        setPasswordError("Current password is incorrect");
+      if (result.success) {
+        // Clear fields and show success
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setShowPasswordFields(false);
+        toast.success("Password updated successfully");
       } else {
-        setPasswordError("Failed to update password. Try signing in again.");
+        setPasswordError(result.error);
       }
     } finally {
       setChangePasswordLoading(false);
@@ -192,14 +179,7 @@ function Profile() {
   };
 
   const SignOut = () => {
-    signOut(auth)
-      .then(() => {
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("Error signing out:", error);
-        toast.error("Failed to sign out");
-      });
+    signOutUser(navigate);
   };
 
   return (
@@ -210,17 +190,6 @@ function Profile() {
           backgroundImage: `linear-gradient(0deg, hsl(0deg 0% 0% / 73%) 0%, hsl(0deg 0% 0% / 73%) 35%), url(${WelcomePageBanner})`,
         }}
       >
-        {IsMyListUpdated ? (
-          <Toaster
-            toastOptions={{
-              style: {
-                padding: "1rem",
-                backgroundColor: "#f4fff4",
-                borderLeft: "6px solid green",
-              },
-            }}
-          />
-        ) : null}
         <Fade>
           <div className="max-w-3xl mx-auto bg-[#000000bf] p-5 md:p-8 rounded-md">
             <h1 className="text-4xl text-white font-bold mb-6">

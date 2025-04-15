@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import axios from "../axios";
@@ -6,7 +6,7 @@ import { searchMovie, searchPerson } from "../config/URLs";
 import { imageURL2 } from "../config/constants";
 import { AuthContext } from "../contexts/UserContext";
 
-import ColoredStarRating from "../components/StarRating/ColoredStarRating";
+import StarRating from "../components/StarRating/StarRating";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 import useUpdateMyList from "../hooks/useUpdateMyList";
@@ -19,7 +19,8 @@ function Search() {
   const { User } = useContext(AuthContext);
   const { handleMoviePopup, myListMovies } = useMoviePopup();
   const { convertGenre } = useGenresConverter();
-  const { addToMyList, removeFromMyList } = useUpdateMyList();
+  const myListUtils = useUpdateMyList();
+  const { PopupMessage, addToMyList, removeFromMyList } = myListUtils;
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchType, setSearchType] = useState("movie"); // 'movie' or 'person'
@@ -97,8 +98,74 @@ function Search() {
     navigate(`/people/${person.id}`);
   };
 
+  // Handle movies being added to MyList via the rating modal
+  useEffect(() => {
+    const handleRatingModalClosed = (event) => {
+      const { movieId, success, action } = event.detail;
+      
+      if (success && (action === 'add' || action === 'update')) {
+        // Update the searchResults to show that the movie is now in MyList
+        setSearchResults(prevResults => 
+          prevResults.map(movie => 
+            movie.id === movieId 
+              ? { ...movie, isInMyList: true } 
+              : movie
+          )
+        );
+      }
+    };
+    
+    // Add event listener
+    window.addEventListener('ratingModalClosed', handleRatingModalClosed);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('ratingModalClosed', handleRatingModalClosed);
+    };
+  }, []);
+
+  // Create wrapped versions of list functions to update UI state
+  const handleAddToMyList = useCallback((movie) => {
+    const result = addToMyList(movie);
+    
+    // When the result resolves, update the UI
+    result.then(success => {
+      if (success) {
+        setSearchResults(prevResults => 
+          prevResults.map(m => 
+            m.id === movie.id 
+              ? { ...m, isInMyList: true } 
+              : m
+          )
+        );
+      }
+    });
+    
+    return result;
+  }, [addToMyList]);
+
+  const handleRemoveFromMyList = useCallback((movie) => {
+    const result = removeFromMyList(movie);
+    
+    // When the result resolves, update the UI
+    result.then(success => {
+      if (success) {
+        setSearchResults(prevResults => 
+          prevResults.map(m => 
+            m.id === movie.id 
+              ? { ...m, isInMyList: false } 
+              : m
+          )
+        );
+      }
+    });
+    
+    return result;
+  }, [removeFromMyList]);
+
   return (
     <div className="min-h-screen bg-black">
+      {PopupMessage}
       <div className="pt-20 pb-8 px-4 md:px-8">
         {/* Search controls with toggle */}
         <div className="max-w-3xl mx-auto">
@@ -168,8 +235,8 @@ function Search() {
                   key={movie.id}
                   movie={movie}
                   handleMoviePopup={handleMoviePopup}
-                  addToMyList={addToMyList}
-                  removeFromMyList={removeFromMyList}
+                  addToMyList={handleAddToMyList}
+                  removeFromMyList={handleRemoveFromMyList}
                   convertGenre={convertGenre}
                 />
               ))

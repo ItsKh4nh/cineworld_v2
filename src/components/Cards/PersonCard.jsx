@@ -5,7 +5,7 @@ const PersonCard = ({ person, handlePersonClick }) => {
   return (
     <div 
       key={person.id} 
-      className="cursor-pointer bg-zinc-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-red-600 transition duration-200"
+      className="cursor-pointer bg-zinc-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-cineworldYellow transition duration-200"
       onClick={() => handlePersonClick(person)}
     >
       {/* Person profile image */}
@@ -18,7 +18,12 @@ const PersonCard = ({ person, handlePersonClick }) => {
         />
       ) : (
         <div className="w-full h-48 bg-gray-800 flex items-center justify-center">
-          <span className="text-gray-400">No Image</span>
+          <img 
+            src="/placeholder.jpg" 
+            alt={person.name} 
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
         </div>
       )}
       

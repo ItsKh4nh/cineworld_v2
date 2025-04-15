@@ -12,6 +12,7 @@ function usePeopleList() {
   const showSignInPrompt = () => {
     toast.error("Please login to add people to your list", {
       duration: 3000,
+      position: 'top-center',
       onClick: () => navigate("/signin")
     });
   };
@@ -65,7 +66,7 @@ function usePeopleList() {
         
         // Check if person already exists
         if (people.some(p => p.id === personData.id)) {
-          toast.error("This person is already in your list", { id: `person-exists-${person.id}` });
+          // Return false but don't show toast - handleListAction will handle this
           return false;
         }
         
@@ -81,11 +82,10 @@ function usePeopleList() {
         });
       }
       
-      // We don't show toast here to avoid duplication, as the caller will display their own toast
       return true;
     } catch (error) {
       console.error("Error adding person to list:", error);
-      toast.error("Failed to add person to list", { id: `person-error-${person.id}` });
+      // Don't show toast here - let handleListAction handle errors
       return false;
     }
   };
@@ -112,14 +112,13 @@ function usePeopleList() {
           lastUpdated: new Date().toISOString() 
         });
         
-        // Don't show toast here as the confirmation modal already gives feedback
         return true;
       }
       
       return false;
     } catch (error) {
       console.error("Error removing person from list:", error);
-      toast.error("Failed to remove person from list");
+      // Don't show toast here - let handleListAction handle errors
       return false;
     }
   };

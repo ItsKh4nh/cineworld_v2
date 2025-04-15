@@ -4,17 +4,17 @@ import axios from "../axios";
 import { 
   personDetails, 
   personMovieCredits, 
-  personExternalIds} from "../config/URLs";
-import { imageURL, imageURL2 } from "../config/constants";
-import Navbar from "../components/Header/Navbar";
+  personExternalIds
+} from "../config";
+import { imageURL, imageURL2 } from "../config";
 import Footer from "../components/Footer/Footer";
 import { ClipLoader } from "react-spinners";
 import { FaImdb, FaFacebook, FaInstagram, FaTwitter, FaPlus, FaMinus } from "react-icons/fa";
-import ColoredStarRating from "../components/StarRating/ColoredStarRating";
+import StarRating from "../components/StarRating/StarRating";
 import useMoviePopup from "../hooks/useMoviePopup";
 import usePeopleList from "../hooks/usePeopleList";
 import ConfirmationModal from "../components/Modals/ConfirmationModal";
-import toast, { Toaster } from "react-hot-toast";
+import { formatDate, calculateAge, handleListAction } from "../utils";
 
 function People() {
   // State variables
@@ -33,33 +33,6 @@ function People() {
   const navigate = useNavigate();
   const { handleMoviePopup } = useMoviePopup();
   const { isPersonInList, addPersonToList, removePersonFromList } = usePeopleList();
-
-  // Helper functions
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const calculateAge = (birthday, deathday) => {
-    if (!birthday) return "N/A";
-    
-    const birthDate = new Date(birthday);
-    let endDate = deathday ? new Date(deathday) : new Date();
-    
-    let age = endDate.getFullYear() - birthDate.getFullYear();
-    const monthDiff = endDate.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && endDate.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    
-    return age;
-  };
 
   // Check if person is in list
   const checkPersonInList = async () => {
@@ -83,78 +56,34 @@ function People() {
 
   // Add person to list
   const confirmAddToList = async () => {
-    try {
-      // Close the modal first
-      setShowConfirmModal(false);
-      
-      // Generate a unique toast ID based on person ID and action
-      const toastId = `add-person-${person.id}`;
-      
-      // Start loading toast
-      toast.loading(`Adding ${person.name} to your list...`, { id: toastId });
-      
-      const success = await addPersonToList(person);
-      
-      // Update the toast based on the result
-      if (success) {
-        setIsInList(true);
-        toast.success(`${person.name} added to MyList`, { 
-          id: toastId,
-          duration: 2000 
-        });
-      } else {
-        toast.error(`Failed to add ${person.name} to your list`, { 
-          id: toastId,
-          duration: 2000 
-        });
-      }
-    } catch (error) {
-      console.error("Error adding person to list:", error);
-      // Use a unique toast ID for the error case
-      const errorToastId = `error-add-person-${person.id}`;
-      toast.error(`Error: ${error.message || "Failed to add to list"}`, {
-        id: errorToastId,
-        duration: 2000
-      });
-    }
+    setShowConfirmModal(false);
+    
+    // Create a unique toast ID to prevent duplicates
+    const toastId = `add-person-${person.id}`;
+    
+    await handleListAction(
+      addPersonToList, 
+      person, 
+      "add", 
+      () => setIsInList(true),
+      toastId
+    );
   };
 
   // Remove person from list
   const confirmRemoveFromList = async () => {
-    try {
-      // Close the modal first
-      setShowConfirmModal(false);
-      
-      // Generate a unique toast ID based on person ID and action
-      const toastId = `remove-person-${person.id}`;
-      
-      // Start loading toast
-      toast.loading(`Removing ${person.name} from your list...`, { id: toastId });
-      
-      const success = await removePersonFromList(person);
-      
-      // Update the toast based on the result
-      if (success) {
-        setIsInList(false);
-        toast.success(`${person.name} removed from your list`, { 
-          id: toastId,
-          duration: 2000 
-        });
-      } else {
-        toast.error(`Failed to remove ${person.name} from your list`, { 
-          id: toastId,
-          duration: 2000 
-        });
-      }
-    } catch (error) {
-      console.error("Error removing person from list:", error);
-      // Use a unique toast ID for the error case
-      const errorToastId = `error-remove-person-${person.id}`;
-      toast.error(`Error: ${error.message || "Failed to remove from list"}`, {
-        id: errorToastId,
-        duration: 2000
-      });
-    }
+    setShowConfirmModal(false);
+    
+    // Create a unique toast ID to prevent duplicates
+    const toastId = `remove-person-${person.id}`;
+    
+    await handleListAction(
+      removePersonFromList, 
+      person, 
+      "remove", 
+      () => setIsInList(false),
+      toastId
+    );
   };
 
   // Data fetching
@@ -201,9 +130,6 @@ function People() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Navbar />
-      <Toaster position="bottom-center" />
-
       {loading ? (
         <div className="flex flex-col items-center justify-center min-h-screen">
           <ClipLoader color="#E50914" size={60} />
@@ -215,7 +141,7 @@ function People() {
           <div 
             className="relative w-full h-[40vh] md:h-[50vh] bg-cover bg-center"
             style={{
-              backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url(${imageURL}${person.profile_path})`,
+              backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url(${person.profile_path ? imageURL + person.profile_path : '/placeholder.jpg'})`,
               backgroundPosition: 'center 20%',
             }}
           >
@@ -258,7 +184,7 @@ function People() {
               <div>
                 <div className="mb-6">
                   <img
-                    src={`${imageURL2}${person.profile_path}`}
+                    src={person.profile_path ? `${imageURL2}${person.profile_path}` : '/placeholder.jpg'}
                     alt={person.name}
                     className="w-full rounded-lg shadow-lg"
                   />
@@ -451,11 +377,19 @@ function People() {
                                 >
                                   {/* Movie poster */}
                                   <div className="relative">
-                                    <img
-                                      src={`${imageURL2}${movie.poster_path}`}
-                                      alt={movie.title}
-                                      className="w-full aspect-[2/3] object-cover"
-                                    />
+                                    {movie.poster_path ? (
+                                      <img
+                                        src={`${imageURL2}${movie.poster_path}`}
+                                        alt={movie.title}
+                                        className="w-full aspect-[2/3] object-cover"
+                                      />
+                                    ) : (
+                                      <img
+                                        src="/placeholderVertical.jpg"
+                                        alt={movie.title}
+                                        className="w-full aspect-[2/3] object-cover"
+                                      />
+                                    )}
                                   </div>
                                   
                                   {/* Movie details */}
@@ -476,7 +410,7 @@ function People() {
 
                                     {/* Rating/Score */}
                                     <div className="mb-2">
-                                      <ColoredStarRating rating={movie.vote_average} size="small" showDenominator={false} />
+                                      <StarRating rating={movie.vote_average} size="small" showDenominator={false} />
                                     </div>
                                     
                                     {/* Character or Job */}
@@ -527,7 +461,11 @@ function People() {
                                       />
                                     ) : (
                                       <div className="bg-gray-800 w-full h-full flex items-center justify-center text-gray-500">
-                                        No Image
+                                        <img 
+                                          src="/placeholderVertical.jpg" 
+                                          alt={movie.title}
+                                          className="w-full h-full object-cover"
+                                        />
                                       </div>
                                     )}
                                   </div>
@@ -541,7 +479,7 @@ function People() {
                                     </p>
                                   </div>
                                   <div className="p-4 flex-shrink-0 hidden md:flex items-center">
-                                    <ColoredStarRating rating={movie.vote_average} size="large" />
+                                    <StarRating rating={movie.vote_average} size="large" />
                                   </div>
                                 </div>
                               ))}
@@ -583,7 +521,11 @@ function People() {
                                             />
                                           ) : (
                                             <div className="bg-gray-800 w-full h-full flex items-center justify-center text-gray-500">
-                                              No Image
+                                              <img 
+                                                src="/placeholderVertical.jpg" 
+                                                alt={movie.title}
+                                                className="w-full h-full object-cover"
+                                              />
                                             </div>
                                           )}
                                         </div>
@@ -597,7 +539,7 @@ function People() {
                                           </p>
                                         </div>
                                         <div className="p-4 flex-shrink-0 hidden md:flex items-center">
-                                          <ColoredStarRating rating={movie.vote_average} size="large" />
+                                          <StarRating rating={movie.vote_average} size="large" />
                                         </div>
                                       </div>
                                     ))}
@@ -621,11 +563,19 @@ function People() {
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                             {person.images.profiles.map((image, index) => (
                               <div key={index} className="aspect-[2/3] rounded-lg overflow-hidden">
-                                <img 
-                                  src={`${imageURL2}${image.file_path}`}
-                                  alt={`${person.name} profile ${index+1}`}
-                                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                                />
+                                {image.file_path ? (
+                                  <img 
+                                    src={`${imageURL2}${image.file_path}`}
+                                    alt={`${person.name} profile ${index+1}`}
+                                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                                  />
+                                ) : (
+                                  <img 
+                                    src="/placeholder.jpg"
+                                    alt={`${person.name} profile ${index+1}`}
+                                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                                  />
+                                )}
                               </div>
                             ))}
                           </div>

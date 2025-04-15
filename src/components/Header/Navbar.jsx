@@ -8,8 +8,56 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../contexts/UserContext";
 import { genresList } from "../../config/constants";
 import { auth } from "../../firebase/FirebaseConfig";
-import GuestModeBanner from "../GuestModeBanner/GuestModeBanner";
 import useHasInteractions from "../../hooks/useHasInteractions";
+
+// Add CSS for the glowing recommendation link and sparkle animation
+const recommendationGlowStyle = `
+  @keyframes glowingEffect {
+    0% {
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.2), 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+    50% {
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+    100% {
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.2), 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+  }
+  
+  @keyframes sparkle {
+    0% {
+      transform: scale(0.8) rotate(0deg);
+      opacity: 0.6;
+    }
+    50% {
+      transform: scale(1.2) rotate(10deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.8) rotate(0deg);
+      opacity: 0.6;
+    }
+  }
+  
+  .recommendation-glow {
+    color: #FFBB00;
+    animation: glowingEffect 3s ease-in-out infinite;
+    font-weight: 500;
+  }
+  
+  .recommendation-glow:hover {
+    color: #FFDD00;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+
+  .sparkle-icon {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    color: #FFDD00;
+    animation: sparkle 2s ease-in-out infinite;
+  }
+`;
 
 function Navbar(props) {
   const { User, isGuestMode, disableGuestMode } = useContext(AuthContext);
@@ -114,7 +162,7 @@ function Navbar(props) {
           : "fixed top-0 z-50 w-full"
       }
     >
-      <GuestModeBanner message="" />
+      <style>{recommendationGlowStyle}</style>
       <Fade>
         <nav
           className={`transition duration-500 ease-in-out  ${
@@ -140,9 +188,17 @@ function Navbar(props) {
                     {hasInteractions && (
                       <Link
                         to={"/recommendations"}
-                        className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-cineworldYellow lg:px-3 text-m"
+                        className="py-2 font-medium text-white transition ease-in-out rounded-md cursor-pointer lg:px-3 text-m recommendation-glow relative"
                       >
                         Recommendations
+                        <svg 
+                          className="sparkle-icon w-4 h-4" 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          viewBox="0 0 24 24" 
+                          fill="currentColor"
+                        >
+                          <path fillRule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5z" clipRule="evenodd" />
+                        </svg>
                       </Link>
                     )}
 
@@ -242,7 +298,7 @@ function Navbar(props) {
                   <Link to={"/search"}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="items-center w-10 h-10 pr-4 mt-auto mb-auto text-white hover:text-red-800 cursor-pointer"
+                      className="items-center w-10 h-10 pr-4 mt-auto mb-auto text-white hover:text-cineworldYellow cursor-pointer"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -368,7 +424,7 @@ function Navbar(props) {
                   {hasInteractions && (
                     <Link
                       to={"/recommendations"}
-                      className="block px-3 py-2 text-base font-medium text-white hover:text-cineworldYellow"
+                      className="block px-3 py-2 text-base font-medium recommendation-glow"
                     >
                       Recommendations
                     </Link>

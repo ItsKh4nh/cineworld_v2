@@ -99,7 +99,7 @@ export const RatingModalProvider = ({ children }) => {
   const addRatedMovieToList = async (ratedMovie) => {
     if (!user) {
       toast.error("User not authenticated");
-      return;
+      return false;
     }
 
     console.log("Adding rated movie to list:", ratedMovie);
@@ -107,7 +107,7 @@ export const RatingModalProvider = ({ children }) => {
     
     try {
       // Convert genres array to genre_ids if needed
-      let movieToSave = { ...ratedMovie };
+      let movieToSave = { ...ratedMovie, isInMyList: true };
       
       // If movie has genres array of objects but not genre_ids, convert it
       if (movieToSave.genres && Array.isArray(movieToSave.genres) && !movieToSave.genre_ids) {
@@ -133,7 +133,8 @@ export const RatingModalProvider = ({ children }) => {
           filteredMovies.push({
             ...movieToSave,
             // Ensure these properties are copied if they exist
-            genre_ids: movieToSave.genre_ids || existingMovie.genre_ids
+            genre_ids: movieToSave.genre_ids || existingMovie.genre_ids,
+            isInMyList: true // Explicitly mark as in MyList
           });
           
           // Update the document with the new array
@@ -151,19 +152,21 @@ export const RatingModalProvider = ({ children }) => {
       } else {
         // Document doesn't exist, create it with the movie
         // Create a new array instead of using arrayUnion
-        await updateDoc(userDocRef, { movies: [movieToSave] });
+        await setDoc(userDocRef, { movies: [movieToSave] });
         console.log("Rated movie added to MyList");
         toast.success("Movie added to MyList");
       }
       
       // Track the movie interaction
-      trackMovieInteraction(movieToSave.id);
+      await trackMovieInteraction(movieToSave.id);
       
       closeRatingModal();
+      return true; // Return true to indicate success to any calling component
     } catch (error) {
       console.log(error.code);
       console.log(error.message);
       toast.error(error.message);
+      return false; // Return false to indicate failure
     }
   };
 
