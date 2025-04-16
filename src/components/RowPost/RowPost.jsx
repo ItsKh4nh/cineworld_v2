@@ -127,7 +127,7 @@ function RowPost(props) {
                 <SwiperSlide
                   key={obj.id}
                   className={props.islarge ? "large" : "bg-cover"}
-                  onClick={() => handleMoviePopup({...obj, isInMyList})}
+                  onClick={() => handleMoviePopup({ ...obj, isInMyList })}
                 >
                   {props.islarge ? (
                     <>
@@ -179,7 +179,7 @@ function RowPost(props) {
                           onClick={(e) => {
                             e.stopPropagation();
                             if (openRatingModal) {
-                              openRatingModal({...obj, isInMyList: true}, User);
+                              openRatingModal({ ...obj, isInMyList: true }, User);
                             }
                           }}
                           className="bg-cineworldYellow text-white w-9 h-9 rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:bg-white hover:text-cineworldYellow"
@@ -204,13 +204,13 @@ function RowPost(props) {
                           onClick={async (e) => {
                             e.stopPropagation();
                             // Update the movies array with the updated isInMyList status
-                            const result = await addToMyList({...obj, isInMyList: false});
+                            const result = await addToMyList({ ...obj, isInMyList: false });
                             if (result) {
                               // If successful, update the movies state to reflect the change
-                              setMovies(prevMovies => 
-                                prevMovies.map(movie => 
-                                  movie.id === obj.id 
-                                    ? {...movie, isInMyList: true} 
+                              setMovies(prevMovies =>
+                                prevMovies.map(movie =>
+                                  movie.id === obj.id
+                                    ? { ...movie, isInMyList: true }
                                     : movie
                                 )
                               );

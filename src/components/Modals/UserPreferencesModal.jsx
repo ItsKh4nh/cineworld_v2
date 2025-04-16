@@ -31,13 +31,13 @@ function UserPreferencesModal({ user, onClose }) {
   // Handle search for movies or people
   const handleSearch = async () => {
     if (!searchQuery.trim() || searchQuery.trim().length < 2) return;
-    
+
     setIsSearching(true);
     try {
       if (searchType === "movie") {
         // For movies, first search to get movie IDs
         const searchResponse = await axios.get(searchMovie(searchQuery));
-        
+
         // Then filter the results client-side to remove future releases
         const currentDate = new Date();
         const filteredResults = searchResponse.data.results.filter(movie => {
@@ -45,7 +45,7 @@ function UserPreferencesModal({ user, onClose }) {
           const releaseDate = new Date(movie.release_date);
           return releaseDate <= currentDate;
         });
-        
+
         setSearchResults(filteredResults);
       } else {
         // For people, keep using the search/person endpoint
@@ -115,7 +115,7 @@ function UserPreferencesModal({ user, onClose }) {
       const myListRef = doc(db, "MyList", user.uid);
       const myListDoc = await getDoc(myListRef);
       const currentData = myListDoc.exists() ? myListDoc.data() : {};
-      
+
       // Add movies to MyList with ratings if provided
       const currentMovies = currentData.movies || [];
       const moviesWithRatings = selectedMovies.map(movie => {
@@ -123,23 +123,23 @@ function UserPreferencesModal({ user, onClose }) {
           status: "Completed",
           dateAdded: new Date().toISOString()
         };
-        
+
         // Use provided rating or default to 10
         userRating.score = movieRatings[movie.id] || 10;
-        
+
         return {
           ...movie,
           userRating
         };
       });
-      
+
       // Add people to MyList
       const currentPeople = currentData.people || [];
       const peopleWithDateAdded = selectedPeople.map(person => ({
         ...person,
         dateAdded: new Date().toISOString()
       }));
-      
+
       // Update MyList with all preferences
       await setDoc(myListRef, {
         ...currentData,
@@ -152,18 +152,18 @@ function UserPreferencesModal({ user, onClose }) {
       // Add movies to InteractionList
       const interactionListRef = doc(db, "InteractionList", user.uid);
       const interactionDoc = await getDoc(interactionListRef);
-      
+
       if (interactionDoc.exists()) {
         // Get existing movie IDs
         const existingData = interactionDoc.data();
         const existingMovieIds = existingData.movie_ids || [];
-        
+
         // Get IDs of newly selected movies
         const newMovieIds = selectedMovies.map(movie => movie.id);
-        
+
         // Create a merged array of unique movie IDs
         const uniqueMovieIds = Array.from(new Set([...existingMovieIds, ...newMovieIds]));
-        
+
         // Update the InteractionList
         await updateDoc(interactionListRef, {
           movie_ids: uniqueMovieIds,
@@ -269,7 +269,7 @@ function UserPreferencesModal({ user, onClose }) {
             <h3 className="text-xl font-semibold text-white mb-4">
               Add Movies You've Watched
             </h3>
-            
+
             <div className="flex mb-4">
               <input
                 type="text"
@@ -284,7 +284,7 @@ function UserPreferencesModal({ user, onClose }) {
                 </div>
               )}
             </div>
-            
+
             {/* Split layout: 2/3 for search results, 1/3 for selected items */}
             <div className="flex flex-col md:flex-row gap-4">
               {/* Search Results - 2/3 width */}
@@ -294,17 +294,16 @@ function UserPreferencesModal({ user, onClose }) {
                     <h4 className="text-lg font-medium text-white mb-2">Search Results</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto max-h-[50vh]">
                       {searchResults.map((movie) => (
-                        <div 
-                          key={movie.id} 
-                          className={`bg-gray-800 rounded p-2 cursor-pointer transition-all ${
-                            selectedMovies.some(m => m.id === movie.id) ? 'ring-2 ring-red-600' : ''
-                          }`}
+                        <div
+                          key={movie.id}
+                          className={`bg-gray-800 rounded p-2 cursor-pointer transition-all ${selectedMovies.some(m => m.id === movie.id) ? 'ring-2 ring-red-600' : ''
+                            }`}
                           onClick={() => handleSelectMovie(movie)}
                         >
                           {movie.poster_path ? (
-                            <img 
-                              src={imageURL2 + movie.poster_path} 
-                              alt={movie.title} 
+                            <img
+                              src={imageURL2 + movie.poster_path}
+                              alt={movie.title}
                               className="w-full h-36 object-cover rounded mb-2"
                             />
                           ) : (
@@ -326,16 +325,16 @@ function UserPreferencesModal({ user, onClose }) {
                 ) : (
                   <div className="bg-gray-800 rounded p-4 text-center h-40 flex items-center justify-center">
                     <p className="text-gray-400">
-                      {searchQuery.length < 2 
-                        ? "Type at least 2 characters to search" 
-                        : isSearching 
-                          ? "Searching..." 
+                      {searchQuery.length < 2
+                        ? "Type at least 2 characters to search"
+                        : isSearching
+                          ? "Searching..."
                           : "No results found. Try a different search term."}
                     </p>
                   </div>
                 )}
               </div>
-              
+
               {/* Selected Movies - 1/3 width */}
               <div className="md:w-1/3 bg-gray-800 rounded-lg p-4 border border-gray-700">
                 <h4 className="text-lg font-medium text-white mb-2 flex items-center">
@@ -344,7 +343,7 @@ function UserPreferencesModal({ user, onClose }) {
                     {selectedMovies.length}
                   </span>
                 </h4>
-                
+
                 {selectedMovies.length === 0 ? (
                   <div className="text-center py-8 text-gray-400">
                     <p>No movies selected yet.</p>
@@ -356,11 +355,11 @@ function UserPreferencesModal({ user, onClose }) {
                       <div key={movie.id} className="bg-gray-700 rounded p-2 relative flex">
                         <button class="absolute top-1 right-1 bg-red-600 text-white text-sm rounded-full w-5 h-5 grid place-items-center leading-none">×</button>
 
-                        
+
                         {movie.poster_path ? (
-                          <img 
-                            src={imageURL2 + movie.poster_path} 
-                            alt={movie.title} 
+                          <img
+                            src={imageURL2 + movie.poster_path}
+                            alt={movie.title}
                             className="w-16 h-24 object-cover rounded mr-2 flex-shrink-0"
                           />
                         ) : (
@@ -368,13 +367,13 @@ function UserPreferencesModal({ user, onClose }) {
                             <span className="text-gray-400 text-xs">No Image</span>
                           </div>
                         )}
-                        
+
                         <div className="flex-grow">
                           <h5 className="text-white text-sm font-medium line-clamp-1">{movie.title}</h5>
                           <p className="text-gray-400 text-xs mb-1">
                             {movie.release_date ? movie.release_date.substring(0, 4) : "N/A"}
                           </p>
-                          
+
                           <div className="mt-1">
                             <label className="block text-white text-xs font-medium mb-1">
                               Your Rating:
@@ -412,7 +411,7 @@ function UserPreferencesModal({ user, onClose }) {
             <h3 className="text-xl font-semibold text-white mb-4">
               Add Your Favorite Actors, Directors, etc.
             </h3>
-            
+
             <div className="flex mb-4">
               <input
                 type="text"
@@ -430,7 +429,7 @@ function UserPreferencesModal({ user, onClose }) {
                 </div>
               )}
             </div>
-            
+
             {/* Split layout: 2/3 for search results, 1/3 for selected items */}
             <div className="flex flex-col md:flex-row gap-4">
               {/* Search Results - 2/3 width */}
@@ -440,24 +439,23 @@ function UserPreferencesModal({ user, onClose }) {
                     <h4 className="text-lg font-medium text-white mb-2">Search Results</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto max-h-[50vh]">
                       {searchResults.map((person) => (
-                        <div 
-                          key={person.id} 
-                          className={`bg-gray-800 rounded p-2 cursor-pointer transition-all ${
-                            selectedPeople.some(p => p.id === person.id) ? 'ring-2 ring-red-600' : ''
-                          }`}
+                        <div
+                          key={person.id}
+                          className={`bg-gray-800 rounded p-2 cursor-pointer transition-all ${selectedPeople.some(p => p.id === person.id) ? 'ring-2 ring-red-600' : ''
+                            }`}
                           onClick={() => handleSelectPerson(person)}
                         >
                           {person.profile_path ? (
-                            <img 
-                              src={imageURL2 + person.profile_path} 
-                              alt={person.name} 
+                            <img
+                              src={imageURL2 + person.profile_path}
+                              alt={person.name}
                               className="w-full h-36 object-cover rounded mb-2"
                             />
                           ) : (
                             <div className="w-full h-36 bg-gray-700 rounded mb-2 flex items-center justify-center">
-                              <img 
-                                src="/placeholder.jpg" 
-                                alt={person.name} 
+                              <img
+                                src="/placeholder.jpg"
+                                alt={person.name}
                                 className="w-full h-full object-cover rounded"
                                 loading="lazy"
                               />
@@ -474,16 +472,16 @@ function UserPreferencesModal({ user, onClose }) {
                 ) : (
                   <div className="bg-gray-800 rounded p-4 text-center h-40 flex items-center justify-center">
                     <p className="text-gray-400">
-                      {searchQuery.length < 2 
-                        ? "Type at least 2 characters to search" 
-                        : isSearching 
-                          ? "Searching..." 
+                      {searchQuery.length < 2
+                        ? "Type at least 2 characters to search"
+                        : isSearching
+                          ? "Searching..."
                           : "No results found. Try a different search term."}
                     </p>
                   </div>
                 )}
               </div>
-              
+
               {/* Selected People - 1/3 width */}
               <div className="md:w-1/3 bg-gray-800 rounded-lg p-4 border border-gray-700">
                 <h4 className="text-lg font-medium text-white mb-2 flex items-center">
@@ -492,7 +490,7 @@ function UserPreferencesModal({ user, onClose }) {
                     {selectedPeople.length}
                   </span>
                 </h4>
-                
+
                 {selectedPeople.length === 0 ? (
                   <div className="text-center py-8 text-gray-400">
                     <p>No people selected yet.</p>
@@ -504,24 +502,24 @@ function UserPreferencesModal({ user, onClose }) {
                       <div key={person.id} className="bg-gray-700 rounded p-2 relative flex">
                         <button class="absolute top-1 right-1 bg-red-600 text-white text-sm rounded-full w-5 h-5 grid place-items-center leading-none">×</button>
 
-                        
+
                         {person.profile_path ? (
-                          <img 
-                            src={imageURL2 + person.profile_path} 
-                            alt={person.name} 
+                          <img
+                            src={imageURL2 + person.profile_path}
+                            alt={person.name}
                             className="w-16 h-24 object-cover rounded mr-2 flex-shrink-0"
                           />
                         ) : (
                           <div className="w-16 h-24 bg-gray-600 rounded mr-2 flex items-center justify-center flex-shrink-0">
-                            <img 
-                              src="/placeholder.jpg" 
-                              alt={person.name} 
+                            <img
+                              src="/placeholder.jpg"
+                              alt={person.name}
                               className="w-full h-full object-cover rounded"
                               loading="lazy"
                             />
                           </div>
                         )}
-                        
+
                         <div className="flex-grow pt-2">
                           <h5 className="text-white text-sm font-medium line-clamp-1">{person.name}</h5>
                           <p className="text-gray-400 text-xs">
@@ -548,17 +546,16 @@ function UserPreferencesModal({ user, onClose }) {
             <h3 className="text-xl font-semibold text-white mb-4">
               Select Your Favorite Genres
             </h3>
-            
+
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
               {genresList.map((genre) => (
-                <div 
+                <div
                   key={genre.id}
                   onClick={() => handleSelectGenre(genre)}
-                  className={`p-3 rounded cursor-pointer transition-all ${
-                    selectedGenres.some(g => g.id === genre.id) 
-                      ? 'bg-cineworldYellow text-white' 
+                  className={`p-3 rounded cursor-pointer transition-all ${selectedGenres.some(g => g.id === genre.id)
+                      ? 'bg-cineworldYellow text-white'
                       : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                  }`}
+                    }`}
                 >
                   {genre.name}
                 </div>

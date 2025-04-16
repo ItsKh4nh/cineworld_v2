@@ -17,7 +17,7 @@ function Genre() {
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const currentPage = parseInt(queryParams.get('page') || '1');
-  
+
   const { User } = useContext(AuthContext);
   const { handleMoviePopup, myListMovies } = useMoviePopup();
   const { convertGenre } = useGenresConverter();
@@ -58,7 +58,7 @@ function Genre() {
       setLoading(true);
       // Modify the URL to include the page parameter
       const url = `discover/movie?api_key=${import.meta.env.VITE_TMDB_API_KEY}&language=en-US&sort_by=vote_average.desc&vote_count.gte=1000&with_genres=${genreId}&page=${currentPage}`;
-      
+
       axios
         .get(url)
         .then((response) => {
@@ -119,15 +119,14 @@ function Genre() {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage <= 1}
-            className={`w-12 h-12 rounded-full flex items-center justify-center ${
-              currentPage <= 1 ? 'bg-gray-700 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'
-            } transition-colors`}
+            className={`w-12 h-12 rounded-full flex items-center justify-center ${currentPage <= 1 ? 'bg-gray-700 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'
+              } transition-colors`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          
+
           <div className="flex items-center bg-gray-800 rounded-full px-4 py-2">
             <span className="text-white mr-2">Page</span>
             <input
@@ -139,20 +138,19 @@ function Genre() {
             />
             <span className="text-white ml-1">/ {totalPages}</span>
           </div>
-          
+
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage >= totalPages}
-            className={`w-12 h-12 rounded-full flex items-center justify-center ${
-              currentPage >= totalPages ? 'bg-gray-700 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'
-            } transition-colors`}
+            className={`w-12 h-12 rounded-full flex items-center justify-center ${currentPage >= totalPages ? 'bg-gray-700 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'
+              } transition-colors`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
         </div>
-        
+
         <button
           onClick={handleGoToPage}
           className="mt-2 px-6 py-1 bg-red-800 text-white text-sm rounded-md hover:bg-red-700 transition-colors"
@@ -168,7 +166,7 @@ function Genre() {
       <div className="pt-24 pb-8 px-8">
         <h1 className="text-white text-4xl font-bold">{displayName} Movies</h1>
       </div>
-      
+
       {/* Movies grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 md:px-8 pb-12">
         {loading ? (
@@ -192,14 +190,14 @@ function Genre() {
           </div>
         )}
       </div>
-      
+
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center pb-12">
           {renderPagination()}
         </div>
       )}
-      
+
       <Footer />
     </div>
   );

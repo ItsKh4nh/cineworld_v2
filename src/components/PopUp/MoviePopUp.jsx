@@ -49,7 +49,7 @@ function MoviePopUp() {
       document.body.style.overflow = 'auto';
       setIsVisible(false);
     }
-    
+
     return () => {
       document.body.style.overflow = 'auto';
     };
@@ -67,7 +67,7 @@ function MoviePopUp() {
             // Get the first 10 cast members
             setCast(response.data.cast.slice(0, 10));
           }
-          
+
           if (response.data.crew && response.data.crew.length > 0) {
             const directorInfo = response.data.crew.find(
               (person) => person.job === "Director"
@@ -121,17 +121,17 @@ function MoviePopUp() {
       {PopupMessage}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-70"
             onClick={() => setShowModal(false)}
           ></div>
-          
+
           <div className="relative z-50 w-full max-w-3xl mx-4 my-8 rounded-lg overflow-hidden">
             {isVisible && (
               <Fade direction="up" duration={300} triggerOnce>
                 <div className="bg-neutral-800 rounded-lg shadow-xl">
                   {/* Video */}
-                  <div className="relative w-full" style={{height: "350px"}}>
+                  <div className="relative w-full" style={{ height: "350px" }}>
                     {trailerUrl ? (
                       <YouTube
                         videoId={trailerUrl}
@@ -139,7 +139,7 @@ function MoviePopUp() {
                         className="absolute top-0 left-0 w-full h-full"
                       />
                     ) : movieInfo.backdrop_path ? (
-                      <img 
+                      <img
                         src={`${imageURL + movieInfo.backdrop_path}`}
                         alt={movieInfo.title || movieInfo.name}
                         className="w-full h-full object-cover"
@@ -172,14 +172,14 @@ function MoviePopUp() {
                             <StarRating rating={movieInfo.vote_average} size="large" />
                           </div>
                         </div>
-                        
+
                         <div>
                           <div className="text-neutral-400 text-xs">Released on</div>
                           <div className="text-white text-sm">
                             {formatDate(movieInfo.release_date || movieInfo.first_air_date)}
                           </div>
                         </div>
-                        
+
                         <div>
                           <div className="text-neutral-400 text-xs">Genres</div>
                           <div className="text-white text-sm">
@@ -187,7 +187,7 @@ function MoviePopUp() {
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Right column - 2 rows (with Cast taking more space) */}
                       <div className="flex flex-col space-y-4">
                         {director && (
@@ -196,7 +196,7 @@ function MoviePopUp() {
                             <div className="text-white text-sm">{director}</div>
                           </div>
                         )}
-                        
+
                         {cast.length > 0 && (
                           <div>
                             <div className="text-neutral-400 text-xs">Cast</div>
@@ -239,7 +239,7 @@ function MoviePopUp() {
                         </svg>
                         Play
                       </button>
-                      
+
                       {isAuthenticated() && isInUserList ? (
                         <button
                           className="flex items-center justify-center border border-white text-white font-medium py-2 px-4 rounded hover:bg-white hover:text-black transition-colors"
@@ -280,7 +280,7 @@ function MoviePopUp() {
                         </button>
                       )}
                     </div>
-                    
+
                     <button
                       className="flex items-center justify-center bg-red-700 hover:bg-white hover:text-red-700 transition-colors text-white font-medium py-2 px-4 rounded ml-auto"
                       onClick={() => setShowModal(false)}

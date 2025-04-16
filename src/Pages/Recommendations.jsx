@@ -40,7 +40,7 @@ function Recommendations() {
         navigate("/signin");
         return;
       }
-      
+
       if (fetchedRef.current) return;
       fetchedRef.current = true;
 
@@ -87,7 +87,7 @@ function Recommendations() {
   // Movie list item component
   const MovieListItem = ({ movie }) => {
     const isInList = movie.isInMyList || justAddedMovies[movie.id];
-    
+
     return (
       <>
         {/* Mobile view - Card layout (2 per row) */}
@@ -100,7 +100,7 @@ function Recommendations() {
               alt={movie.title || movie.name}
               loading="lazy"
             />
-            
+
             {/* Play and Add buttons on image */}
             <div className="absolute top-2 left-2 flex space-x-2">
               <div
@@ -114,7 +114,7 @@ function Recommendations() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
                 </svg>
               </div>
-              
+
               {isInList ? (
                 <div
                   onClick={(e) => {
@@ -146,27 +146,27 @@ function Recommendations() {
               )}
             </div>
           </div>
-          
+
           {/* Card content */}
           <div className="p-2 flex-grow">
             {/* Movie title */}
             <h2 className="text-white text-base font-bold mb-1 line-clamp-1">{movie.title || movie.name}</h2>
-            
+
             {/* Release date */}
             <p className="text-white/80 text-xs mb-1">
-              {movie.release_date || movie.first_air_date 
+              {movie.release_date || movie.first_air_date
                 ? new Date(movie.release_date || movie.first_air_date).toLocaleDateString('en-US', {
-                    year: 'numeric'
-                  }) 
+                  year: 'numeric'
+                })
                 : 'Release date unknown'
               }
             </p>
-            
+
             {/* Star rating */}
             <div className="flex items-center mb-1">
               <StarRating rating={movie.vote_average} size="small" />
             </div>
-            
+
             {/* Genres - horizontal dot-separated format */}
             {convertGenre && movie.genre_ids && (
               <div className="flex items-center">
@@ -194,7 +194,7 @@ function Recommendations() {
                 alt={movie.title || movie.name}
                 loading="lazy"
               />
-              
+
               {/* Overlay with play button on hover */}
               <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
                 <div className="bg-cineworldYellow text-white w-10 h-10 rounded-full flex items-center justify-center">
@@ -204,30 +204,30 @@ function Recommendations() {
                 </div>
               </div>
             </div>
-            
+
             {/* Movie details - takes up even more width */}
             <div className="w-4/5 lg:w-5/6 p-4 md:p-6 flex flex-col cursor-pointer" onClick={() => handleMoviePopup(movie)}>
               <h2 className="text-white text-xl md:text-2xl font-bold mb-2">{movie.title || movie.name}</h2>
-              
+
               {/* Date in its own row */}
               <div className="mb-2">
                 <span className="text-white/80 text-sm">
-                  {movie.release_date || movie.first_air_date 
+                  {movie.release_date || movie.first_air_date
                     ? new Date(movie.release_date || movie.first_air_date).toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric'
-                      }) 
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })
                     : 'Release date unknown'
                   }
                 </span>
               </div>
-              
+
               {/* Rating in a separate row */}
               <div className="mb-3">
                 <StarRating rating={movie.vote_average} />
               </div>
-              
+
               {/* Genres */}
               {convertGenre && movie.genre_ids && (
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -238,12 +238,12 @@ function Recommendations() {
                   ))}
                 </div>
               )}
-              
+
               {/* Overview/description */}
               <p className="text-white/70 text-sm md:text-base mb-4 line-clamp-2 md:line-clamp-3">
                 {movie.overview || "No description available."}
               </p>
-              
+
               {/* Action buttons */}
               <div className="flex mt-auto space-x-3">
                 <button
@@ -258,7 +258,7 @@ function Recommendations() {
                   </svg>
                   Play
                 </button>
-                
+
                 {isInList ? (
                   <button
                     onClick={(e) => {
