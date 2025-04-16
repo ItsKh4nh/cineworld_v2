@@ -10,6 +10,13 @@ import { genresList } from "../../config/constants";
 import { auth } from "../../firebase/FirebaseConfig";
 import useHasInteractions from "../../hooks/useHasInteractions";
 
+// Import SVGs as React Components
+import SparkleIcon from '../../icons/sparkle-icon.svg?react';
+import ChevronDownIcon from '../../icons/chevron-down-icon.svg?react';
+import SearchIcon from '../../icons/search-icon.svg?react';
+import MenuIcon from '../../icons/menu-icon.svg?react';
+import CloseIcon from '../../icons/close-icon.svg?react';
+
 // Add CSS for the glowing recommendation link and sparkle animation
 const recommendationGlowStyle = `
   @keyframes glowingEffect {
@@ -191,14 +198,7 @@ function Navbar(props) {
                         className="py-2 font-medium text-white transition ease-in-out rounded-md cursor-pointer lg:px-3 text-m recommendation-glow relative"
                       >
                         Recommendations
-                        <svg 
-                          className="sparkle-icon w-4 h-4" 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          viewBox="0 0 24 24" 
-                          fill="currentColor"
-                        >
-                          <path fillRule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5z" clipRule="evenodd" />
-                        </svg>
+                        <SparkleIcon className="sparkle-icon w-4 h-4" />
                       </Link>
                     )}
 
@@ -212,15 +212,7 @@ function Navbar(props) {
                         className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-cineworldYellow lg:px-3 text-m flex items-center"
                       >
                         Genre
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg" 
-                          className="h-4 w-4 ml-1" 
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <ChevronDownIcon className="h-4 w-4 ml-1" />
                       </button>
                       
                       {/* Genre Dropdown Menu */}
@@ -252,15 +244,7 @@ function Navbar(props) {
                         className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-cineworldYellow lg:px-3 text-m flex items-center"
                       >
                         Country
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg" 
-                          className="h-4 w-4 ml-1" 
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                        <ChevronDownIcon className="h-4 w-4 ml-1" />
                       </button>
                       
                       {/* Country Dropdown Menu */}
@@ -296,19 +280,7 @@ function Navbar(props) {
                 <div className="flex items-center">
                   {/* Search Icon */}
                   <Link to={"/search"}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="items-center w-10 h-10 pr-4 mt-auto mb-auto text-white hover:text-cineworldYellow cursor-pointer"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
+                    <SearchIcon className="items-center w-10 h-10 pr-4 mt-auto mb-auto text-white hover:text-cineworldYellow cursor-pointer" />
                   </Link>
 
                   {/* Username and Avatar as a group */}
@@ -368,39 +340,9 @@ function Navbar(props) {
                 >
                   <span className="sr-only">Open main menu</span>
                   {!isOpen ? (
-                    <svg
-                      className="block w-6 h-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      onClick={NavBlack}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M4 6h16M4 12h16M4 18h16"
-                      />
-                    </svg>
+                    <MenuIcon className="block w-6 h-6" aria-hidden="true" onClick={NavBlack} />
                   ) : (
-                    <svg
-                      className="block w-6 h-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      onClick={NavTransparent}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    <CloseIcon className="block w-6 h-6" aria-hidden="true" onClick={NavTransparent} />
                   )}
                 </button>
               </div>

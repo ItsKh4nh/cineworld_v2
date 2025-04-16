@@ -29,6 +29,13 @@ import StarRating from "../components/StarRating/StarRating";
 import { AuthContext } from "../contexts/UserContext";
 import { formatDate, formatMoney, formatRuntime } from "../utils";
 
+// Import SVGs as React Components
+import StarIcon from '../icons/star-icon.svg?react';
+import EditIcon from '../icons/edit-icon.svg?react';
+import AddIcon from '../icons/add-icon.svg?react';
+import PlaySolidIcon from '../icons/play-solid-icon.svg?react';
+import PlayIcon from '../icons/play-icon.svg?react';
+
 function Play() {
   // State variables
   const [urlId, setUrlId] = useState("");
@@ -428,9 +435,7 @@ function Play() {
             <div className="flex flex-wrap gap-4 items-center mb-6 bg-gray-900 bg-opacity-70 backdrop-blur-sm p-4 rounded-lg">
               <div className="flex items-center">
                 <div className="flex items-center">
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    viewBox="0 0 24 24" 
+                  <StarIcon 
                     fill={
                       movieDetails.vote_average <= 2 ? "#ff4545" : // Red
                       movieDetails.vote_average <= 4 ? "#ffa534" : // Orange
@@ -440,13 +445,7 @@ function Play() {
                     }
                     className="w-7 h-7 mr-2"
                     aria-hidden="true"
-                  >
-                    <path 
-                      fillRule="evenodd" 
-                      d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" 
-                      clipRule="evenodd" 
-                    />
-                  </svg>
+                  />
                   <span className="text-base text-white">
                     <span className="font-bold">{movieDetails.vote_average ? parseFloat(movieDetails.vote_average.toFixed(2)) : 'N/A'}</span>
                     <span>/10 </span>
@@ -493,38 +492,12 @@ function Play() {
                 >
                   {isInMyList ? (
                     <>
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        className="h-5 w-5 mr-1" 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
-                        stroke="currentColor"
-                      >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" 
-                        />
-                      </svg>
+                      <EditIcon className="h-5 w-5 mr-1" />
                       Update Your Rating
                     </>
                   ) : (
                     <>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 mr-1" 
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                          strokeWidth={2} 
-                          d="M12 4v16m8-8H4" 
-                      />
-                    </svg>
+                    <AddIcon className="h-5 w-5 mr-1" />
                       Add to MyList
                     </>
                   )}
@@ -848,13 +821,7 @@ function Play() {
                                   className="w-full h-full object-cover rounded"
                                 />
                                 <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <svg 
-                                    className="w-12 h-12 text-red-600" 
-                                    fill="currentColor" 
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path d="M8 5v14l11-7z" />
-                                  </svg>
+                                  <PlaySolidIcon className="w-12 h-12 text-red-600" />
                                   <span className="text-white text-sm mt-2">Open in YouTube</span>
                                 </div>
                               </div>
@@ -1079,9 +1046,7 @@ function Play() {
                                   }}
                                   className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
                                 >
-                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                                  </svg>
+                                  <PlayIcon className="w-4 h-4" />
                                 </div>
                                 
                                 {movie.isInMyList ? (
@@ -1092,9 +1057,7 @@ function Play() {
                                     }}
                                     className="bg-cineworldYellow text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:bg-white hover:text-cineworldYellow transition-all duration-150"
                                   >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                    </svg>
+                                    <EditIcon className="w-4 h-4" />
                                   </div>
                                 ) : (
                                   <div
@@ -1104,9 +1067,7 @@ function Play() {
                                     }}
                                     className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
                                   >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                    </svg>
+                                    <AddIcon className="w-4 h-4" />
                                   </div>
                                 )}
                               </div>
@@ -1188,9 +1149,7 @@ function Play() {
                             }}
                             className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                            </svg>
+                            <PlayIcon className="w-4 h-4" />
                           </div>
                           
                           {movie.isInMyList ? (
@@ -1201,9 +1160,7 @@ function Play() {
                               }}
                               className="bg-cineworldYellow text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:bg-white hover:text-cineworldYellow transition-all duration-150"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                              </svg>
+                              <EditIcon className="w-4 h-4" />
                             </div>
                           ) : (
                             <div
@@ -1213,9 +1170,7 @@ function Play() {
                               }}
                               className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                              </svg>
+                              <AddIcon className="w-4 h-4" />
                             </div>
                           )}
                         </div>

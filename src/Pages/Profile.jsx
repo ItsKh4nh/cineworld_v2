@@ -27,6 +27,14 @@ import {
 } from "../utils";
 import { showSuccessToast, showErrorToast } from "../utils";
 
+// Import SVGs as React Components
+import EditIcon from '../icons/edit-icon.svg?react';
+import LockIcon from '../icons/lock-icon.svg?react';
+import EyeOpenIcon from '../icons/eye-open-icon.svg?react';
+import EyeClosedIcon from '../icons/eye-closed-icon.svg?react';
+import HomeIcon from '../icons/home-icon.svg?react';
+import LogoutIcon from '../icons/logout-icon.svg?react';
+
 function Profile() {
   const { User } = useContext(AuthContext);
 
@@ -209,14 +217,7 @@ function Profile() {
                     className="absolute bottom-0 right-0 bg-white text-black p-1.5 rounded-full hover:bg-yellow-400 transition-colors"
                     title="Change avatar"
                   >
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      className="h-4 w-4" 
-                      viewBox="0 0 20 20" 
-                      fill="currentColor"
-                    >
-                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                    </svg>
+                    <EditIcon className="h-4 w-4" />
                   </button>
                 </div>
                 
@@ -310,14 +311,7 @@ function Profile() {
                       onClick={() => setShowPasswordFields(!showPasswordFields)}
                       className="text-white hover:text-cineworldYellow flex items-center gap-2 transition-colors"
                     >
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        className="h-5 w-5" 
-                        viewBox="0 0 20 20" 
-                        fill="currentColor"
-                      >
-                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                      </svg>
+                      <LockIcon className="h-5 w-5" />
                       {showPasswordFields ? "Hide Password Change" : "Change Password"}
                     </button>
                     
@@ -346,15 +340,9 @@ function Profile() {
                               onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                             >
                               {showCurrentPassword ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
-                                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
-                                </svg>
+                                <EyeClosedIcon className="h-5 w-5" />
                               ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                                </svg>
+                                <EyeOpenIcon className="h-5 w-5" />
                               )}
                             </button>
                           </div>
@@ -377,15 +365,9 @@ function Profile() {
                               onClick={() => setShowNewPassword(!showNewPassword)}
                             >
                               {showNewPassword ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
-                                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
-                                </svg>
+                                <EyeClosedIcon className="h-5 w-5" />
                               ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                                </svg>
+                                <EyeOpenIcon className="h-5 w-5" />
                               )}
                             </button>
                           </div>
@@ -408,15 +390,9 @@ function Profile() {
                               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                             >
                               {showConfirmPassword ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
-                                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
-                                </svg>
+                                <EyeClosedIcon className="h-5 w-5" />
                               ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                                </svg>
+                                <EyeOpenIcon className="h-5 w-5" />
                               )}
                             </button>
                           </div>
@@ -443,20 +419,7 @@ function Profile() {
                 onClick={() => navigate("/")}
                 className="flex items-center bg-cineworldYellow text-white px-6 py-2 rounded transition-colors hover:bg-white hover:text-cineworldYellow"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-5 h-5 mr-2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-                  />
-                </svg>
+                <HomeIcon className="w-5 h-5 mr-2" />
                 Back to Home
               </button>
               
@@ -465,20 +428,7 @@ function Profile() {
                 onClick={SignOut}
                 className="flex items-center bg-red-700 border-white text-white px-6 py-2 rounded hover:bg-white hover:text-red-700 transition-colors"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                  className="w-5 h-5 mr-2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
-                    />
-                  </svg>
+                  <LogoutIcon className="w-5 h-5 mr-2" />
                 Logout
                 </button>
             </div>

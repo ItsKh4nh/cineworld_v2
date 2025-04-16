@@ -11,6 +11,10 @@ import { RatingModalContext } from "../contexts/RatingModalContext";
 import StarRating from "../components/StarRating/StarRating";
 import MovieCard from "../components/Cards/MovieCard";
 
+// Import SVGs as React Components
+import ChevronLeftIcon from '../icons/chevron-left-icon.svg?react';
+import ChevronRightIcon from '../icons/chevron-right-icon.svg?react';
+
 function Genre() {
   const { genreName } = useParams();
   const location = useLocation();
@@ -122,9 +126,7 @@ function Genre() {
             className={`w-12 h-12 rounded-full flex items-center justify-center ${currentPage <= 1 ? 'bg-gray-700 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'
               } transition-colors`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeftIcon className="h-6 w-6" />
           </button>
 
           <div className="flex items-center bg-gray-800 rounded-full px-4 py-2">
@@ -145,9 +147,7 @@ function Genre() {
             className={`w-12 h-12 rounded-full flex items-center justify-center ${currentPage >= totalPages ? 'bg-gray-700 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'
               } transition-colors`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRightIcon className="h-6 w-6" />
           </button>
         </div>
 

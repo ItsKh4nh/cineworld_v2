@@ -10,6 +10,12 @@ import StarRating from "../components/StarRating/StarRating";
 import { imageURL2 } from "../config/constants";
 import { getPersonalizedRecommendations } from "../services/RecommendationsService";
 
+// Import SVGs as React Components
+import PlayIcon from '../icons/play-icon.svg?react';
+import EditIcon from '../icons/edit-icon.svg?react';
+import AddIcon from '../icons/add-icon.svg?react';
+import PlaySolidIcon from '../icons/play-solid-icon.svg?react';
+
 function Recommendations() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -110,9 +116,7 @@ function Recommendations() {
                 }}
                 className="text-white w-7 h-7 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                </svg>
+                <PlayIcon className="w-3 h-3" />
               </div>
 
               {isInList ? (
@@ -127,9 +131,7 @@ function Recommendations() {
                   }}
                   className="bg-cineworldYellow text-white w-7 h-7 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:bg-white hover:text-cineworldYellow transition-all duration-150"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                  </svg>
+                  <EditIcon className="w-3 h-3" />
                 </div>
               ) : (
                 <div
@@ -139,9 +141,7 @@ function Recommendations() {
                   }}
                   className="text-white w-7 h-7 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
+                  <AddIcon className="w-3 h-3" />
                 </div>
               )}
             </div>
@@ -198,9 +198,7 @@ function Recommendations() {
               {/* Overlay with play button on hover */}
               <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
                 <div className="bg-cineworldYellow text-white w-10 h-10 rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                    <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
-                  </svg>
+                  <PlaySolidIcon className="w-5 h-5" />
                 </div>
               </div>
             </div>
@@ -253,9 +251,7 @@ function Recommendations() {
                   }}
                   className="bg-cineworldYellow hover:bg-white hover:text-cineworldYellow text-white px-4 py-2 rounded-md transition-colors duration-200 flex items-center"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                  </svg>
+                  <PlayIcon className="w-5 h-5 mr-2" />
                   Play
                 </button>
 
@@ -271,9 +267,7 @@ function Recommendations() {
                     }}
                     className="bg-white text-black hover:bg-black hover:text-white px-4 py-2 rounded-md transition-colors duration-200 flex items-center"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                    </svg>
+                    <EditIcon className="w-5 h-5 mr-2" />
                     Update Your Rating
                   </button>
                 ) : (
@@ -284,9 +278,7 @@ function Recommendations() {
                     }}
                     className="border border-white text-white hover:bg-white hover:text-black px-4 py-2 rounded-md transition-colors duration-200 flex items-center"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
+                    <AddIcon className="w-5 h-5 mr-2" />
                     Add to MyList
                   </button>
                 )}

@@ -2,13 +2,21 @@ import React, { useState, useEffect, useContext } from "react";
 import { Fade } from "react-awesome-reveal";
 import StarRating from "../StarRating/StarRating";
 
+// Axios and constants
 import axios from "../../axios";
 import { imageURL } from "../../config/constants";
+
+// Context and hooks
 import { PopUpContext } from "../../contexts/moviePopUpContext";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
 import useMoviePopup from "../../hooks/useMoviePopup";
+
+// Import SVGs as React Components
+import PlayIcon from '../../icons/play-icon.svg?react';
+import MoreInfoIcon from '../../icons/more-info-icon.svg?react';
+import LoadingPlayIcon from '../../icons/loading-play-icon.svg?react';
 
 function Banner(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);
@@ -18,30 +26,23 @@ function Banner(props) {
   const { handleMoviePopup, formatDate, myListMovies } = useMoviePopup();
 
   const [movie, setMovie] = useState([]);
-  const [moviePopupInfo, setMoviePopupInfo] = useState({});
-  const [urlId, setUrlId] = useState("");
-
+  
   function getWindowSize() {
     const { innerWidth: width } = window;
-    return {
-      width,
-    };
+    return { width };
   }
-
   const [windowSize, setWindowSize] = useState(getWindowSize());
 
   const fetchMovies = async () => {
     try {
       const response = await axios.get(props.url);
-      const randomMovie = response.data.results.sort(function (a, b) {
-        return 0.5 - Math.random();
-      })[0];
+      const randomMovie = response.data.results.sort(() => 0.5 - Math.random())[0];
 
       // Check if movie is in MyList
-      const isInMyList = myListMovies.some(m => m.id === randomMovie.id);
+      const isInMyList = myListMovies.some((m) => m.id === randomMovie.id);
       setMovie({
         ...randomMovie,
-        isInMyList
+        isInMyList,
       });
     } catch (error) {
       // Handle error
@@ -51,20 +52,21 @@ function Banner(props) {
   useEffect(() => {
     fetchMovies();
 
-    function handleWindowResize() {
+    const handleWindowResize = () => {
       setWindowSize(getWindowSize());
-    }
+    };
 
     window.addEventListener("resize", handleWindowResize);
-    return () => window.removeEventListener("resize", handleWindowResize); // Cleanup
-  }, [props.url, myListMovies]); // Added myListMovies as dependency
+    return () => window.removeEventListener("resize", handleWindowResize);
+  }, [props.url, myListMovies]);
 
   return (
     <>
       <div
         style={{
-          backgroundImage: `linear-gradient(90deg, hsl(0deg 0% 7% / 91%) 0%, hsl(0deg 0% 0% / 0%) 35%, hsl(220deg 26% 44% / 0%) 100%), url(${movie ? imageURL + movie.backdrop_path : ""
-            })`,
+          backgroundImage: `linear-gradient(90deg, hsl(0deg 0% 7% / 91%) 0%, hsl(0deg 0% 0% / 0%) 35%, hsl(220deg 26% 44% / 0%) 100%), url(${
+            movie ? imageURL + movie.backdrop_path : ""
+          })`,
         }}
         className="h-[50rem] md:h-[55rem] 3xl:h-[63rem] bg-cover bg-center object-contain grid items-center"
       >
@@ -137,82 +139,25 @@ function Banner(props) {
                     onClick={() => playMovie(movie)}
                     className="bg-cineworldYellow hover:bg-white hover:text-cineworldYellow transition duration-500 ease-in-out shadow-2xl flex items-center mb-3 mr-3 text-base sm:text-xl font-semibold text-white py-2 sm:py-2 px-10 sm:px-14 rounded-md"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-6 h-6 mr-2"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
-                      />
-                    </svg>
+                    <PlayIcon className="w-6 h-6 mr-2" />
                     Play
                   </button>
                   <button
                     onClick={() => handleMoviePopup(movie)}
                     className="bg-[#33333380] flex items-center shadow-2xl mb-3 text-base sm:text-xl font-semibold text-white hover:bg-white hover:text-black transition duration-500 ease-in-out py-2 px-8 rounded-md"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 items-center mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <MoreInfoIcon className="w-6 h-6 mr-2" />
                     More Info
                   </button>
                 </>
               ) : (
                 <>
                   <button className="animate-pulse bg-neutral-900 transition duration-500 ease-in-out shadow-2xl flex items-center mb-3 mr-3 text-base sm:text-xl font-semibold text-neutral-500 py-2 sm:py-2 px-10 sm:px-14 rounded-md">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-5 items-center mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <LoadingPlayIcon className="w-6 h-6 mr-2" />
                     Play
                   </button>
                   <button className="animate-pulse bg-neutral-900 flex items-center shadow-2xl mb-3 text-base sm:text-xl font-semibold text-neutral-500 transition duration-500 ease-in-out py-2 px-8 rounded-md">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 items-center mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <MoreInfoIcon className="w-6 h-6 mr-2" />
                     More Info
                   </button>
                 </>

@@ -17,6 +17,12 @@ import StarRating from "../StarRating/StarRating";
 import { FaMinus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
+// Import SVGs as React Components
+import ClearIcon from '../../icons/clear-icon.svg?react';
+import StarPlaceholderIcon from '../../icons/star-placeholder-icon.svg?react';
+import EditIcon from '../../icons/edit-icon.svg?react';
+import RemoveIcon from '../../icons/remove-icon.svg?react';
+
 function MyListTable() {
   const { User } = useContext(AuthContext);
   const { removeFromMyList, updateMovieNote, PopupMessage, addRatedMovieToList, updateRatedMovie } = useUpdateMyList();
@@ -487,9 +493,7 @@ function MyListTable() {
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600 hover:text-red-500 focus:outline-none"
                 aria-label="Clear search"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
+                <ClearIcon className="h-6 w-6" />
               </button>
             </div>
             <div>
@@ -590,15 +594,7 @@ function MyListTable() {
                             {movie.userRating?.score ? (
                               <StarRating rating={movie.userRating.score} />
                             ) : (
-                              <svg 
-                                xmlns="http://www.w3.org/2000/svg" 
-                                viewBox="0 0 24 24" 
-                                fill="#6b7280"
-                                className="w-5 h-5"
-                                aria-hidden="true"
-                              >
-                                <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                              </svg>
+                              <StarPlaceholderIcon className="w-5 h-5" aria-hidden="true" />
                             )}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -649,18 +645,14 @@ function MyListTable() {
                                 className="text-yellow-400 hover:text-yellow-300"
                                 title="Edit Rating"
                               >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                </svg>
+                                <EditIcon className="h-8 w-8" />
                               </button>
                               <button
                                 onClick={() => handleRemoveMovie(movie)}
                                 className="text-red-400 hover:text-red-300"
                                 title="Remove"
                               >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                                </svg>
+                                <RemoveIcon className="h-8 w-8" />
                               </button>
                             </div>
                           </td>
@@ -705,15 +697,7 @@ function MyListTable() {
                               {movie.userRating?.score ? (
                                 <StarRating rating={movie.userRating.score} size="small" />
                               ) : (
-                                <svg 
-                                  xmlns="http://www.w3.org/2000/svg" 
-                                  viewBox="0 0 24 24" 
-                                  fill="#6b7280"
-                                  className="w-5 h-5"
-                                  aria-hidden="true"
-                                >
-                                  <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                                </svg>
+                                <StarPlaceholderIcon className="w-5 h-5" aria-hidden="true" />
                               )}
                             </div>
                             <div className="text-xs text-gray-400">
@@ -726,18 +710,14 @@ function MyListTable() {
                               className="text-yellow-400 hover:text-yellow-300"
                               title="Edit Rating"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                              </svg>
+                              <EditIcon className="h-6 w-6" />
                             </button>
                             <button
                               onClick={() => handleRemoveMovie(movie)}
                               className="text-red-400 hover:text-red-300"
                               title="Remove"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                              </svg>
+                              <RemoveIcon className="h-6 w-6" />
                             </button>
                           </div>
                         </div>
@@ -799,9 +779,7 @@ function MyListTable() {
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600 hover:text-red-500 focus:outline-none"
               aria-label="Clear search"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
+              <ClearIcon className="h-6 w-6" />
             </button>
           </div>
           

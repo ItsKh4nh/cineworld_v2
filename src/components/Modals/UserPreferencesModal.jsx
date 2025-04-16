@@ -6,6 +6,9 @@ import axios from "../../axios";
 import { searchMovie, searchPerson } from "../../config/URLs";
 import StarRating from "../StarRating/StarRating";
 
+// Import SVGs as React Components
+import CloseIcon from '../../icons/close-icon.svg?react';
+
 function UserPreferencesModal({ user, onClose }) {
   const [step, setStep] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -209,20 +212,7 @@ function UserPreferencesModal({ user, onClose }) {
             onClick={handleSkip}
             className="text-gray-400 hover:text-white"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <CloseIcon className="h-6 w-6" />
           </button>
         </div>
 

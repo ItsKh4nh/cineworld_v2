@@ -15,6 +15,11 @@ import useGuestMode from "../../hooks/useGuestMode";
 import { RatingModalContext } from "../../contexts/RatingModalContext";
 import axios from "../../axios";
 
+// Import SVGs as React Components
+import PlayCircleIcon from '../../icons/play-circle-icon.svg?react';
+import RemoveCircleIcon from '../../icons/remove-circle-icon.svg?react';
+import AddCircleIcon from '../../icons/add-circle-icon.svg?react';
+
 function MoviePopUp() {
   const { User } = useContext(AuthContext);
   const { showModal, setShowModal, movieInfo, trailerUrl } = useContext(PopUpContext);
@@ -225,18 +230,7 @@ function MoviePopUp() {
                           playMovie(movieInfo);
                         }}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 mr-1"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                        <PlayCircleIcon className="h-5 w-5 mr-1" />
                         Play
                       </button>
 
@@ -245,18 +239,7 @@ function MoviePopUp() {
                           className="flex items-center justify-center border border-white text-white font-medium py-2 px-4 rounded hover:bg-white hover:text-black transition-colors"
                           onClick={handleRemoveFromMyList}
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5 mr-1"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                          <RemoveCircleIcon className="h-5 w-5 mr-1" />
                           Remove
                         </button>
                       ) : (
@@ -264,18 +247,7 @@ function MoviePopUp() {
                           className="flex items-center justify-center border border-white text-white font-medium py-2 px-4 rounded hover:bg-white hover:text-black transition-colors"
                           onClick={handleAddToMyList}
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5 mr-1"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                          <AddCircleIcon className="h-5 w-5 mr-1" />
                           Add to MyList
                         </button>
                       )}
