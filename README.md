@@ -1,6 +1,6 @@
 # CineWorld 🎬
 
-A web application project focused on building a FREE movies streaming plattform with clean and modern UI, with an integration of a Neural Collaborative Filtering movie recommendation system. The project aims delivered a seamless and enjoyable experience for movie enjoyers.
+A web application project focused on building a FREE movies streaming platform with a clean and modern UI, integrated with a Neural Collaborative Filtering to gave out personalized movie recommendations. The project aims delivered a seamless and enjoyable experience for movie enjoyers.
 
 ## ✨ Features
 
@@ -11,7 +11,7 @@ A web application project focused on building a FREE movies streaming plattform 
 - Watch numerous movies with high quality and no delays.
 - List management for for archival purposes.
 - Profile management (for logged in users)
-- Get personalized movie recommendations for logged in users through an external API (utilizing a NCF model)
+- Get personalized movie recommendations for logged in users through external APIs
 
 ## 🚀 Technology Stack
 
@@ -29,8 +29,6 @@ A web application project focused on building a FREE movies streaming plattform 
 - **APIs:**
   - TMDB (The Movie Database) API for movie and people data
   - Custom recommendation API (https://api-cineworld.onrender.com) for AI-based movie recommendations
-- **AI/Machine Learning:**
-  - Neural Collaborative Filtering (NCF) model for personalized recommendations
 
 ## ⚙️ Getting Started
 
