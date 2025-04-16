@@ -1,55 +1,51 @@
 # CineWorld 🎬
 
-A web application likely focused on movies, showtimes, or related entertainment content. Built with React, Vite, and Firebase.
+A web application project focused on building a FREE movies streaming plattform with clean and modern UI, with an integration of a Neural Collaborative Filtering movie recommendation system. The project aims delivered a seamless and enjoyable experience for movie enjoyers.
 
 ## ✨ Features
 
-_(Note: These are inferred features based on project structure and dependencies. Please update with actual features.)_
-
-- Browse movies/shows.
-- View details (potentially including trailers via `react-youtube`).
-- User authentication (inferred from Firebase).
-- Interactive carousels/sliders (inferred from `swiper`).
-- Responsive design (using Tailwind CSS).
-- Notifications/Feedback (inferred from `react-hot-toast`).
-- Smooth animations/transitions (inferred from `react-awesome-reveal`).
+- Sign up and Log in functionality (supports Guest mode with limited features).
+- Browse movies in many categories and criteria.
+- Also acts as a Encyclopedia with extensive information about movies and people.
+- Search for movies or people.
+- Watch numerous movies with high quality and no delays.
+- List management for for archival purposes.
+- Profile management (for logged in users)
+- Get personalized movie recommendations for logged in users through an external API (utilizing a NCF model)
 
 ## 🚀 Technology Stack
 
 - **Frontend:**
-  - React 19 (`react`, `react-dom`)
-  - Vite (`vite`) as the build tool
-  - React Router (`react-router-dom`) for routing
-  - Tailwind CSS (`tailwindcss`) for styling
-  - Axios (`axios`) for HTTP requests
+  - React 19
+  - Vite as the build tool
+  - React Router for routing
+  - Tailwind CSS for styling
+  - Axios for HTTP requests
 - **Backend/BaaS:**
-  - Firebase (`firebase`) for backend services (authentication, database, etc. - specific usage needs confirmation)
-- **UI Libraries & Utilities:**
-  - Headless UI (`@headlessui/react`)
-  - Swiper (`swiper`) for carousels
-  - React Icons (`react-icons`)
-  - React Hot Toast (`react-hot-toast`) for notifications
-  - React Spinners (`react-spinners`) for loading indicators
-  - React Awesome Reveal (`react-awesome-reveal`) for animations
-  - React YouTube (`react-youtube`) for embedding videos
-- **Development:**
-  - PostCSS (`postcss`, `autoprefixer`)
-  - Sass (`sass`) (potentially used alongside Tailwind)
-  - Vite SVGR Plugin (`vite-plugin-svgr`)
+  - Firebase for backend services:
+    - Authentication (email/password)
+    - Firestore for database storage
+    - Firebase hosting for deployment
+- **APIs:**
+  - TMDB (The Movie Database) API for movie and people data
+  - Custom recommendation API (https://api-cineworld.onrender.com) for AI-based movie recommendations
+- **AI/Machine Learning:**
+  - Neural Collaborative Filtering (NCF) model for personalized recommendations
 
 ## ⚙️ Getting Started
 
 ### Prerequisites
 
 - Node.js (v18 or later recommended)
-- npm (usually comes with Node.js)
+- npm (Node Package Manager)
 - Firebase Project: You need to set up a Firebase project and obtain the configuration credentials.
+- TMDB API Key: Register at https://www.themoviedb.org/documentation/api to get your API key
 
 ### Installation
 
 1.  Clone the repository:
     ```bash
-    git clone <your-repository-url>
+    git clone https://github.com/ItsKh4nh/cineworld_v2
     cd cineworld
     ```
 2.  Install dependencies:
@@ -71,8 +67,8 @@ _(Note: These are inferred features based on project structure and dependencies.
     VITE_FIREBASE_APP_ID=your_app_id
     VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
 
-    # Add other environment variables like API keys if needed
-    # VITE_TMDB_API_KEY=your_tmdb_api_key
+    # TMDB API key (required for movie data)
+    VITE_TMDB_API_KEY=your_tmdb_api_key
     ```
 
 ### Running the Development Server
@@ -94,24 +90,23 @@ This will start the Vite development server, typically available at `http://loca
 ```
 cineworld/
 ├── public/               # Static assets
-├── src/                  # Source files
-│   ├── assets/           # Images, fonts, etc.
+├── src/                  # Source directory
+│   ├── assets/           # Icons
 │   ├── components/       # Reusable UI components
-│   ├── config/           # Configuration files (e.g., API endpoints)
+│   ├── config/           # Configuration files (API endpoints, constants)
 │   ├── contexts/         # React context providers
-│   ├── controllers/      # Application logic controllers (if any)
+│   ├── controllers/      # Application logic controllers
 │   ├── firebase/         # Firebase configuration and utilities
 │   ├── hooks/            # Custom React hooks
 │   ├── Pages/            # Page-level components
 │   ├── routes/           # Routing configuration
-│   ├── services/         # API service integrations (e.g., movie API calls)
+│   ├── services/         # API service integrations
 │   ├── utils/            # Utility functions
 │   ├── App.jsx           # Main application component
-│   ├── App.css           # Global App styles (minimal if using Tailwind)
+│   ├── App.css           # Global App styles
 │   ├── index.css         # Global styles / Tailwind base/components/utilities
 │   ├── index.jsx         # Entry point for the React application
 │   └── axios.js          # Axios instance configuration
-├── .env                  # Local environment variables (DO NOT COMMIT)
 ├── .env.sample           # Example environment variables
 ├── .gitignore            # Git ignore configuration
 ├── index.html            # HTML entry point
@@ -120,17 +115,4 @@ cineworld/
 ├── postcss.config.cjs    # PostCSS configuration
 ├── tailwind.config.cjs   # Tailwind CSS configuration
 ├── vite.config.js        # Vite configuration
-└── README.md             # Project documentation (This file)
 ```
-
-## 🤝 Contributing
-
-_(Optional: Add guidelines if you accept contributions)_
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. Please make sure to update tests as appropriate.
-
-## 📄 License
-
-_(Optional: Specify your project's license, e.g., MIT)_
-
-[MIT](https://choosealicense.com/licenses/mit/)
