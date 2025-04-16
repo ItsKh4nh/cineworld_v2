@@ -1,21 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
-
 import { useNavigate } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
 import toast from "react-hot-toast";
 
 import { AuthContext } from "../contexts/UserContext";
 import WelcomePageBanner from "/WelcomePageBanner.jpg";
-
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
 
 // Utilities
 import {
@@ -25,7 +14,6 @@ import {
   changeUserPassword,
   isGoogleAuthUser,
 } from "../utils";
-import { showSuccessToast, showErrorToast } from "../utils";
 
 // Icons
 import EditIcon from "../assets/edit-icon.svg?react";
@@ -37,31 +25,36 @@ import LogoutIcon from "../assets/logout-icon.svg?react";
 
 function Profile() {
   const { User } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const inputRef = useRef(null);
 
+  // Profile information state
+  const [userName, setUserName] = useState("");
   const [profilePic, setProfilePic] = useState("");
   const [newProfilePicURL, setNewProfilePicURL] = useState("");
   const [newProfilePic, setNewProfilePic] = useState("");
   const [isUserNameChanged, setIsUserNameChanged] = useState(false);
-  const [userName, setUserName] = useState("");
-  const [IsMyListUpdated, setIsMyListUpdated] = useState(false);
+  const [isGoogleAccount, setIsGoogleAccount] = useState(false);
+
+  // Loading states
   const [changeUsernameLoading, setChangeUsernameLoading] = useState(false);
   const [changeProfilePictureLoading, setChangeProfilePictureLoading] =
     useState(false);
-  const [isGoogleAccount, setIsGoogleAccount] = useState(false);
+  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
 
   // Password change state
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
-  const [showPasswordFields, setShowPasswordFields] = useState(false);
+
+  // Password visibility toggles
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const navigate = useNavigate();
-
+  // Set up initial user data when component mounts
   useEffect(() => {
     if (User != null) {
       // If user has no photo URL, assign a random avatar from public folder
@@ -85,44 +78,26 @@ function Profile() {
     }
   }, [User]);
 
+  // Set username when user data is available
   useEffect(() => {
     if (User) {
       setUserName(User.displayName || "");
     }
   }, [User]);
 
-  const inputRef = useRef(null);
-
-  const handleClick = () => {
+  // Profile picture handlers
+  const handleFileSelect = () => {
     inputRef.current.click();
   };
 
   const handleFileChange = (event) => {
     const fileObj = event.target.files[0];
-    setNewProfilePic(fileObj);
-    setNewProfilePicURL(URL.createObjectURL(fileObj));
     if (!fileObj) {
       return;
     }
+    setNewProfilePic(fileObj);
+    setNewProfilePicURL(URL.createObjectURL(fileObj));
     event.target.value = null;
-  };
-
-  const changeUsername = async () => {
-    setChangeUsernameLoading(true);
-
-    try {
-      const success = await updateUserName(userName);
-      if (success) {
-        toast.success("Username updated successfully");
-      } else {
-        toast.error("Failed to update username");
-      }
-    } catch (error) {
-      console.error("Error updating username:", error);
-      toast.error("Failed to update username");
-    } finally {
-      setChangeUsernameLoading(false);
-    }
   };
 
   const changeProfilePicture = async () => {
@@ -146,6 +121,26 @@ function Profile() {
     }
   };
 
+  // Username change handler
+  const changeUsername = async () => {
+    setChangeUsernameLoading(true);
+
+    try {
+      const success = await updateUserName(userName);
+      if (success) {
+        toast.success("Username updated successfully");
+      } else {
+        toast.error("Failed to update username");
+      }
+    } catch (error) {
+      console.error("Error updating username:", error);
+      toast.error("Failed to update username");
+    } finally {
+      setChangeUsernameLoading(false);
+    }
+  };
+
+  // Password change handler
   const changePassword = async () => {
     setPasswordError("");
 
@@ -187,7 +182,8 @@ function Profile() {
     }
   };
 
-  const SignOut = () => {
+  // Sign out handler
+  const handleSignOut = () => {
     signOutUser(navigate);
   };
 
@@ -214,7 +210,7 @@ function Profile() {
                     alt="Profile"
                   />
                   <button
-                    onClick={handleClick}
+                    onClick={handleFileSelect}
                     className="absolute bottom-0 right-0 bg-white text-black p-1.5 rounded-full hover:bg-yellow-400 transition-colors"
                     title="Change avatar"
                   >
@@ -444,7 +440,7 @@ function Profile() {
 
               {/* Logout button on the right */}
               <button
-                onClick={SignOut}
+                onClick={handleSignOut}
                 className="flex items-center bg-red-700 border-white text-white px-6 py-2 rounded hover:bg-white hover:text-red-700 transition-colors"
               >
                 <LogoutIcon className="w-5 h-5 mr-2" />

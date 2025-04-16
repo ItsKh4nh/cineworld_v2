@@ -1,50 +1,59 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "../axios";
-import { imageUrlBackup, genresList } from "../config/constants";
+import { genresList } from "../config/constants";
 import { AuthContext } from "../contexts/UserContext";
 import Footer from "../components/Footer/Footer";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 import useUpdateMyList from "../hooks/useUpdateMyList";
 import { RatingModalContext } from "../contexts/RatingModalContext";
-import StarRating from "../components/StarRating/StarRating";
 import MovieCard from "../components/Cards/MovieCard";
 
 // Icons
 import ChevronLeftIcon from "../assets/chevron-left-icon.svg?react";
 import ChevronRightIcon from "../assets/chevron-right-icon.svg?react";
 
+/**
+ * Genre page component that displays movies filtered by a specific genre
+ * with pagination support
+ */
 function Genre() {
+  // URL and routing parameters
   const { genreName } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const currentPage = parseInt(queryParams.get("page") || "1");
 
+  // Hooks and contexts
   const { User } = useContext(AuthContext);
   const { handleMoviePopup, myListMovies } = useMoviePopup();
   const { convertGenre } = useGenresConverter();
   const { addToMyList, removeFromMyList } = useUpdateMyList();
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
   const { openRatingModal } = useContext(RatingModalContext) || {};
+
+  // UI State
+  const [loading, setLoading] = useState(true);
   const [displayName, setDisplayName] = useState("");
-  const [genreId, setGenreId] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [inputPage, setInputPage] = useState(currentPage);
 
-  // Update input page when current page changes
+  // Data State
+  const [movies, setMovies] = useState([]);
+  const [genreId, setGenreId] = useState(null);
+
+  // Sync input page field with URL page parameter
   useEffect(() => {
     setInputPage(currentPage);
   }, [currentPage]);
 
-  // Scroll to top when component mounts or page changes
+  // Scroll to top when changing pages or genres
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [genreName, currentPage]);
 
-  // Get genre ID from name
+  // Resolve genre ID from URL parameter
   useEffect(() => {
     if (genreName) {
       const formattedGenreName = genreName.replace(/-/g, " ").toLowerCase();
@@ -58,11 +67,11 @@ function Genre() {
     }
   }, [genreName]);
 
-  // Fetch movies by genre
+  // Fetch movies when genre ID or page changes
   useEffect(() => {
     if (genreId) {
       setLoading(true);
-      // Modify the URL to include the page parameter
+
       const url = `discover/movie?api_key=${
         import.meta.env.VITE_TMDB_API_KEY
       }&language=en-US&sort_by=vote_average.desc&vote_count.gte=1000&with_genres=${genreId}&page=${currentPage}`;
@@ -70,15 +79,17 @@ function Genre() {
       axios
         .get(url)
         .then((response) => {
-          // Add isInMyList property to each movie
+          // Mark movies that are already in user's list
           const moviesWithMyListStatus = response.data.results.map((movie) => ({
             ...movie,
             isInMyList: myListMovies.some((m) => m.id === movie.id),
           }));
           setMovies(moviesWithMyListStatus);
+
+          // TMDB API limits to 500 pages
           setTotalPages(
             response.data.total_pages > 500 ? 500 : response.data.total_pages
-          ); // TMDB API limits to 500 pages
+          );
           setLoading(false);
         })
         .catch((error) => {
@@ -88,14 +99,13 @@ function Genre() {
     }
   }, [genreId, currentPage, myListMovies]);
 
-  // Handle page change
+  // Pagination handlers
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       navigate(`/genre/${genreName}?page=${newPage}`);
     }
   };
 
-  // Handle input change
   const handleInputChange = (e) => {
     const value = e.target.value;
     if (value === "" || /^\d+$/.test(value)) {
@@ -103,25 +113,22 @@ function Genre() {
     }
   };
 
-  // Handle Go button click or Enter key
   const handleGoToPage = () => {
     const pageNum = parseInt(inputPage);
     if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
       handlePageChange(pageNum);
     } else {
-      // Reset to current page if invalid
-      setInputPage(currentPage);
+      setInputPage(currentPage); // Reset to current page if invalid
     }
   };
 
-  // Handle Enter key press
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleGoToPage();
     }
   };
 
-  // Generate pagination UI
+  // Pagination UI component
   const renderPagination = () => {
     return (
       <div className="flex flex-col items-center justify-center py-8">

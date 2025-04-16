@@ -1,17 +1,10 @@
-import React, { useContext, useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-
 import axios from "../axios";
 import { searchMovie, searchPerson } from "../config/URLs";
-import { imageUrlBackup } from "../config/constants";
-import { AuthContext } from "../contexts/UserContext";
-
-import StarRating from "../components/StarRating/StarRating";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 import useUpdateMyList from "../hooks/useUpdateMyList";
-import { RatingModalContext } from "../contexts/RatingModalContext";
-import { ClipLoader } from "react-spinners";
 import MovieCard from "../components/Cards/MovieCard";
 import PersonCard from "../components/Cards/PersonCard";
 
@@ -19,24 +12,26 @@ import PersonCard from "../components/Cards/PersonCard";
 import ClearIcon from "../assets/clear-icon.svg?react";
 
 function Search() {
-  const { User } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  // Hooks for movie functionality
   const { handleMoviePopup, myListMovies } = useMoviePopup();
   const { convertGenre } = useGenresConverter();
   const myListUtils = useUpdateMyList();
   const { PopupMessage, addToMyList, removeFromMyList } = myListUtils;
+
+  // Search state
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchType, setSearchType] = useState("movie"); // 'movie' or 'person'
   const [isSearching, setIsSearching] = useState(false);
-  const { openRatingModal } = useContext(RatingModalContext) || {};
-  const navigate = useNavigate();
 
-  // Scroll to top when component mounts
+  // Scroll to top when component mounts for better UX
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Implement search delay for better UX
+  // Search with debounce to improve performance and reduce API calls
   useEffect(() => {
     const delaySearch = setTimeout(() => {
       if (searchQuery.trim().length >= 2) {
@@ -49,6 +44,28 @@ function Search() {
     return () => clearTimeout(delaySearch);
   }, [searchQuery, searchType]);
 
+  // Listen for rating modal interactions to update UI
+  useEffect(() => {
+    const handleRatingModalClosed = (event) => {
+      const { movieId, success, action } = event.detail;
+
+      if (success && (action === "add" || action === "update")) {
+        // Update the searchResults to show that the movie is now in MyList
+        setSearchResults((prevResults) =>
+          prevResults.map((movie) =>
+            movie.id === movieId ? { ...movie, isInMyList: true } : movie
+          )
+        );
+      }
+    };
+
+    window.addEventListener("ratingModalClosed", handleRatingModalClosed);
+    return () => {
+      window.removeEventListener("ratingModalClosed", handleRatingModalClosed);
+    };
+  }, []);
+
+  // Search functionality
   const performSearch = async () => {
     if (!searchQuery.trim() || searchQuery.trim().length < 2) return;
 
@@ -82,13 +99,12 @@ function Search() {
     }
   };
 
-  // Clear search query
+  // Search UI control functions
   const clearSearchQuery = () => {
     setSearchQuery("");
     setSearchResults([]);
   };
 
-  // Toggle search type and clear search
   const toggleSearchType = (type) => {
     if (type !== searchType) {
       setSearchType(type);
@@ -96,36 +112,12 @@ function Search() {
     }
   };
 
-  // Navigate to person detail page
+  // Navigation functions
   const handlePersonClick = (person) => {
     navigate(`/people/${person.id}`);
   };
 
-  // Handle movies being added to MyList via the rating modal
-  useEffect(() => {
-    const handleRatingModalClosed = (event) => {
-      const { movieId, success, action } = event.detail;
-
-      if (success && (action === "add" || action === "update")) {
-        // Update the searchResults to show that the movie is now in MyList
-        setSearchResults((prevResults) =>
-          prevResults.map((movie) =>
-            movie.id === movieId ? { ...movie, isInMyList: true } : movie
-          )
-        );
-      }
-    };
-
-    // Add event listener
-    window.addEventListener("ratingModalClosed", handleRatingModalClosed);
-
-    // Clean up
-    return () => {
-      window.removeEventListener("ratingModalClosed", handleRatingModalClosed);
-    };
-  }, []);
-
-  // Create wrapped versions of list functions to update UI state
+  // MyList management with UI state updates
   const handleAddToMyList = useCallback(
     (movie) => {
       const result = addToMyList(movie);

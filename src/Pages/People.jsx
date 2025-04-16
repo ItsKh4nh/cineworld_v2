@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axios from "../axios";
 import {
   personDetails,
@@ -24,12 +24,11 @@ import ConfirmationModal from "../components/Modals/ConfirmationModal";
 import { formatDate, calculateAge, handleListAction } from "../utils";
 
 function People() {
-  // State variables
+  // State management
   const [loading, setLoading] = useState(true);
   const [person, setPerson] = useState({});
   const [movieCredits, setMovieCredits] = useState({});
   const [externalIds, setExternalIds] = useState({});
-  const [taggedImages, setTaggedImages] = useState([]);
   const [activeTab, setActiveTab] = useState("about");
   const [isInList, setIsInList] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -37,12 +36,11 @@ function People() {
 
   // Hooks
   const { id } = useParams();
-  const navigate = useNavigate();
   const { handleMoviePopup } = useMoviePopup();
   const { isPersonInList, addPersonToList, removePersonFromList } =
     usePeopleList();
 
-  // Check if person is in list
+  // Check if the current person is in the user's list
   const checkPersonInList = async () => {
     if (id && isPersonInList) {
       const result = await isPersonInList(id);
@@ -50,25 +48,20 @@ function People() {
     }
   };
 
-  // Handle add to list button click
+  // List management functions
   const handleAddToListClick = () => {
     setConfirmAction("add");
     setShowConfirmModal(true);
   };
 
-  // Handle remove from list button click
   const handleRemoveFromListClick = () => {
     setConfirmAction("remove");
     setShowConfirmModal(true);
   };
 
-  // Add person to list
   const confirmAddToList = async () => {
     setShowConfirmModal(false);
-
-    // Create a unique toast ID to prevent duplicates
     const toastId = `add-person-${person.id}`;
-
     await handleListAction(
       addPersonToList,
       person,
@@ -78,13 +71,9 @@ function People() {
     );
   };
 
-  // Remove person from list
   const confirmRemoveFromList = async () => {
     setShowConfirmModal(false);
-
-    // Create a unique toast ID to prevent duplicates
     const toastId = `remove-person-${person.id}`;
-
     await handleListAction(
       removePersonFromList,
       person,
@@ -94,49 +83,39 @@ function People() {
     );
   };
 
-  // Data fetching
+  // Data fetching when person ID changes
   useEffect(() => {
-    // Reset states
+    // Reset states for new person data
     setPerson({});
     setMovieCredits({});
     setExternalIds({});
-    setTaggedImages([]);
     setLoading(true);
 
-    // Fetch person details
-    axios
+    // Fetch all required person data in parallel
+    const fetchPersonDetails = axios
       .get(personDetails(id))
-      .then((response) => {
-        setPerson(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching person details:", error);
-      });
+      .then((response) => setPerson(response.data))
+      .catch((error) => console.error("Error fetching person details:", error));
 
-    // Fetch movie credits
-    axios
+    const fetchMovieCredits = axios
       .get(personMovieCredits(id))
-      .then((response) => {
-        setMovieCredits(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching movie credits:", error);
-      });
+      .then((response) => setMovieCredits(response.data))
+      .catch((error) => console.error("Error fetching movie credits:", error));
 
-    // Fetch external IDs
-    axios
+    const fetchExternalIds = axios
       .get(personExternalIds(id))
-      .then((response) => {
-        setExternalIds(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching external IDs:", error);
-      });
+      .then((response) => setExternalIds(response.data))
+      .catch((error) => console.error("Error fetching external IDs:", error));
 
-    setLoading(false);
-
-    // Check if person is in list
-    checkPersonInList();
+    // Execute all requests and update loading state
+    Promise.all([
+      fetchPersonDetails,
+      fetchMovieCredits,
+      fetchExternalIds,
+    ]).finally(() => {
+      setLoading(false);
+      checkPersonInList();
+    });
   }, [id]);
 
   return (
@@ -177,7 +156,7 @@ function People() {
             </div>
           </div>
 
-          {/* Confirmation Modal */}
+          {/* Confirmation Modal for list actions */}
           <ConfirmationModal
             isOpen={showConfirmModal}
             onClose={() => setShowConfirmModal(false)}
@@ -258,7 +237,7 @@ function People() {
                       <p>{person.place_of_birth || "N/A"}</p>
                     </div>
 
-                    {/* External IDs */}
+                    {/* External IDs / Social Media Links */}
                     {(externalIds.imdb_id ||
                       externalIds.facebook_id ||
                       externalIds.instagram_id ||
@@ -359,7 +338,7 @@ function People() {
                     </button>
                   </div>
 
-                  {/* Add to MyList / Remove from MyList button */}
+                  {/* Add/Remove List Button */}
                   {isInList ? (
                     <button
                       onClick={handleRemoveFromListClick}

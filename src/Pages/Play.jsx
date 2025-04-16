@@ -12,18 +12,9 @@ import {
   configurationLanguages,
 } from "../config";
 import { imageUrlOriginal, imageUrlBackup, languageList } from "../config";
-import Navbar from "../components/Header/Navbar";
-import Footer from "../components/Footer/Footer";
-import usePlayMovie from "../hooks/usePlayMovie";
-import useUpdateMyList from "../hooks/useUpdateMyList";
-import useGenresConverter from "../hooks/useGenresConverter";
-import useMoviePopup from "../hooks/useMoviePopup";
 import { ClipLoader } from "react-spinners";
 import { doc, getDoc, updateDoc, arrayUnion, setDoc } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
 import {
   FaImdb,
   FaFacebook,
@@ -31,8 +22,22 @@ import {
   FaTwitter,
   FaWikipediaW,
 } from "react-icons/fa";
+
+// Components
+import Navbar from "../components/Header/Navbar";
+import Footer from "../components/Footer/Footer";
 import StarRating from "../components/StarRating/StarRating";
+
+// Contexts
 import { AuthContext } from "../contexts/UserContext";
+
+// Custom hooks
+import usePlayMovie from "../hooks/usePlayMovie";
+import useUpdateMyList from "../hooks/useUpdateMyList";
+import useGenresConverter from "../hooks/useGenresConverter";
+import useMoviePopup from "../hooks/useMoviePopup";
+
+// Utilities
 import { formatDate, formatMoney, formatRuntime } from "../utils";
 
 // Icons
@@ -42,55 +47,60 @@ import AddIcon from "../assets/add-icon.svg?react";
 import PlaySolidIcon from "../assets/play-solid-icon.svg?react";
 import PlayIcon from "../assets/play-icon.svg?react";
 
+// Swiper styles for carousels
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
 function Play() {
-  // State variables
-  const [urlId, setUrlId] = useState("");
-  const [activeVideo, setActiveVideo] = useState(null);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { User } = useContext(AuthContext);
+  const videoRef = useRef(null);
+
+  // Custom hooks
+  const { playMovie } = usePlayMovie();
+  const { addToMyList, removeFromMyList, PopupMessage, checkIfInMyList } =
+    useUpdateMyList();
+  const { convertGenre } = useGenresConverter();
+  const { handleMoviePopup } = useMoviePopup();
+
+  // Data-related state
   const [movieDetails, setMovieDetails] = useState({});
-  const [isFromMyList, setIsFromMyList] = useState(false);
   const [trailerVideos, setTrailerVideos] = useState([]);
   const [similarMovies, setSimilarMovies] = useState([]);
   const [collectionInfo, setCollectionInfo] = useState(null);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [loading, setLoading] = useState(true);
-  const [isInMyList, setIsInMyList] = useState(false);
-  const [movieSource, setMovieSource] = useState(null);
   const [externalIds, setExternalIds] = useState({});
   const [keywords, setKeywords] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [languages, setLanguages] = useState({});
+  const [movieSource, setMovieSource] = useState(null);
+
+  // UI state
+  const [urlId, setUrlId] = useState("");
+  const [activeVideo, setActiveVideo] = useState(null);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [loading, setLoading] = useState(true);
+  const [isInMyList, setIsInMyList] = useState(false);
+  const [isFromMyList, setIsFromMyList] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const videoRef = useRef(null);
 
-  // Hooks
-  const { User } = useContext(AuthContext);
-  const { addToMyList, removeFromMyList, PopupMessage, checkIfInMyList } =
-    useUpdateMyList();
-  const { playMovie } = usePlayMovie();
-  const { convertGenre } = useGenresConverter();
-  const { handleMoviePopup } = useMoviePopup();
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Track movie interaction directly to avoid circular dependency
+  // Track movie interaction in user's history
   const trackMovieInteraction = async (movie_id) => {
     try {
       if (!User || !User.uid) return false;
 
       const movie_id_number =
         typeof movie_id === "string" ? parseInt(movie_id) : movie_id;
-
-      // Reference to the user's interaction list document
       const interactionDocRef = doc(db, "InteractionList", User.uid);
       const docSnap = await getDoc(interactionDocRef);
 
       if (docSnap.exists()) {
-        // Document exists, check if movie_id is already in the list
+        // Only add if not already in the list
         const userData = docSnap.data();
         const movieIds = userData.movie_ids || [];
 
-        // Only add if not already in the list
         if (!movieIds.includes(movie_id_number)) {
           await updateDoc(interactionDocRef, {
             movie_ids: arrayUnion(movie_id_number),
@@ -112,7 +122,7 @@ function Play() {
     }
   };
 
-  // Track user interaction with video player
+  // Helper functions
   const handlePlayerInteraction = () => {
     if (!hasInteracted) {
       trackMovieInteraction(id);
@@ -120,7 +130,6 @@ function Play() {
     }
   };
 
-  // Check movie source
   const checkMovieSource = async () => {
     try {
       const movieSourceRef = doc(db, "MovieSources", id);
@@ -130,8 +139,7 @@ function Play() {
         const sourceData = movieSourceDoc.data();
         if (sourceData.link_embed_1) {
           setMovieSource(sourceData.link_embed_1);
-          // If we have a direct source, don't load YouTube trailer
-          setUrlId("");
+          setUrlId(""); // If we have a direct source, don't load YouTube trailer
         } else if (sourceData.link_m3u8_1) {
           setMovieSource(sourceData.link_m3u8_1);
           setUrlId("");
@@ -159,25 +167,42 @@ function Play() {
     return languageCode.toUpperCase();
   };
 
-  // Scroll to video on play
   const scrollToVideo = () => {
     if (videoRef.current) {
       videoRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  // Check if movie is in user's list
   const checkMovieInList = async () => {
     const result = await checkIfInMyList(id);
     setIsInMyList(result);
   };
 
-  // Data fetching
-  useEffect(() => {
-    // Scroll to top when navigating to a new movie
-    window.scrollTo(0, 0);
+  const handleMyListAction = () => {
+    if (isInMyList) {
+      removeFromMyList(movieDetails).then((result) => {
+        if (result) {
+          setIsInMyList(false);
+        }
+      });
+    } else {
+      addToMyList(movieDetails).then((result) => {
+        if (result) {
+          setIsInMyList(true);
+        }
+      });
+    }
+  };
 
-    // Reset states
+  const handleVideoSelect = (video) => {
+    // Open the video directly in YouTube in a new tab
+    window.open(`https://www.youtube.com/watch?v=${video.key}`, "_blank");
+  };
+
+  // Initial data loading
+  useEffect(() => {
+    // Reset state and scroll to top when navigating to a new movie
+    window.scrollTo(0, 0);
     setUrlId("");
     setActiveVideo(null);
     setMovieDetails({});
@@ -222,13 +247,11 @@ function Play() {
       .get(movieVideos(id))
       .then((response) => {
         if (response.data.results.length !== 0) {
-          // Set the first trailer as the active video for the page header
+          // Find trailers or teasers to use as the main video
           const trailers = response.data.results.filter(
             (video) => video.type === "Trailer" || video.type === "Teaser"
           );
           if (trailers.length > 0) {
-            // Only set these for initial page load autoplay
-            // This won't affect the video tab click behavior
             setActiveVideo(trailers[0]);
             setUrlId(trailers[0].key);
           }
@@ -239,13 +262,13 @@ function Play() {
         console.error("Error fetching videos:", error);
       });
 
-    // Fetch movie details
+    // Fetch movie details and related data
     axios
       .get(getMovieDetails(id))
       .then((response) => {
         setMovieDetails(response.data);
 
-        // Fetch collection details
+        // Fetch collection details if movie belongs to a collection
         if (response.data.belongs_to_collection) {
           axios
             .get(collectionDetails(response.data.belongs_to_collection.id))
@@ -256,7 +279,6 @@ function Play() {
 
               // Mark each movie in collection to check if it's in user's list
               if (User && User.uid) {
-                // Check each movie in the collection
                 const checkPromises = processedCollection.parts.map(
                   async (movie) => {
                     const isInList = await checkIfInMyList(movie.id);
@@ -264,7 +286,6 @@ function Play() {
                   }
                 );
 
-                // Wait for all checks to complete
                 Promise.all(checkPromises).then((updatedParts) => {
                   processedCollection.parts = updatedParts;
                   setCollectionInfo(processedCollection);
@@ -314,7 +335,7 @@ function Play() {
           .then((res) => {
             const recommendedMovies = res.data.results.slice(0, 20);
 
-            // Check which movies are in the user's list and filter them out
+            // Check which movies are in the user's list
             if (User && User.uid) {
               const checkPromises = recommendedMovies.map(async (movie) => {
                 const isInList = await checkIfInMyList(movie.id);
@@ -346,19 +367,19 @@ function Play() {
       });
   }, [id]);
 
-  // Check if movie is in user's list and handle collection movies
+  // Update UI when the PopupMessage changes (indicates add/remove operations completed)
   useEffect(() => {
     if (!loading) {
       checkMovieInList();
 
-      // Check if collection movies are in the user's list
+      // Update collection movies' status in user's list
       if (collectionInfo && collectionInfo.parts) {
         const checkCollectionMovies = async () => {
           for (const movie of collectionInfo.parts) {
             const isInList = await checkIfInMyList(movie.id);
             movie.isInMyList = isInList;
           }
-          // Force a re-render
+          // Force a re-render with new state reference
           setCollectionInfo({ ...collectionInfo });
         };
 
@@ -367,29 +388,7 @@ function Play() {
     }
   }, [PopupMessage]);
 
-  // Handle movie list actions
-  const handleMyListAction = () => {
-    if (isInMyList) {
-      removeFromMyList(movieDetails).then((result) => {
-        if (result) {
-          setIsInMyList(false);
-        }
-      });
-    } else {
-      addToMyList(movieDetails).then((result) => {
-        if (result) {
-          setIsInMyList(true);
-        }
-      });
-    }
-  };
-
-  // Handle video selection
-  const handleVideoSelect = (video) => {
-    // Open the video directly in YouTube in a new tab
-    window.open(`https://www.youtube.com/watch?v=${video.key}`, "_blank");
-  };
-
+  // Component Rendering
   return (
     <div className="min-h-screen bg-black text-white pt-16">
       <Navbar playPage />

@@ -4,18 +4,30 @@ import { Fade } from "react-awesome-reveal";
 import { AuthContext } from "../contexts/UserContext";
 import Footer from "../components/Footer/Footer";
 
+/**
+ * Welcome page component - serves as the landing page for unauthenticated users
+ * Features a hero section, feature highlights, and signup/guest authentication options
+ */
 function Welcome() {
+  // State and context
   const [email, setEmail] = useState("");
   const { User, isGuestMode, enableGuestMode } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Only redirect authenticated users, but not guest users
+  /**
+   * Redirect authenticated users to home page
+   * Guest users are allowed to stay on this page if they want
+   */
   useEffect(() => {
     if (User && !isGuestMode) {
       navigate("/");
     }
   }, [User, isGuestMode, navigate]);
 
+  /**
+   * Enables guest mode and redirects to the home page
+   * This allows users to browse content without creating an account
+   */
   const handleGuestMode = () => {
     enableGuestMode();
     navigate("/");
@@ -23,7 +35,7 @@ function Welcome() {
 
   return (
     <div>
-      {/*Hero Section*/}
+      {/* Hero Section with Sign-Up Form */}
       <div
         style={{
           background: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.5)), url("/hero.png")`,
@@ -60,7 +72,7 @@ function Welcome() {
                     </button>
                   </Link>
                 </div>
-                <button 
+                <button
                   onClick={handleGuestMode}
                   className="mt-4 px-6 py-2 text-white bg-transparent border border-white rounded-sm hover:bg-white hover:text-black transition-colors"
                 >
@@ -78,13 +90,12 @@ function Welcome() {
         ></div>
       </div>
 
-      {/* separator */}
+      {/* Section Separator */}
       <div className="h-2 w-full bg-[#232323]" aria-hidden="true" />
 
-      {/* 1st section */}
+      {/* Feature Section: TV Experience */}
       <div className="py-10 bg-black text-white">
         <div className="flex max-w-6xl mx-auto items-center justify-center md:flex-row flex-col px-4 md:px-2">
-          {/* left side */}
           <div className="flex-1 text-center md:text-left">
             <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
               Enjoy on your TV
@@ -94,7 +105,6 @@ function Welcome() {
               Blu-ray players, and more.
             </p>
           </div>
-          {/* right side */}
           <div className="flex-1 relative">
             <img src="/tv.png" alt="TV image" className="mt-4 z-20 relative" />
             <video
@@ -110,13 +120,12 @@ function Welcome() {
         </div>
       </div>
 
-      {/* separator */}
+      {/* Section Separator */}
       <div className="h-2 w-full bg-[#232323]" aria-hidden="true" />
 
-      {/* 2nd section */}
+      {/* Feature Section: Downloadable Content */}
       <div className="py-10 bg-black text-white">
         <div className="flex max-w-6xl mx-auto items-center justify-center md:flex-row flex-col-reverse px-4 md:px-2">
-          {/* left side */}
           <div className="flex-1 relative">
             <div className="relative">
               <img
@@ -150,8 +159,6 @@ function Welcome() {
               </div>
             </div>
           </div>
-          {/* right side */}
-
           <div className="flex-1 md:text-left text-center">
             <h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-balance">
               Download your shows to watch offline
@@ -163,14 +170,12 @@ function Welcome() {
         </div>
       </div>
 
-      {/* separator */}
-
+      {/* Section Separator */}
       <div className="h-2 w-full bg-[#232323]" aria-hidden="true" />
 
-      {/* 3rd section */}
+      {/* Feature Section: Multi-device Support */}
       <div className="py-10 bg-black text-white">
         <div className="flex max-w-6xl mx-auto items-center justify-center md:flex-row flex-col px-4 md:px-2">
-          {/* left side */}
           <div className="flex-1 text-center md:text-left">
             <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
               Watch everywhere
@@ -179,8 +184,6 @@ function Welcome() {
               Stream unlimited movies on your phone, tablet, laptop, and TV.
             </p>
           </div>
-
-          {/* right side */}
           <div className="flex-1 relative overflow-hidden">
             <img
               src="/device-pile.png"
@@ -202,20 +205,19 @@ function Welcome() {
         </div>
       </div>
 
+      {/* Section Separator */}
       <div className="h-2 w-full bg-[#232323]" aria-hidden="true" />
 
-      {/* 4th section*/}
+      {/* Feature Section: Kids Profiles */}
       <div className="py-10 bg-black text-white">
         <div
           className="flex max-w-6xl mx-auto items-center justify-center flex-col-reverse md:flex-row
            px-4 md:px-2
         "
         >
-          {/* left */}
           <div className="flex-1 relative">
-            <img src="/kids.png" alt="Enjoy on your TV" className="mt-4" />
+            <img src="/kids.png" alt="Kids profile feature" className="mt-4" />
           </div>
-          {/* right */}
           <div className="flex-1 text-center md:text-left">
             <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
               Create profiles for kids
@@ -228,11 +230,10 @@ function Welcome() {
         </div>
       </div>
 
-      {/* separator */}
-
+      {/* Section Separator */}
       <div className="h-2 w-full bg-[#232323]" aria-hidden="true" />
 
-      {/* Footer */}
+      {/* Footer Section */}
       <Footer></Footer>
     </div>
   );

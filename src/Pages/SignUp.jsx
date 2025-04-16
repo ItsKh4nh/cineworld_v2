@@ -16,31 +16,37 @@ import EyeClosedIcon from "../assets/eye-closed-icon.svg?react";
 import ErrorIcon from "../assets/error-icon.svg?react";
 
 function SignUp() {
+  const navigate = useNavigate();
   const location = useLocation();
   const { User, setUser } = useContext(AuthContext);
+
+  // Form state
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [ErrorMessage, setErrorMessage] = useState("");
+
+  // UI state
+  const [errorMessage, setErrorMessage] = useState("");
   const [loader, setLoader] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState({
+  const [showPasswords, setShowPasswords] = useState(false);
+
+  // Validation state
+  const [validationErrors, setValidationErrors] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-  const [showPasswords, setShowPasswords] = useState(false);
 
-  const navigate = useNavigate();
-
-  // Redirect if user is already logged in
+  // Redirect authenticated users to home page
   useEffect(() => {
     if (User) {
       navigate("/");
     }
   }, [User, navigate]);
 
+  // Pre-fill email if provided in URL parameters
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const emailParam = params.get("email");
@@ -49,14 +55,14 @@ function SignUp() {
     }
   }, [location]);
 
+  // Form field validation handlers
   const handleUsernameChange = async (e) => {
     const username = e.target.value;
     setUsername(username);
 
-    // Only perform basic validation without checking Firebase
-    // We'll check username uniqueness during account creation
+    // Perform client-side username validation
     if (!username || username.trim().length === 0) {
-      setFieldErrors((prev) => ({
+      setValidationErrors((prev) => ({
         ...prev,
         username: "Username is required",
       }));
@@ -65,36 +71,33 @@ function SignUp() {
 
     const trimmedUsername = username.trim();
 
-    // Leading/trailing spaces check
     if (username !== trimmedUsername) {
-      setFieldErrors((prev) => ({
+      setValidationErrors((prev) => ({
         ...prev,
         username: "Username cannot start or end with spaces",
       }));
       return;
     }
 
-    // Length validation (6-20 characters)
     if (trimmedUsername.length < 6 || trimmedUsername.length > 20) {
-      setFieldErrors((prev) => ({
+      setValidationErrors((prev) => ({
         ...prev,
         username: "Username must be between 6 and 20 characters",
       }));
       return;
     }
 
-    // Character restriction check (only alphanumeric and underscore)
     const validUsernameRegex = /^[a-zA-Z0-9_]+$/;
     if (!validUsernameRegex.test(trimmedUsername)) {
-      setFieldErrors((prev) => ({
+      setValidationErrors((prev) => ({
         ...prev,
         username: "Username can only contain letters, numbers, and underscores",
       }));
       return;
     }
 
-    // Clear any previous errors if validation passes
-    setFieldErrors((prev) => ({
+    // Clear error if validation passes
+    setValidationErrors((prev) => ({
       ...prev,
       username: "",
     }));
@@ -105,7 +108,7 @@ function SignUp() {
     setEmail(email);
 
     const validation = await validateEmail(email);
-    setFieldErrors((prev) => ({
+    setValidationErrors((prev) => ({
       ...prev,
       email: validation.error || "",
     }));
@@ -116,7 +119,7 @@ function SignUp() {
     setPassword(password);
 
     const validation = validatePassword(password);
-    setFieldErrors((prev) => ({
+    setValidationErrors((prev) => ({
       ...prev,
       password: validation.error || "",
     }));
@@ -127,26 +130,28 @@ function SignUp() {
     setConfirmPassword(confirmPass);
 
     const validation = validateConfirmPassword(password, confirmPass);
-    setFieldErrors((prev) => ({
+    setValidationErrors((prev) => ({
       ...prev,
       confirmPassword: validation.error || "",
     }));
   };
 
+  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoader(true);
     setErrorMessage("");
-    setFieldErrors({
+    setValidationErrors({
       username: "",
       email: "",
       password: "",
       confirmPassword: "",
     });
 
-    // Validate username
+    // Comprehensive validation before submission
+    // Username validation
     if (!username || username.trim().length === 0) {
-      setFieldErrors((prev) => ({
+      setValidationErrors((prev) => ({
         ...prev,
         username: "Username is required",
       }));
@@ -156,9 +161,8 @@ function SignUp() {
 
     const trimmedUsername = username.trim();
 
-    // Leading/trailing spaces check
     if (username !== trimmedUsername) {
-      setFieldErrors((prev) => ({
+      setValidationErrors((prev) => ({
         ...prev,
         username: "Username cannot start or end with spaces",
       }));
@@ -166,9 +170,8 @@ function SignUp() {
       return;
     }
 
-    // Length validation (6-20 characters)
     if (trimmedUsername.length < 6 || trimmedUsername.length > 20) {
-      setFieldErrors((prev) => ({
+      setValidationErrors((prev) => ({
         ...prev,
         username: "Username must be between 6 and 20 characters",
       }));
@@ -176,10 +179,9 @@ function SignUp() {
       return;
     }
 
-    // Character restriction check (only alphanumeric and underscore)
     const validUsernameRegex = /^[a-zA-Z0-9_]+$/;
     if (!validUsernameRegex.test(trimmedUsername)) {
-      setFieldErrors((prev) => ({
+      setValidationErrors((prev) => ({
         ...prev,
         username: "Username can only contain letters, numbers, and underscores",
       }));
@@ -187,10 +189,10 @@ function SignUp() {
       return;
     }
 
-    // Validate password first
+    // Password validation
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
-      setFieldErrors((prev) => ({
+      setValidationErrors((prev) => ({
         ...prev,
         password: passwordValidation.error,
       }));
@@ -198,13 +200,13 @@ function SignUp() {
       return;
     }
 
-    // Add confirm password validation
+    // Confirm password validation
     const confirmPasswordValidation = validateConfirmPassword(
       password,
       confirmPassword
     );
     if (!confirmPasswordValidation.isValid) {
-      setFieldErrors((prev) => ({
+      setValidationErrors((prev) => ({
         ...prev,
         confirmPassword: confirmPasswordValidation.error,
       }));
@@ -212,10 +214,10 @@ function SignUp() {
       return;
     }
 
-    // Validate email format
+    // Email validation
     const emailValidation = await validateEmail(email);
     if (!emailValidation.isValid) {
-      setFieldErrors((prev) => ({
+      setValidationErrors((prev) => ({
         ...prev,
         email: emailValidation.error,
       }));
@@ -223,14 +225,15 @@ function SignUp() {
       return;
     }
 
-    // Attempt to sign up
+    // Attempt to create user account
     const { user, error } = await emailSignUp(email, password, username);
 
     if (error) {
+      // Route specific errors to the appropriate field
       if (error.includes("Username")) {
-        setFieldErrors((prev) => ({ ...prev, username: error }));
+        setValidationErrors((prev) => ({ ...prev, username: error }));
       } else if (error.includes("Email")) {
-        setFieldErrors((prev) => ({ ...prev, email: error }));
+        setValidationErrors((prev) => ({ ...prev, email: error }));
       } else {
         setErrorMessage(error);
       }
@@ -239,18 +242,18 @@ function SignUp() {
     }
 
     if (user) {
-      // Update the AuthContext immediately
+      // Update context and redirect to home page
       setUser({
         ...user,
-        displayName: username.trim(), // Ensure displayName is set immediately
+        displayName: username.trim(),
       });
       navigate("/");
     }
   };
 
-  // Modify the input class assignment
+  // Helper function for input field styling based on validation state
   const getInputClass = (fieldName) => {
-    return fieldErrors[fieldName]
+    return validationErrors[fieldName]
       ? "bg-stone-700 text-white sm:text-sm rounded-sm border-2 border-red-700 focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
       : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white";
   };
@@ -291,9 +294,9 @@ function SignUp() {
                       placeholder="Enter your username"
                       required=""
                     />
-                    {fieldErrors.username && (
+                    {validationErrors.username && (
                       <p className="mt-1 text-sm text-red-500">
-                        {fieldErrors.username}
+                        {validationErrors.username}
                       </p>
                     )}
                   </div>
@@ -314,9 +317,9 @@ function SignUp() {
                       placeholder="name@example.com"
                       required=""
                     ></input>
-                    {fieldErrors.email && (
+                    {validationErrors.email && (
                       <p className="mt-1 text-sm text-red-500">
-                        {fieldErrors.email}
+                        {validationErrors.email}
                       </p>
                     )}
                   </div>
@@ -349,9 +352,9 @@ function SignUp() {
                         )}
                       </button>
                     </div>
-                    {fieldErrors.password && (
+                    {validationErrors.password && (
                       <p className="mt-1 text-sm text-red-500">
-                        {fieldErrors.password}
+                        {validationErrors.password}
                       </p>
                     )}
                   </div>
@@ -384,18 +387,17 @@ function SignUp() {
                         )}
                       </button>
                     </div>
-                    {fieldErrors.confirmPassword && (
+                    {validationErrors.confirmPassword && (
                       <p className="mt-1 text-sm text-red-500">
-                        {fieldErrors.confirmPassword}
+                        {validationErrors.confirmPassword}
                       </p>
                     )}
                   </div>
                   <div>
-                    {ErrorMessage && (
+                    {errorMessage && (
                       <h1 className="flex text-white font-bold p-4 bg-red-700 rounded text-center">
                         <ErrorIcon className="w-6 h-6 mr-1" />
-
-                        {ErrorMessage}
+                        {errorMessage}
                       </h1>
                     )}
                   </div>

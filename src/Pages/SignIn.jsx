@@ -15,20 +15,24 @@ function SignIn() {
   const { User } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [ErrorMessage, setErrorMessage] = useState("");
-  const [loader, setLoader] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // UI state
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loader, setLoader] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
-  // Redirect if user is already logged in
+  // Redirect authenticated users to home page
   useEffect(() => {
     if (User) {
       navigate("/");
     }
   }, [User, navigate]);
 
+  // Handle email/password sign in
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoader(true);
@@ -47,6 +51,7 @@ function SignIn() {
     }
   };
 
+  // Handle Google sign in
   const signinWithGoogle = async (e) => {
     e.preventDefault();
     setLoader(true);
@@ -63,6 +68,9 @@ function SignIn() {
       navigate("/");
     }
   };
+
+  // Toggle password visibility
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
     <section
@@ -96,14 +104,14 @@ function SignIn() {
                       name="email"
                       id="email"
                       className={
-                        ErrorMessage
+                        errorMessage
                           ? "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 border-2 border-red-700  dark:placeholder-white dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder:text-white"
                           : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-white dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder:text-white"
                       }
                       placeholder="name@example.com"
                       required=""
                       onChange={(e) => setEmail(e.target.value)}
-                    ></input>
+                    />
                   </div>
                   <div>
                     <label
@@ -119,7 +127,7 @@ function SignIn() {
                         id="password"
                         placeholder="••••••••"
                         className={
-                          ErrorMessage
+                          errorMessage
                             ? "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5  border-2 border-red-700 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder:text-white"
                             : "bg-stone-700 text-white sm:text-sm rounded-sm focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder:text-white"
                         }
@@ -129,7 +137,7 @@ function SignIn() {
                       <button
                         type="button"
                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-white"
-                        onClick={() => setShowPassword(!showPassword)}
+                        onClick={togglePasswordVisibility}
                       >
                         {showPassword ? (
                           <EyeClosedIcon className="w-5 h-5" />
@@ -139,14 +147,15 @@ function SignIn() {
                       </button>
                     </div>
                   </div>
-                  <div>
-                    {ErrorMessage && (
-                      <h1 className="flex text-white font-bold p-4 bg-red-700 rounded text-center">
-                        <ErrorIcon className="w-6 h-6 mr-1" />
-                        {ErrorMessage}
-                      </h1>
-                    )}
-                  </div>
+
+                  {/* Display error message if any */}
+                  {errorMessage && (
+                    <div className="flex text-white font-bold p-4 bg-red-700 rounded text-center">
+                      <ErrorIcon className="w-6 h-6 mr-1" />
+                      {errorMessage}
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
@@ -156,7 +165,7 @@ function SignIn() {
                           type="checkbox"
                           className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
                           required=""
-                        ></input>
+                        />
                       </div>
                       <div className="ml-3 text-sm">
                         <label
@@ -177,6 +186,8 @@ function SignIn() {
                       </button>
                     </div>
                   </div>
+
+                  {/* Primary login button */}
                   <button
                     type="submit"
                     className={`w-full text-white ${
@@ -187,6 +198,8 @@ function SignIn() {
                   >
                     {loader ? <ClipLoader color="#ff0000" /> : `Log in`}
                   </button>
+
+                  {/* Google login button */}
                   <button
                     onClick={signinWithGoogle}
                     className={`flex justify-center items-center w-full text-white ${
@@ -199,11 +212,16 @@ function SignIn() {
                       <ClipLoader color="#ff0000" />
                     ) : (
                       <>
-                        <img className="w-8" src="/GoogleLogo.png"></img>{" "}
+                        <img
+                          className="w-8"
+                          src="/GoogleLogo.png"
+                          alt="Google logo"
+                        />
                         <p className="ml-1">Log in with Google</p>
                       </>
                     )}
                   </button>
+
                   <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                     Don't have an account yet?{" "}
                     <Link
@@ -219,6 +237,8 @@ function SignIn() {
           </Fade>
         </div>
       </div>
+
+      {/* Forgot password modal */}
       {showForgotPasswordModal && (
         <ForgotPasswordModal
           onClose={() => setShowForgotPasswordModal(false)}

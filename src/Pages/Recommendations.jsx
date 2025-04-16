@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Removed unused location import
 import { AuthContext } from "../contexts/UserContext";
 import { RatingModalContext } from "../contexts/RatingModalContext";
 import useGenresConverter from "../hooks/useGenresConverter";
@@ -18,35 +18,38 @@ import PlaySolidIcon from "../assets/play-solid-icon.svg?react";
 
 function Recommendations() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
 
+  // Context and custom hooks
   const { User } = useContext(AuthContext);
   const { handleMoviePopup, myListMovies } = useMoviePopup();
   const { convertGenre } = useGenresConverter();
   const { addToMyList, removeFromMyList } = useUpdateMyList();
   const { openRatingModal } = useContext(RatingModalContext) || {};
 
+  // State management
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [noMoviesMessage, setNoMoviesMessage] = useState("");
   const [justAddedMovies, setJustAddedMovies] = useState({});
 
+  // Prevents duplicate API calls during component re-renders
   const fetchedRef = useRef(false);
 
-  // Scroll to top when component mounts
+  // Ensures page starts at the top when navigating to recommendations
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Fetch recommendations
+  // Fetches personalized movie recommendations for the current user
   useEffect(() => {
     const fetchRecommendations = async () => {
+      // Redirect unauthenticated users to sign in
       if (!User) {
         navigate("/signin");
         return;
       }
 
+      // Prevent duplicate API calls
       if (fetchedRef.current) return;
       fetchedRef.current = true;
 
@@ -54,7 +57,7 @@ function Recommendations() {
         setLoading(true);
         const recommendations = await getPersonalizedRecommendations(User.uid);
 
-        // Add isInMyList property to each movie
+        // Enhance recommendations with myList status for UI state management
         const moviesWithMyListStatus = recommendations.map((movie) => ({
           ...movie,
           isInMyList: myListMovies.some((m) => m.id === movie.id),
@@ -77,14 +80,14 @@ function Recommendations() {
     };
 
     fetchRecommendations();
-  }, [User, myListMovies]);
+  }, [User, myListMovies, navigate]);
 
-  // Handle adding to MyList with local state update
+  // Handles adding a movie to MyList with optimistic UI updates
   const handleAddToMyList = async (movie) => {
     try {
       const success = await addToMyList(movie);
       if (success) {
-        // Update local state to show immediately changed button
+        // Update local state for immediate UI feedback before global state updates
         setJustAddedMovies((prev) => ({ ...prev, [movie.id]: true }));
       }
     } catch (error) {
@@ -92,8 +95,9 @@ function Recommendations() {
     }
   };
 
-  // Movie list item component
+  // Movie list item component for both mobile and desktop views
   const MovieListItem = ({ movie }) => {
+    // Determine if movie is in user's list (either from context or just added locally)
     const isInList = movie.isInMyList || justAddedMovies[movie.id];
 
     return (
@@ -116,7 +120,7 @@ function Recommendations() {
               loading="lazy"
             />
 
-            {/* Play and Add buttons on image */}
+            {/* Action buttons overlay */}
             <div className="absolute top-2 left-2 flex space-x-2">
               <div
                 onClick={(e) => {
@@ -328,7 +332,7 @@ function Recommendations() {
         </h1>
       </div>
 
-      {/* Movies list - full width container */}
+      {/* Content container with loading, results or error states */}
       <div className="px-4 md:px-8 pb-12 w-full">
         {loading ? (
           <div className="flex justify-center items-center h-64">

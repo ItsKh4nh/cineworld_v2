@@ -1,11 +1,13 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
-
-// Icons
 import HomeIcon from "../assets/home-icon.svg?react";
 
+/**
+ * Error page component displayed when users navigate to a non-existent route
+ * Provides a way for users to return to the home page
+ */
 function ErrorPage() {
   const navigate = useNavigate();
+
   return (
     <div className="h-screen flex items-center justify-center">
       <div className="flex flex-col items-center">
