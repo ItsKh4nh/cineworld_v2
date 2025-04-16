@@ -3,7 +3,7 @@ import { resetPassword } from "../../controllers/auth.controller";
 import { ClipLoader } from "react-spinners";
 
 // Icons
-import { ReactComponent as CloseIcon } from "../../assets/close-icon.svg";
+import CloseIcon from "../../assets/close-icon.svg?react";
 
 /**
  * ForgotPasswordModal Component
