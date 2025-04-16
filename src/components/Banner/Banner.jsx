@@ -14,9 +14,9 @@ import useUpdateMyList from "../../hooks/useUpdateMyList";
 import useMoviePopup from "../../hooks/useMoviePopup";
 
 // Import SVGs as React Components
-import PlayIcon from '../../icons/play-icon.svg?react';
-import MoreInfoIcon from '../../icons/more-info-icon.svg?react';
-import LoadingPlayIcon from '../../icons/loading-play-icon.svg?react';
+import PlayIcon from "../../assets/play-icon.svg?react";
+import MoreInfoIcon from "../../assets/more-info-icon.svg?react";
+import LoadingPlayIcon from "../../assets/loading-play-icon.svg?react";
 
 function Banner(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);
@@ -26,7 +26,7 @@ function Banner(props) {
   const { handleMoviePopup, formatDate, myListMovies } = useMoviePopup();
 
   const [movie, setMovie] = useState([]);
-  
+
   function getWindowSize() {
     const { innerWidth: width } = window;
     return { width };
@@ -36,7 +36,9 @@ function Banner(props) {
   const fetchMovies = async () => {
     try {
       const response = await axios.get(props.url);
-      const randomMovie = response.data.results.sort(() => 0.5 - Math.random())[0];
+      const randomMovie = response.data.results.sort(
+        () => 0.5 - Math.random()
+      )[0];
 
       // Check if movie is in MyList
       const isInMyList = myListMovies.some((m) => m.id === randomMovie.id);
@@ -90,7 +92,11 @@ function Banner(props) {
               <div className="flex items-center">
                 <div className="flex justify-center sm:justify-start">
                   {movie.vote_average ? (
-                    <StarRating rating={movie.vote_average} size="large" showDenominator={true} />
+                    <StarRating
+                      rating={movie.vote_average}
+                      size="large"
+                      showDenominator={true}
+                    />
                   ) : null}
                 </div>
                 <div className="flex justify-center sm:justify-start ml-6">
@@ -105,14 +111,16 @@ function Banner(props) {
               {movie.genre_ids && movie.genre_ids.length > 0 && (
                 <div className="flex items-center">
                   <div className="flex text-white text-lg">
-                    {convertGenre(movie.genre_ids).map((genre, index, array) => (
-                      <React.Fragment key={index}>
-                        <span className="font-medium">{genre}</span>
-                        {index < array.length - 1 && (
-                          <span className="mx-2 text-gray-400">•</span>
-                        )}
-                      </React.Fragment>
-                    ))}
+                    {convertGenre(movie.genre_ids).map(
+                      (genre, index, array) => (
+                        <React.Fragment key={index}>
+                          <span className="font-medium">{genre}</span>
+                          {index < array.length - 1 && (
+                            <span className="mx-2 text-gray-400">•</span>
+                          )}
+                        </React.Fragment>
+                      )
+                    )}
                   </div>
                 </div>
               )}

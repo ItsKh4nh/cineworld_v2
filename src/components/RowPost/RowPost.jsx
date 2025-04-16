@@ -21,9 +21,9 @@ import "./RowPostStyles.scss";
 import StarRating from "../StarRating/StarRating";
 
 // Import SVGs as React Components
-import PlayIcon from '../../icons/play-icon.svg?react';
-import EditIcon from '../../icons/edit-icon.svg?react';
-import AddIcon from '../../icons/add-icon.svg?react';
+import PlayIcon from "../../assets/play-icon.svg?react";
+import EditIcon from "../../assets/edit-icon.svg?react";
+import AddIcon from "../../assets/add-icon.svg?react";
 
 function RowPost(props) {
   const { User } = useContext(AuthContext);
@@ -48,7 +48,8 @@ function RowPost(props) {
     // Otherwise, fetch movies from the URL
     if (props.url) {
       setIsLoading(true);
-      axios.get(props.url)
+      axios
+        .get(props.url)
         .then((response) => {
           if (response.data && response.data.results) {
             setMovies(response.data.results);
@@ -73,7 +74,7 @@ function RowPost(props) {
     if (!myListMovies || !Array.isArray(myListMovies)) {
       return false;
     }
-    return myListMovies.some(movie => movie.id === movie_id);
+    return myListMovies.some((movie) => movie.id === movie_id);
   };
 
   const customSettings = {
@@ -171,7 +172,10 @@ function RowPost(props) {
                           onClick={(e) => {
                             e.stopPropagation();
                             if (openRatingModal) {
-                              openRatingModal({ ...obj, isInMyList: true }, User);
+                              openRatingModal(
+                                { ...obj, isInMyList: true },
+                                User
+                              );
                             }
                           }}
                           className="bg-cineworldYellow text-white w-9 h-9 rounded-full flex items-center justify-center mr-1 backdrop-blur-[1px] shadow-md ease-linear transition-all duration-150 hover:bg-white hover:text-cineworldYellow"
@@ -183,11 +187,14 @@ function RowPost(props) {
                           onClick={async (e) => {
                             e.stopPropagation();
                             // Update the movies array with the updated isInMyList status
-                            const result = await addToMyList({ ...obj, isInMyList: false });
+                            const result = await addToMyList({
+                              ...obj,
+                              isInMyList: false,
+                            });
                             if (result) {
                               // If successful, update the movies state to reflect the change
-                              setMovies(prevMovies =>
-                                prevMovies.map(movie =>
+                              setMovies((prevMovies) =>
+                                prevMovies.map((movie) =>
                                   movie.id === obj.id
                                     ? { ...movie, isInMyList: true }
                                     : movie
@@ -214,7 +221,9 @@ function RowPost(props) {
                       <StarRating rating={obj.vote_average} />
                     </div>
 
-                    {converted && Array.isArray(converted) && converted.length > 0 && (
+                    {converted &&
+                      Array.isArray(converted) &&
+                      converted.length > 0 &&
                       converted.map((genre, idx) => {
                         return (
                           <span
@@ -224,8 +233,7 @@ function RowPost(props) {
                             {genre}
                           </span>
                         );
-                      })
-                    )}
+                      })}
                   </div>
                 </SwiperSlide>
               );

@@ -18,24 +18,33 @@ import { FaMinus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 // Import SVGs as React Components
-import ClearIcon from '../../icons/clear-icon.svg?react';
-import StarPlaceholderIcon from '../../icons/star-placeholder-icon.svg?react';
-import EditIcon from '../../icons/edit-icon.svg?react';
-import RemoveIcon from '../../icons/remove-icon.svg?react';
+import ClearIcon from "../../assets/clear-icon.svg?react";
+import StarPlaceholderIcon from "../../assets/star-placeholder-icon.svg?react";
+import EditIcon from "../../assets/edit-icon.svg?react";
+import RemoveIcon from "../../assets/remove-icon.svg?react";
 
 function MyListTable() {
   const { User } = useContext(AuthContext);
-  const { removeFromMyList, updateMovieNote, PopupMessage, addRatedMovieToList, updateRatedMovie } = useUpdateMyList();
+  const {
+    removeFromMyList,
+    updateMovieNote,
+    PopupMessage,
+    addRatedMovieToList,
+    updateRatedMovie,
+  } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { handleMoviePopup } = useMoviePopup();
   const { convertGenre } = useGenresConverter();
-  
+
   const [myMovies, setMyMovies] = useState([]);
   const [myPeople, setMyPeople] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingNote, setEditingNote] = useState(null);
   const [noteText, setNoteText] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: 'dateAdded', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState({
+    key: "dateAdded",
+    direction: "desc",
+  });
   const [editingRating, setEditingRating] = useState(null);
   const [activeTab, setActiveTab] = useState("movies");
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -60,8 +69,8 @@ function MyListTable() {
       setIsLargeScreen(window.innerWidth >= 1200);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -71,22 +80,24 @@ function MyListTable() {
   useEffect(() => {
     if (myMovies.length > 0) {
       // Extract all genre IDs from movies
-      const allGenreIds = myMovies.flatMap(movie => movie.genre_ids || []);
+      const allGenreIds = myMovies.flatMap((movie) => movie.genre_ids || []);
       // Get unique genre IDs
       const uniqueGenreIds = [...new Set(allGenreIds)];
       // Map to genre names using the genresList from constants
-      const genres = uniqueGenreIds.map(id => {
-        const genre = genresList.find(g => g.id === id);
-        return genre ? { id, name: genre.name } : null;
-      }).filter(Boolean);
-      
+      const genres = uniqueGenreIds
+        .map((id) => {
+          const genre = genresList.find((g) => g.id === id);
+          return genre ? { id, name: genre.name } : null;
+        })
+        .filter(Boolean);
+
       setAvailableGenres(genres);
     }
   }, [myMovies]);
 
   function getMovies() {
     setLoading(true);
-    
+
     // Get movies from MyList collection
     getDoc(doc(db, "MyList", User.uid))
       .then((result) => {
@@ -96,20 +107,22 @@ function MyListTable() {
           const moviesWithRuntime = data.movies.map(async (movie) => {
             try {
               // Use the project's axios instance with baseURL already configured
-              const response = await axios.get(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=en-US`);
+              const response = await axios.get(
+                `https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=en-US`
+              );
               return {
                 ...movie,
                 runtime: response.data.runtime,
-                release_date_full: response.data.release_date
+                release_date_full: response.data.release_date,
               };
             } catch (error) {
               console.error("Error fetching movie details:", error);
               return movie;
             }
           });
-          
+
           // Wait for all promises to resolve
-          Promise.all(moviesWithRuntime).then(updatedMovies => {
+          Promise.all(moviesWithRuntime).then((updatedMovies) => {
             setMyMovies(updatedMovies);
             setAllMovies(updatedMovies); // Store all movies for filtering
           });
@@ -127,7 +140,7 @@ function MyListTable() {
         }
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching data:", error);
         setMyMovies([]);
         setAllMovies([]);
@@ -137,91 +150,105 @@ function MyListTable() {
   }
 
   const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
     }
     setSortConfig({ key, direction });
   };
 
   const sortedMovies = React.useMemo(() => {
     let sortableMovies = [...myMovies];
-    
+
     // First apply genre filter if any genres are selected
     if (selectedGenres.length > 0) {
-      sortableMovies = sortableMovies.filter(movie => {
+      sortableMovies = sortableMovies.filter((movie) => {
         // Check if movie has ALL of the selected genres (AND logic)
-        return movie.genre_ids && selectedGenres.every(genreId => 
-          movie.genre_ids.includes(genreId)
+        return (
+          movie.genre_ids &&
+          selectedGenres.every((genreId) => movie.genre_ids.includes(genreId))
         );
       });
     }
-    
+
     if (sortConfig.key) {
       sortableMovies.sort((a, b) => {
         // Special handling for date fields
-        if (sortConfig.key === 'release_date_full' || sortConfig.key === 'release_date' || sortConfig.key === 'first_air_date') {
-          const dateA = a[sortConfig.key] ? new Date(a[sortConfig.key]) : new Date(0);
-          const dateB = b[sortConfig.key] ? new Date(b[sortConfig.key]) : new Date(0);
-          
-          return sortConfig.direction === 'asc' 
-            ? dateA - dateB 
-            : dateB - dateA;
+        if (
+          sortConfig.key === "release_date_full" ||
+          sortConfig.key === "release_date" ||
+          sortConfig.key === "first_air_date"
+        ) {
+          const dateA = a[sortConfig.key]
+            ? new Date(a[sortConfig.key])
+            : new Date(0);
+          const dateB = b[sortConfig.key]
+            ? new Date(b[sortConfig.key])
+            : new Date(0);
+
+          return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
         }
-        
+
         // Special handling for userRating.dateAdded
-        if (sortConfig.key === 'userRating.dateAdded') {
-          const dateA = a.userRating?.dateAdded ? new Date(a.userRating.dateAdded) : new Date(0);
-          const dateB = b.userRating?.dateAdded ? new Date(b.userRating.dateAdded) : new Date(0);
-          
-          return sortConfig.direction === 'asc' 
-            ? dateA - dateB 
-            : dateB - dateA;
+        if (sortConfig.key === "userRating.dateAdded") {
+          const dateA = a.userRating?.dateAdded
+            ? new Date(a.userRating.dateAdded)
+            : new Date(0);
+          const dateB = b.userRating?.dateAdded
+            ? new Date(b.userRating.dateAdded)
+            : new Date(0);
+
+          return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
         }
-        
+
         // Handle nested properties for userRating
-        if (sortConfig.key.includes('.')) {
-          const [parent, child] = sortConfig.key.split('.');
-          
+        if (sortConfig.key.includes(".")) {
+          const [parent, child] = sortConfig.key.split(".");
+
           // Handle the case where one or both movies don't have the parent property
           if (!a[parent] && !b[parent]) return 0;
-          if (!a[parent]) return sortConfig.direction === 'asc' ? -1 : 1;
-          if (!b[parent]) return sortConfig.direction === 'asc' ? 1 : -1;
-          
+          if (!a[parent]) return sortConfig.direction === "asc" ? -1 : 1;
+          if (!b[parent]) return sortConfig.direction === "asc" ? 1 : -1;
+
           // Handle the case where one or both movies don't have the child property
-          if (child === 'score') {
-            const scoreA = a[parent][child] !== undefined ? a[parent][child] : -1;
-            const scoreB = b[parent][child] !== undefined ? b[parent][child] : -1;
-            
+          if (child === "score") {
+            const scoreA =
+              a[parent][child] !== undefined ? a[parent][child] : -1;
+            const scoreB =
+              b[parent][child] !== undefined ? b[parent][child] : -1;
+
             if (scoreA < scoreB) {
-              return sortConfig.direction === 'asc' ? -1 : 1;
+              return sortConfig.direction === "asc" ? -1 : 1;
             }
             if (scoreA > scoreB) {
-              return sortConfig.direction === 'asc' ? 1 : -1;
+              return sortConfig.direction === "asc" ? 1 : -1;
             }
             return 0;
           }
-          
+
           // For other properties
-          if (a[parent][child] === undefined && b[parent][child] === undefined) return 0;
-          if (a[parent][child] === undefined) return sortConfig.direction === 'asc' ? -1 : 1;
-          if (b[parent][child] === undefined) return sortConfig.direction === 'asc' ? 1 : -1;
-          
+          if (a[parent][child] === undefined && b[parent][child] === undefined)
+            return 0;
+          if (a[parent][child] === undefined)
+            return sortConfig.direction === "asc" ? -1 : 1;
+          if (b[parent][child] === undefined)
+            return sortConfig.direction === "asc" ? 1 : -1;
+
           if (a[parent][child] < b[parent][child]) {
-            return sortConfig.direction === 'asc' ? -1 : 1;
+            return sortConfig.direction === "asc" ? -1 : 1;
           }
           if (a[parent][child] > b[parent][child]) {
-            return sortConfig.direction === 'asc' ? 1 : -1;
+            return sortConfig.direction === "asc" ? 1 : -1;
           }
           return 0;
         }
-        
+
         // Handle direct properties
         if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
+          return sortConfig.direction === "asc" ? -1 : 1;
         }
         if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
+          return sortConfig.direction === "asc" ? 1 : -1;
         }
         return 0;
       });
@@ -236,10 +263,10 @@ function MyListTable() {
 
   const handleSaveNote = async (movie) => {
     const success = await updateMovieNote(movie, noteText);
-    
+
     if (success) {
       setEditingNote(null);
-      
+
       // Refresh the list after a short delay to show the updated data
       setTimeout(() => {
         getMovies();
@@ -257,7 +284,7 @@ function MyListTable() {
       const success = await removeFromMyList(movieToRemove);
       setShowConfirmation(false);
       setMovieToRemove(null);
-      
+
       if (success) {
         // Refresh the list after a short delay to allow the update to complete
         setTimeout(() => {
@@ -274,20 +301,20 @@ function MyListTable() {
 
   const formatDate = (dateString) => {
     if (!dateString) return "Unknown";
-    
+
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return "Unknown";
-    
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return null;
-    return sortConfig.direction === 'asc' ? ' ↑' : ' ↓';
+    return sortConfig.direction === "asc" ? " ↑" : " ↓";
   };
 
   const handleEditRating = (movie) => {
@@ -297,10 +324,10 @@ function MyListTable() {
   const handleSaveRating = async (updatedMovie) => {
     // Use the new updateRatedMovie function to properly update the movie
     const success = await updateRatedMovie(editingRating, updatedMovie);
-    
+
     if (success) {
       setEditingRating(null);
-      
+
       // Refresh the list after a short delay to show the updated data
       setTimeout(() => {
         getMovies();
@@ -310,25 +337,27 @@ function MyListTable() {
 
   const handleRemovePerson = async (person) => {
     try {
-      const userDocRef = doc(db, "MyList", User.uid)
+      const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
-      
+
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const people = userData.people || [];
-        
+
         // Filter out the person to remove
-        const updatedPeople = people.filter(p => p.id !== person.id);
-        
+        const updatedPeople = people.filter((p) => p.id !== person.id);
+
         // Update the document
-        await updateDoc(userDocRef, { 
+        await updateDoc(userDocRef, {
           people: updatedPeople,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         });
-        
+
         // Update local state
-        setMyPeople(prevPeople => prevPeople.filter(p => p.id !== person.id));
-        
+        setMyPeople((prevPeople) =>
+          prevPeople.filter((p) => p.id !== person.id)
+        );
+
         toast.success("Person removed from your list");
       }
     } catch (error) {
@@ -339,10 +368,10 @@ function MyListTable() {
 
   const formatRuntime = (minutes) => {
     if (!minutes) return "Unknown";
-    
+
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
-    
+
     if (hours === 0) {
       return `${mins}m`;
     } else if (mins === 0) {
@@ -364,8 +393,8 @@ function MyListTable() {
     if (status === "All") {
       setMyMovies(allMovies);
     } else {
-      const filtered = allMovies.filter(movie => 
-        movie.userRating?.status === status
+      const filtered = allMovies.filter(
+        (movie) => movie.userRating?.status === status
       );
       setMyMovies(filtered);
     }
@@ -387,18 +416,21 @@ function MyListTable() {
   return (
     <div className="container mx-auto px-4 py-8">
       {PopupMessage}
-      
+
       {/* Confirmation Modal */}
       {showConfirmation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
           <div className="fixed inset-0 bg-black bg-opacity-70"></div>
           <div className="relative z-50 bg-gray-800 rounded-lg p-6 max-w-md mx-auto">
-            <h3 className="text-xl font-medium text-white mb-4">Confirm Removal</h3>
+            <h3 className="text-xl font-medium text-white mb-4">
+              Confirm Removal
+            </h3>
             <p className="text-gray-300 mb-6">
-              Are you sure you want to remove "{movieToRemove?.title || movieToRemove?.name}" from your list?
+              Are you sure you want to remove "
+              {movieToRemove?.title || movieToRemove?.name}" from your list?
             </p>
             <div className="flex justify-end space-x-4">
-              <button 
+              <button
                 onClick={cancelRemove}
                 className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
               >
@@ -416,7 +448,7 @@ function MyListTable() {
       )}
 
       {/* Filter Modal */}
-      <FilterModal 
+      <FilterModal
         isOpen={showFilterModal}
         onClose={handleCloseFilterModal}
         availableGenres={availableGenres}
@@ -425,7 +457,7 @@ function MyListTable() {
         onApplyStatusFilter={handleApplyStatusFilter}
         onResetFilters={handleResetFilters}
       />
-      
+
       {/* Rating Modal */}
       {editingRating && (
         <RatingModal
@@ -434,7 +466,7 @@ function MyListTable() {
           onSave={handleSaveRating}
         />
       )}
-      
+
       {/* Tab Selector - Added mt-16 to create more space from navbar */}
       <div className="flex mb-6 border-b border-gray-700 mt-16">
         <button
@@ -447,7 +479,7 @@ function MyListTable() {
         >
           Movies
         </button>
-        <button 
+        <button
           className={`px-6 py-3 font-medium text-sm ${
             activeTab === "people"
               ? "text-red-600 border-b-2 border-red-600"
@@ -458,9 +490,9 @@ function MyListTable() {
           People
         </button>
       </div>
-      
+
       {/* Movies Tab */}
-      {activeTab === 'movies' && (
+      {activeTab === "movies" && (
         <>
           {/* Add Search, Filter and Sort Controls */}
           <div className="mb-6 flex flex-col md:flex-row gap-4">
@@ -473,21 +505,26 @@ function MyListTable() {
                 onChange={(e) => {
                   const searchTerm = e.target.value.toLowerCase();
                   setSearchTerm(searchTerm);
-                  
-                  if (searchTerm === '') {
+
+                  if (searchTerm === "") {
                     setMyMovies(allMovies); // Reset to original list
                   } else {
-                    const filtered = allMovies.filter(movie => 
-                      (movie.title || movie.name).toLowerCase().includes(searchTerm) ||
-                      (movie.userRating?.note || '').toLowerCase().includes(searchTerm)
+                    const filtered = allMovies.filter(
+                      (movie) =>
+                        (movie.title || movie.name)
+                          .toLowerCase()
+                          .includes(searchTerm) ||
+                        (movie.userRating?.note || "")
+                          .toLowerCase()
+                          .includes(searchTerm)
                     );
                     setMyMovies(filtered);
                   }
                 }}
               />
-              <button 
+              <button
                 onClick={() => {
-                  setSearchTerm('');
+                  setSearchTerm("");
                   setMyMovies(allMovies); // Reset to original list
                 }}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600 hover:text-red-500 focus:outline-none"
@@ -501,14 +538,17 @@ function MyListTable() {
                 onClick={handleOpenFilterModal}
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 w-full md:w-auto"
               >
-                Filters {selectedGenres.length > 0 ? `(${selectedGenres.length})` : ''}
+                Filters{" "}
+                {selectedGenres.length > 0 ? `(${selectedGenres.length})` : ""}
               </button>
             </div>
           </div>
-          
+
           {myMovies.length === 0 ? (
             <div className="text-center py-10">
-              <p className="text-xl text-gray-400">Your movie list is empty. Add some movies to get started!</p>
+              <p className="text-xl text-gray-400">
+                Your movie list is empty. Add some movies to get started!
+              </p>
             </div>
           ) : (
             <>
@@ -521,30 +561,40 @@ function MyListTable() {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                           #
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer" 
-                            onClick={() => handleSort('title')}>
-                          Title {getSortIcon('title')}
+                        <th
+                          className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
+                          onClick={() => handleSort("title")}
+                        >
+                          Title {getSortIcon("title")}
                         </th>
                         {isLargeScreen && (
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                             Genres
                           </th>
                         )}
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
-                            onClick={() => handleSort('release_date_full')}>
-                          Release Date {getSortIcon('release_date_full')}
+                        <th
+                          className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
+                          onClick={() => handleSort("release_date_full")}
+                        >
+                          Release Date {getSortIcon("release_date_full")}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
-                            onClick={() => handleSort('runtime')}>
-                          Runtime {getSortIcon('runtime')}
+                        <th
+                          className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
+                          onClick={() => handleSort("runtime")}
+                        >
+                          Runtime {getSortIcon("runtime")}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
-                            onClick={() => handleSort('userRating.score')}>
-                          Score {getSortIcon('userRating.score')}
+                        <th
+                          className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
+                          onClick={() => handleSort("userRating.score")}
+                        >
+                          Score {getSortIcon("userRating.score")}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
-                            onClick={() => handleSort('userRating.status')}>
-                          Status {getSortIcon('userRating.status')}
+                        <th
+                          className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
+                          onClick={() => handleSort("userRating.status")}
+                        >
+                          Status {getSortIcon("userRating.status")}
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                           Notes
@@ -562,13 +612,16 @@ function MyListTable() {
                           </td>
                           <td className="px-4 py-4">
                             <div className="flex items-center">
-                              <img 
-                                src={imageURL2 + (movie.poster_path || movie.backdrop_path)} 
+                              <img
+                                src={
+                                  imageURL2 +
+                                  (movie.poster_path || movie.backdrop_path)
+                                }
                                 alt={movie.title || movie.name}
                                 className="h-20 w-14 object-cover rounded mr-4"
                               />
                               <div>
-                                <div 
+                                <div
                                   className="text-sm font-medium text-white cursor-pointer hover:text-blue-400"
                                   onClick={() => handleMoviePopup(movie)}
                                 >
@@ -580,12 +633,18 @@ function MyListTable() {
                           {isLargeScreen && (
                             <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
                               <div className="text-sm text-gray-300 mt-1">
-                                {movie.genre_ids ? convertGenre(movie.genre_ids).join(", ") : "N/A"}
+                                {movie.genre_ids
+                                  ? convertGenre(movie.genre_ids).join(", ")
+                                  : "N/A"}
                               </div>
                             </td>
                           )}
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
-                            {formatDate(movie.release_date_full || movie.release_date || movie.first_air_date)}
+                            {formatDate(
+                              movie.release_date_full ||
+                                movie.release_date ||
+                                movie.first_air_date
+                            )}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
                             {formatRuntime(movie.runtime)}
@@ -594,7 +653,10 @@ function MyListTable() {
                             {movie.userRating?.score ? (
                               <StarRating rating={movie.userRating.score} />
                             ) : (
-                              <StarPlaceholderIcon className="w-5 h-5" aria-hidden="true" />
+                              <StarPlaceholderIcon
+                                className="w-5 h-5"
+                                aria-hidden="true"
+                              />
                             )}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -667,37 +729,55 @@ function MyListTable() {
               {isMobile && (
                 <div className="md:hidden">
                   {sortedMovies.map((movie, index) => (
-                    <div key={movie.id} className="flex border-b border-gray-800 py-4">
+                    <div
+                      key={movie.id}
+                      className="flex border-b border-gray-800 py-4"
+                    >
                       <div className="text-gray-400 mr-3 font-medium">
                         {index + 1}
                       </div>
                       <div className="w-16 flex-shrink-0 mr-3">
                         <img
-                          src={imageURL2 + (movie.poster_path || movie.backdrop_path)} 
+                          src={
+                            imageURL2 +
+                            (movie.poster_path || movie.backdrop_path)
+                          }
                           alt={movie.title || movie.name}
                           className="w-full h-24 object-cover rounded"
                         />
                       </div>
                       <div className="flex-1">
-                        <div 
+                        <div
                           className="text-white font-medium cursor-pointer hover:text-blue-400"
                           onClick={() => handleMoviePopup(movie)}
                         >
                           {movie.title || movie.name}
                         </div>
                         <div className="text-sm text-gray-400 mt-1">
-                          {formatDate(movie.release_date_full || movie.release_date || movie.first_air_date)}
+                          {formatDate(
+                            movie.release_date_full ||
+                              movie.release_date ||
+                              movie.first_air_date
+                          )}
                         </div>
                         <div className="text-sm text-gray-300 mt-1">
-                          {movie.genre_ids ? convertGenre(movie.genre_ids).join(", ") : "N/A"}
+                          {movie.genre_ids
+                            ? convertGenre(movie.genre_ids).join(", ")
+                            : "N/A"}
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center">
                             <div className="mr-3">
                               {movie.userRating?.score ? (
-                                <StarRating rating={movie.userRating.score} size="small" />
+                                <StarRating
+                                  rating={movie.userRating.score}
+                                  size="small"
+                                />
                               ) : (
-                                <StarPlaceholderIcon className="w-5 h-5" aria-hidden="true" />
+                                <StarPlaceholderIcon
+                                  className="w-5 h-5"
+                                  aria-hidden="true"
+                                />
                               )}
                             </div>
                             <div className="text-xs text-gray-400">
@@ -730,9 +810,9 @@ function MyListTable() {
           )}
         </>
       )}
-      
+
       {/* People Tab */}
-      {activeTab === 'people' && (
+      {activeTab === "people" && (
         <>
           {/* Search for people */}
           <div className="mb-6 relative">
@@ -744,9 +824,9 @@ function MyListTable() {
               onChange={(e) => {
                 const searchTerm = e.target.value.toLowerCase();
                 setPeopleSearchTerm(searchTerm);
-                
+
                 // Implement search functionality for people
-                if (searchTerm === '') {
+                if (searchTerm === "") {
                   // Just reset people to original list without reloading everything
                   const docRef = doc(db, "MyList", User.uid);
                   getDoc(docRef).then((result) => {
@@ -756,17 +836,20 @@ function MyListTable() {
                     }
                   });
                 } else {
-                  const filtered = myPeople.filter(person => 
-                    person.name.toLowerCase().includes(searchTerm) ||
-                    (person.known_for_department || '').toLowerCase().includes(searchTerm)
+                  const filtered = myPeople.filter(
+                    (person) =>
+                      person.name.toLowerCase().includes(searchTerm) ||
+                      (person.known_for_department || "")
+                        .toLowerCase()
+                        .includes(searchTerm)
                   );
                   setMyPeople(filtered);
                 }
               }}
             />
-            <button 
+            <button
               onClick={() => {
-                setPeopleSearchTerm('');
+                setPeopleSearchTerm("");
                 // Just reset people to original list without reloading everything
                 const docRef = doc(db, "MyList", User.uid);
                 getDoc(docRef).then((result) => {
@@ -782,34 +865,47 @@ function MyListTable() {
               <ClearIcon className="h-6 w-6" />
             </button>
           </div>
-          
+
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <ClipLoader color="#E50914" size={60} />
             </div>
           ) : myPeople.length === 0 ? (
             <div className="text-center py-10">
-              <p className="text-xl text-gray-400">You haven't added any people to your list yet.</p>
+              <p className="text-xl text-gray-400">
+                You haven't added any people to your list yet.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
-              {myPeople.map(person => (
-                <div 
+              {myPeople.map((person) => (
+                <div
                   key={person.id}
                   className="bg-gray-900 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
                 >
-                  <div className="relative cursor-pointer" onClick={() => navigate(`/people/${person.id}`)}>
+                  <div
+                    className="relative cursor-pointer"
+                    onClick={() => navigate(`/people/${person.id}`)}
+                  >
                     <img
-                      src={person.profile_path ? `${imageURL2}${person.profile_path}` : '/placeholder.jpg'}
+                      src={
+                        person.profile_path
+                          ? `${imageURL2}${person.profile_path}`
+                          : "/placeholder.jpg"
+                      }
                       alt={person.name}
                       className="w-full aspect-[2/3] object-cover"
                     />
                   </div>
-                  
+
                   <div className="p-4">
-                    <h3 className="text-white text-lg font-bold line-clamp-1">{person.name}</h3>
-                    <p className="text-gray-400 text-sm mb-3">{person.known_for_department}</p>
-                    
+                    <h3 className="text-white text-lg font-bold line-clamp-1">
+                      {person.name}
+                    </h3>
+                    <p className="text-gray-400 text-sm mb-3">
+                      {person.known_for_department}
+                    </p>
+
                     <div className="flex justify-end">
                       <button
                         onClick={() => handleRemovePerson(person)}
@@ -830,4 +926,4 @@ function MyListTable() {
   );
 }
 
-export default MyListTable; 
+export default MyListTable;

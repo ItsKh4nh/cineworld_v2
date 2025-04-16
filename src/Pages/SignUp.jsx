@@ -11,9 +11,9 @@ import {
 } from "../controllers/auth.controller";
 
 // Import SVGs as React Components
-import EyeOpenIcon from '../icons/eye-open-icon.svg?react';
-import EyeClosedIcon from '../icons/eye-closed-icon.svg?react';
-import ErrorIcon from '../icons/error-icon.svg?react';
+import EyeOpenIcon from "../assets/eye-open-icon.svg?react";
+import EyeClosedIcon from "../assets/eye-closed-icon.svg?react";
+import ErrorIcon from "../assets/error-icon.svg?react";
 
 function SignUp() {
   const location = useLocation();

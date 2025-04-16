@@ -12,15 +12,15 @@ import StarRating from "../components/StarRating/StarRating";
 import MovieCard from "../components/Cards/MovieCard";
 
 // Import SVGs as React Components
-import ChevronLeftIcon from '../icons/chevron-left-icon.svg?react';
-import ChevronRightIcon from '../icons/chevron-right-icon.svg?react';
+import ChevronLeftIcon from "../assets/chevron-left-icon.svg?react";
+import ChevronRightIcon from "../assets/chevron-right-icon.svg?react";
 
 function Genre() {
   const { genreName } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
-  const currentPage = parseInt(queryParams.get('page') || '1');
+  const currentPage = parseInt(queryParams.get("page") || "1");
 
   const { User } = useContext(AuthContext);
   const { handleMoviePopup, myListMovies } = useMoviePopup();
@@ -47,8 +47,10 @@ function Genre() {
   // Get genre ID from name
   useEffect(() => {
     if (genreName) {
-      const formattedGenreName = genreName.replace(/-/g, ' ').toLowerCase();
-      const genre = genresList.find(g => g.name.toLowerCase() === formattedGenreName);
+      const formattedGenreName = genreName.replace(/-/g, " ").toLowerCase();
+      const genre = genresList.find(
+        (g) => g.name.toLowerCase() === formattedGenreName
+      );
       if (genre) {
         setGenreId(genre.id);
         setDisplayName(genre.name);
@@ -61,21 +63,25 @@ function Genre() {
     if (genreId) {
       setLoading(true);
       // Modify the URL to include the page parameter
-      const url = `discover/movie?api_key=${import.meta.env.VITE_TMDB_API_KEY}&language=en-US&sort_by=vote_average.desc&vote_count.gte=1000&with_genres=${genreId}&page=${currentPage}`;
+      const url = `discover/movie?api_key=${
+        import.meta.env.VITE_TMDB_API_KEY
+      }&language=en-US&sort_by=vote_average.desc&vote_count.gte=1000&with_genres=${genreId}&page=${currentPage}`;
 
       axios
         .get(url)
         .then((response) => {
           // Add isInMyList property to each movie
-          const moviesWithMyListStatus = response.data.results.map(movie => ({
+          const moviesWithMyListStatus = response.data.results.map((movie) => ({
             ...movie,
-            isInMyList: myListMovies.some(m => m.id === movie.id)
+            isInMyList: myListMovies.some((m) => m.id === movie.id),
           }));
           setMovies(moviesWithMyListStatus);
-          setTotalPages(response.data.total_pages > 500 ? 500 : response.data.total_pages); // TMDB API limits to 500 pages
+          setTotalPages(
+            response.data.total_pages > 500 ? 500 : response.data.total_pages
+          ); // TMDB API limits to 500 pages
           setLoading(false);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Error fetching genre movies:", error);
           setLoading(false);
         });
@@ -92,7 +98,7 @@ function Genre() {
   // Handle input change
   const handleInputChange = (e) => {
     const value = e.target.value;
-    if (value === '' || /^\d+$/.test(value)) {
+    if (value === "" || /^\d+$/.test(value)) {
       setInputPage(value);
     }
   };
@@ -110,7 +116,7 @@ function Genre() {
 
   // Handle Enter key press
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleGoToPage();
     }
   };
@@ -123,8 +129,11 @@ function Genre() {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage <= 1}
-            className={`w-12 h-12 rounded-full flex items-center justify-center ${currentPage <= 1 ? 'bg-gray-700 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'
-              } transition-colors`}
+            className={`w-12 h-12 rounded-full flex items-center justify-center ${
+              currentPage <= 1
+                ? "bg-gray-700 text-gray-500"
+                : "bg-gray-800 text-white hover:bg-gray-700"
+            } transition-colors`}
           >
             <ChevronLeftIcon className="h-6 w-6" />
           </button>
@@ -144,8 +153,11 @@ function Genre() {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage >= totalPages}
-            className={`w-12 h-12 rounded-full flex items-center justify-center ${currentPage >= totalPages ? 'bg-gray-700 text-gray-500' : 'bg-gray-800 text-white hover:bg-gray-700'
-              } transition-colors`}
+            className={`w-12 h-12 rounded-full flex items-center justify-center ${
+              currentPage >= totalPages
+                ? "bg-gray-700 text-gray-500"
+                : "bg-gray-800 text-white hover:bg-gray-700"
+            } transition-colors`}
           >
             <ChevronRightIcon className="h-6 w-6" />
           </button>
@@ -193,9 +205,7 @@ function Genre() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center pb-12">
-          {renderPagination()}
-        </div>
+        <div className="flex justify-center pb-12">{renderPagination()}</div>
       )}
 
       <Footer />
@@ -203,4 +213,4 @@ function Genre() {
   );
 }
 
-export default Genre; 
+export default Genre;

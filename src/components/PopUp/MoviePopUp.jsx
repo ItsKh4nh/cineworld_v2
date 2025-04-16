@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Fade } from "react-awesome-reveal";
 import YouTube from "react-youtube";
-import StarRating from '../StarRating/StarRating';
+import StarRating from "../StarRating/StarRating";
 
 import { imageURL } from "../../config/constants";
 import { API_KEY } from "../../config/constants";
@@ -16,13 +16,14 @@ import { RatingModalContext } from "../../contexts/RatingModalContext";
 import axios from "../../axios";
 
 // Import SVGs as React Components
-import PlayCircleIcon from '../../icons/play-circle-icon.svg?react';
-import RemoveCircleIcon from '../../icons/remove-circle-icon.svg?react';
-import AddCircleIcon from '../../icons/add-circle-icon.svg?react';
+import PlayCircleIcon from "../../assets/play-circle-icon.svg?react";
+import RemoveCircleIcon from "../../assets/remove-circle-icon.svg?react";
+import AddCircleIcon from "../../assets/add-circle-icon.svg?react";
 
 function MoviePopUp() {
   const { User } = useContext(AuthContext);
-  const { showModal, setShowModal, movieInfo, trailerUrl } = useContext(PopUpContext);
+  const { showModal, setShowModal, movieInfo, trailerUrl } =
+    useContext(PopUpContext);
   const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
   const { openRatingModal } = useContext(RatingModalContext) || {};
   const { isAuthenticated } = useGuestMode();
@@ -47,16 +48,16 @@ function MoviePopUp() {
   // Add body overflow control when modal is open
   useEffect(() => {
     if (showModal) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
       // Set visible immediately to prevent delay
       setIsVisible(true);
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
       setIsVisible(false);
     }
 
     return () => {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     };
   }, [showModal]);
 
@@ -151,7 +152,9 @@ function MoviePopUp() {
                       />
                     ) : (
                       <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
-                        <span className="text-neutral-400">No preview available</span>
+                        <span className="text-neutral-400">
+                          No preview available
+                        </span>
                       </div>
                     )}
                   </div>
@@ -174,21 +177,29 @@ function MoviePopUp() {
                         <div>
                           <div className="text-neutral-400 text-xs">Rating</div>
                           <div className="text-white">
-                            <StarRating rating={movieInfo.vote_average} size="large" />
+                            <StarRating
+                              rating={movieInfo.vote_average}
+                              size="large"
+                            />
                           </div>
                         </div>
 
                         <div>
-                          <div className="text-neutral-400 text-xs">Released on</div>
+                          <div className="text-neutral-400 text-xs">
+                            Released on
+                          </div>
                           <div className="text-white text-sm">
-                            {formatDate(movieInfo.release_date || movieInfo.first_air_date)}
+                            {formatDate(
+                              movieInfo.release_date || movieInfo.first_air_date
+                            )}
                           </div>
                         </div>
 
                         <div>
                           <div className="text-neutral-400 text-xs">Genres</div>
                           <div className="text-white text-sm">
-                            {movieInfo.genre_ids && convertGenre(movieInfo.genre_ids).join(', ')}
+                            {movieInfo.genre_ids &&
+                              convertGenre(movieInfo.genre_ids).join(", ")}
                           </div>
                         </div>
                       </div>
@@ -197,7 +208,9 @@ function MoviePopUp() {
                       <div className="flex flex-col space-y-4">
                         {director && (
                           <div>
-                            <div className="text-neutral-400 text-xs">Director</div>
+                            <div className="text-neutral-400 text-xs">
+                              Director
+                            </div>
                             <div className="text-white text-sm">{director}</div>
                           </div>
                         )}

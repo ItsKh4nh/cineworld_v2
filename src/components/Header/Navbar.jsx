@@ -11,11 +11,11 @@ import { auth } from "../../firebase/FirebaseConfig";
 import useHasInteractions from "../../hooks/useHasInteractions";
 
 // Import SVGs as React Components
-import SparkleIcon from '../../icons/sparkle-icon.svg?react';
-import ChevronDownIcon from '../../icons/chevron-down-icon.svg?react';
-import SearchIcon from '../../icons/search-icon.svg?react';
-import MenuIcon from '../../icons/menu-icon.svg?react';
-import CloseIcon from '../../icons/close-icon.svg?react';
+import SparkleIcon from "../../assets/sparkle-icon.svg?react";
+import ChevronDownIcon from "../../assets/chevron-down-icon.svg?react";
+import SearchIcon from "../../assets/search-icon.svg?react";
+import MenuIcon from "../../assets/menu-icon.svg?react";
+import CloseIcon from "../../assets/close-icon.svg?react";
 
 // Add CSS for the glowing recommendation link and sparkle animation
 const recommendationGlowStyle = `
@@ -88,7 +88,7 @@ function Navbar(props) {
     { code: "JP", name: "Japan" },
     { code: "KR", name: "South Korea" },
     { code: "HK", name: "Hong Kong" },
-    { code: "CN", name: "China" }
+    { code: "CN", name: "China" },
   ];
 
   const navigate = useNavigate();
@@ -99,19 +99,21 @@ function Navbar(props) {
       if (!User.photoURL) {
         const avatarNum = Math.floor(Math.random() * 4) + 1;
         const randomAvatar = `/avatar${avatarNum}.png`;
-        
+
         // Update the user's profile with the random avatar
         updateProfile(auth.currentUser, {
-          photoURL: randomAvatar
-        }).then(() => {
-          setProfilePic(randomAvatar);
-        }).catch(error => {
-          console.error("Error setting default avatar:", error);
-        });
+          photoURL: randomAvatar,
+        })
+          .then(() => {
+            setProfilePic(randomAvatar);
+          })
+          .catch((error) => {
+            console.error("Error setting default avatar:", error);
+          });
       } else {
         setProfilePic(User.photoURL);
       }
-      
+
       // Add fallback to email prefix only if displayName is null/undefined
       setUsername(User.displayName);
     }
@@ -119,15 +121,15 @@ function Navbar(props) {
     return () => {
       window.removeEventListener("scroll", transitionNavBar);
     };
-  }, [User]); 
-  
+  }, [User]);
+
   // Close mobile menu and dropdowns when location changes (user navigates)
   useEffect(() => {
     setIsOpen(false);
     setGenreDropdownOpen(false);
     setCountryDropdownOpen(false);
   }, [location]);
-  
+
   const [isOpen, setIsOpen] = useState(false);
 
   const [show, handleShow] = useState(false);
@@ -190,7 +192,6 @@ function Navbar(props) {
                 </div>
                 <div className="hidden md:block">
                   <div className="flex items-center ml-10 space-x-4">
-
                     {/* Recommendations Link - only show if user has interactions */}
                     {hasInteractions && (
                       <Link
@@ -214,16 +215,22 @@ function Navbar(props) {
                         Genre
                         <ChevronDownIcon className="h-4 w-4 ml-1" />
                       </button>
-                      
+
                       {/* Genre Dropdown Menu */}
-                      <div 
-                        className={`absolute left-0 mt-2 w-96 rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transition-opacity duration-150 ${genreDropdownOpen ? 'opacity-100' : 'opacity-0 invisible'}`}
+                      <div
+                        className={`absolute left-0 mt-2 w-96 rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transition-opacity duration-150 ${
+                          genreDropdownOpen
+                            ? "opacity-100"
+                            : "opacity-0 invisible"
+                        }`}
                       >
                         <div className="py-1 max-h-96 overflow-y-auto grid grid-cols-3 gap-1">
                           {genresList.map((genre) => (
                             <Link
                               key={genre.id}
-                              to={`/genre/${genre.name.toLowerCase().replace(/ /g, '-')}`}
+                              to={`/genre/${genre.name
+                                .toLowerCase()
+                                .replace(/ /g, "-")}`}
                               className="block px-4 py-2 text-sm text-white hover:bg-cineworldYellow hover:text-white"
                               onClick={() => setGenreDropdownOpen(false)}
                             >
@@ -246,16 +253,22 @@ function Navbar(props) {
                         Country
                         <ChevronDownIcon className="h-4 w-4 ml-1" />
                       </button>
-                      
+
                       {/* Country Dropdown Menu */}
-                      <div 
-                        className={`absolute left-0 mt-2 w-[28rem] rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transition-opacity duration-150 ${countryDropdownOpen ? 'opacity-100' : 'opacity-0 invisible'}`}
+                      <div
+                        className={`absolute left-0 mt-2 w-[28rem] rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transition-opacity duration-150 ${
+                          countryDropdownOpen
+                            ? "opacity-100"
+                            : "opacity-0 invisible"
+                        }`}
                       >
                         <div className="py-1 max-h-96 overflow-y-auto grid grid-cols-3 gap-2 px-2">
                           {countries.map((country) => (
                             <Link
                               key={country.code}
-                              to={`/country/${country.name.toLowerCase().replace(/ /g, '-')}`}
+                              to={`/country/${country.name
+                                .toLowerCase()
+                                .replace(/ /g, "-")}`}
                               className="block px-4 py-2 text-sm text-white hover:bg-cineworldYellow hover:text-white whitespace-nowrap"
                               onClick={() => setCountryDropdownOpen(false)}
                             >
@@ -292,7 +305,10 @@ function Navbar(props) {
                         </span>
                         <img
                           className="h-10 w-10 rounded-full cursor-pointer"
-                          src={profilePic || `/avatar${Math.floor(Math.random() * 4) + 1}.png`}
+                          src={
+                            profilePic ||
+                            `/avatar${Math.floor(Math.random() * 4) + 1}.png`
+                          }
                           alt="Profile"
                         />
                       </Link>
@@ -303,7 +319,7 @@ function Navbar(props) {
                         </button>
                       </Link>
                     )}
-                    
+
                     <ul className="absolute hidden text-white pt-1 right-0 group-hover:block transition ease-in-out delay-150">
                       {User ? (
                         <>
@@ -340,9 +356,17 @@ function Navbar(props) {
                 >
                   <span className="sr-only">Open main menu</span>
                   {!isOpen ? (
-                    <MenuIcon className="block w-6 h-6" aria-hidden="true" onClick={NavBlack} />
+                    <MenuIcon
+                      className="block w-6 h-6"
+                      aria-hidden="true"
+                      onClick={NavBlack}
+                    />
                   ) : (
-                    <CloseIcon className="block w-6 h-6" aria-hidden="true" onClick={NavTransparent} />
+                    <CloseIcon
+                      className="block w-6 h-6"
+                      aria-hidden="true"
+                      onClick={NavTransparent}
+                    />
                   )}
                 </button>
               </div>
@@ -389,7 +413,9 @@ function Navbar(props) {
                           {genresList.map((genre) => (
                             <Link
                               key={genre.id}
-                              to={`/genre/${genre.name.toLowerCase().replace(/ /g, '-')}`}
+                              to={`/genre/${genre.name
+                                .toLowerCase()
+                                .replace(/ /g, "-")}`}
                               className="block px-3 py-1 text-sm text-gray-400 hover:text-white"
                               onClick={() => {
                                 setGenreDropdownOpen(false);
@@ -415,14 +441,16 @@ function Navbar(props) {
                     >
                       Country
                     </button>
-                    
+
                     {countryDropdownOpen && (
                       <div className="pl-4 space-y-1">
                         <div className="grid grid-cols-2 gap-2 pr-2">
                           {countries.map((country) => (
                             <Link
                               key={country.code}
-                              to={`/country/${country.name.toLowerCase().replace(/ /g, '-')}`}
+                              to={`/country/${country.name
+                                .toLowerCase()
+                                .replace(/ /g, "-")}`}
                               className="block px-3 py-1 text-sm text-gray-400 hover:text-white whitespace-nowrap"
                               onClick={() => {
                                 setCountryDropdownOpen(false);
@@ -438,7 +466,7 @@ function Navbar(props) {
                   </div>
 
                   <Link to={"/mylist"}>
-                    <a 
+                    <a
                       className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-cineworldYellow hover:text-white"
                       onClick={() => setIsOpen(false)}
                     >

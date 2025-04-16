@@ -6,10 +6,10 @@ import { Fade } from "react-awesome-reveal";
 import { genresList } from "../../config/constants";
 
 // Import SVGs as React Components
-import ChevronDownIcon from '../../icons/chevron-down-icon.svg?react';
-import SearchIcon from '../../icons/search-icon.svg?react';
-import MenuIcon from '../../icons/menu-icon.svg?react';
-import CloseIcon from '../../icons/close-icon.svg?react';
+import ChevronDownIcon from "../../assets/chevron-down-icon.svg?react";
+import SearchIcon from "../../assets/search-icon.svg?react";
+import MenuIcon from "../../assets/menu-icon.svg?react";
+import CloseIcon from "../../assets/close-icon.svg?react";
 
 function NavbarWithoutUser() {
   const { enableGuestMode } = useContext(AuthContext);
@@ -19,7 +19,7 @@ function NavbarWithoutUser() {
   const [isOpen, setIsOpen] = useState(false);
   const [genreDropdownOpen, setGenreDropdownOpen] = useState(false);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
-  
+
   // Country list
   const countries = [
     { code: "US", name: "United States" },
@@ -33,7 +33,7 @@ function NavbarWithoutUser() {
     { code: "JP", name: "Japan" },
     { code: "KR", name: "South Korea" },
     { code: "HK", name: "Hong Kong" },
-    { code: "CN", name: "China" }
+    { code: "CN", name: "China" },
   ];
 
   // Close mobile menu and dropdowns when location changes (user navigates)
@@ -42,7 +42,7 @@ function NavbarWithoutUser() {
     setGenreDropdownOpen(false);
     setCountryDropdownOpen(false);
   }, [location]);
-  
+
   const transitionNavBar = () => {
     if (window.scrollY > 80) {
       handleShow(true);
@@ -61,7 +61,7 @@ function NavbarWithoutUser() {
   const NavBlack = () => {
     handleShow(true);
   };
-  
+
   const NavTransparent = () => {
     handleShow(false);
   };
@@ -105,16 +105,22 @@ function NavbarWithoutUser() {
                         Genre
                         <ChevronDownIcon className="h-4 w-4 ml-1" />
                       </button>
-                      
+
                       {/* Genre Dropdown Menu */}
-                      <div 
-                        className={`absolute left-0 mt-2 w-96 rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transition-opacity duration-150 ${genreDropdownOpen ? 'opacity-100' : 'opacity-0 invisible'}`}
+                      <div
+                        className={`absolute left-0 mt-2 w-96 rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transition-opacity duration-150 ${
+                          genreDropdownOpen
+                            ? "opacity-100"
+                            : "opacity-0 invisible"
+                        }`}
                       >
                         <div className="py-1 max-h-96 overflow-y-auto grid grid-cols-3 gap-1">
                           {genresList.map((genre) => (
                             <Link
                               key={genre.id}
-                              to={`/genre/${genre.name.toLowerCase().replace(/ /g, '-')}`}
+                              to={`/genre/${genre.name
+                                .toLowerCase()
+                                .replace(/ /g, "-")}`}
                               className="block px-4 py-2 text-sm text-white hover:bg-cineworldYellow hover:text-white"
                               onClick={() => setGenreDropdownOpen(false)}
                             >
@@ -137,16 +143,22 @@ function NavbarWithoutUser() {
                         Country
                         <ChevronDownIcon className="h-4 w-4 ml-1" />
                       </button>
-                      
+
                       {/* Country Dropdown Menu */}
-                      <div 
-                        className={`absolute left-0 mt-2 w-[28rem] rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transition-opacity duration-150 ${countryDropdownOpen ? 'opacity-100' : 'opacity-0 invisible'}`}
+                      <div
+                        className={`absolute left-0 mt-2 w-[28rem] rounded-md shadow-lg bg-black ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transition-opacity duration-150 ${
+                          countryDropdownOpen
+                            ? "opacity-100"
+                            : "opacity-0 invisible"
+                        }`}
                       >
                         <div className="py-1 max-h-96 overflow-y-auto grid grid-cols-3 gap-2 px-2">
                           {countries.map((country) => (
                             <Link
                               key={country.code}
-                              to={`/country/${country.name.toLowerCase().replace(/ /g, '-')}`}
+                              to={`/country/${country.name
+                                .toLowerCase()
+                                .replace(/ /g, "-")}`}
                               className="block px-4 py-2 text-sm text-white hover:bg-cineworldYellow hover:text-white whitespace-nowrap"
                               onClick={() => setCountryDropdownOpen(false)}
                             >
@@ -185,9 +197,17 @@ function NavbarWithoutUser() {
                 >
                   <span className="sr-only">Open main menu</span>
                   {!isOpen ? (
-                    <MenuIcon className="block w-6 h-6" aria-hidden="true" onClick={NavBlack} />
+                    <MenuIcon
+                      className="block w-6 h-6"
+                      aria-hidden="true"
+                      onClick={NavBlack}
+                    />
                   ) : (
-                    <CloseIcon className="block w-6 h-6" aria-hidden="true" onClick={NavTransparent} />
+                    <CloseIcon
+                      className="block w-6 h-6"
+                      aria-hidden="true"
+                      onClick={NavTransparent}
+                    />
                   )}
                 </button>
               </div>
@@ -217,14 +237,16 @@ function NavbarWithoutUser() {
                     >
                       Genre
                     </button>
-                    
+
                     {genreDropdownOpen && (
                       <div className="pl-4 space-y-1">
                         <div className="grid grid-cols-2 gap-1">
                           {genresList.map((genre) => (
                             <Link
                               key={genre.id}
-                              to={`/genre/${genre.name.toLowerCase().replace(/ /g, '-')}`}
+                              to={`/genre/${genre.name
+                                .toLowerCase()
+                                .replace(/ /g, "-")}`}
                               className="block px-3 py-1 text-sm text-gray-400 hover:text-white"
                               onClick={() => {
                                 setGenreDropdownOpen(false);
@@ -250,14 +272,16 @@ function NavbarWithoutUser() {
                     >
                       Country
                     </button>
-                    
+
                     {countryDropdownOpen && (
                       <div className="pl-4 space-y-1">
                         <div className="grid grid-cols-2 gap-2 pr-2">
                           {countries.map((country) => (
                             <Link
                               key={country.code}
-                              to={`/country/${country.name.toLowerCase().replace(/ /g, '-')}`}
+                              to={`/country/${country.name
+                                .toLowerCase()
+                                .replace(/ /g, "-")}`}
                               className="block px-3 py-1 text-sm text-gray-400 hover:text-white whitespace-nowrap"
                               onClick={() => {
                                 setCountryDropdownOpen(false);
@@ -273,7 +297,7 @@ function NavbarWithoutUser() {
                   </div>
 
                   <Link to={"/signin"}>
-                    <a 
+                    <a
                       className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-cineworldYellow hover:text-white"
                       onClick={() => setIsOpen(false)}
                     >

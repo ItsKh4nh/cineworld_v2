@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 // Import SVGs as React Components
-import HomeIcon from '../icons/home-icon.svg?react';
+import HomeIcon from "../assets/home-icon.svg?react";
 
 function ErrorPage() {
   const navigate = useNavigate();

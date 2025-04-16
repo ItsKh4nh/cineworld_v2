@@ -11,10 +11,10 @@ import { imageURL2 } from "../config/constants";
 import { getPersonalizedRecommendations } from "../services/RecommendationsService";
 
 // Import SVGs as React Components
-import PlayIcon from '../icons/play-icon.svg?react';
-import EditIcon from '../icons/edit-icon.svg?react';
-import AddIcon from '../icons/add-icon.svg?react';
-import PlaySolidIcon from '../icons/play-solid-icon.svg?react';
+import PlayIcon from "../assets/play-icon.svg?react";
+import EditIcon from "../assets/edit-icon.svg?react";
+import AddIcon from "../assets/add-icon.svg?react";
+import PlaySolidIcon from "../assets/play-solid-icon.svg?react";
 
 function Recommendations() {
   const navigate = useNavigate();
@@ -55,9 +55,9 @@ function Recommendations() {
         const recommendations = await getPersonalizedRecommendations(User.uid);
 
         // Add isInMyList property to each movie
-        const moviesWithMyListStatus = recommendations.map(movie => ({
+        const moviesWithMyListStatus = recommendations.map((movie) => ({
           ...movie,
-          isInMyList: myListMovies.some(m => m.id === movie.id)
+          isInMyList: myListMovies.some((m) => m.id === movie.id),
         }));
 
         setMovies(moviesWithMyListStatus);
@@ -70,7 +70,9 @@ function Recommendations() {
       } catch (error) {
         console.error("Error fetching recommendations:", error);
         setLoading(false);
-        setNoMoviesMessage("An error occurred while fetching recommendations. Please try again later.");
+        setNoMoviesMessage(
+          "An error occurred while fetching recommendations. Please try again later."
+        );
       }
     };
 
@@ -83,7 +85,7 @@ function Recommendations() {
       const success = await addToMyList(movie);
       if (success) {
         // Update local state to show immediately changed button
-        setJustAddedMovies(prev => ({ ...prev, [movie.id]: true }));
+        setJustAddedMovies((prev) => ({ ...prev, [movie.id]: true }));
       }
     } catch (error) {
       console.error("Error adding to list:", error);
@@ -97,12 +99,19 @@ function Recommendations() {
     return (
       <>
         {/* Mobile view - Card layout (2 per row) */}
-        <div className="md:hidden bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition-colors duration-200 cursor-pointer h-full flex flex-col" onClick={() => handleMoviePopup(movie)}>
+        <div
+          className="md:hidden bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition-colors duration-200 cursor-pointer h-full flex flex-col"
+          onClick={() => handleMoviePopup(movie)}
+        >
           {/* Movie poster - full width on mobile */}
           <div className="w-full relative">
             <img
               className="w-full aspect-[16/9] object-cover"
-              src={movie.backdrop_path ? imageURL2 + movie.backdrop_path : "/placeholder.jpg"}
+              src={
+                movie.backdrop_path
+                  ? imageURL2 + movie.backdrop_path
+                  : "/placeholder.jpg"
+              }
               alt={movie.title || movie.name}
               loading="lazy"
             />
@@ -150,16 +159,19 @@ function Recommendations() {
           {/* Card content */}
           <div className="p-2 flex-grow">
             {/* Movie title */}
-            <h2 className="text-white text-base font-bold mb-1 line-clamp-1">{movie.title || movie.name}</h2>
+            <h2 className="text-white text-base font-bold mb-1 line-clamp-1">
+              {movie.title || movie.name}
+            </h2>
 
             {/* Release date */}
             <p className="text-white/80 text-xs mb-1">
               {movie.release_date || movie.first_air_date
-                ? new Date(movie.release_date || movie.first_air_date).toLocaleDateString('en-US', {
-                  year: 'numeric'
-                })
-                : 'Release date unknown'
-              }
+                ? new Date(
+                    movie.release_date || movie.first_air_date
+                  ).toLocaleDateString("en-US", {
+                    year: "numeric",
+                  })
+                : "Release date unknown"}
             </p>
 
             {/* Star rating */}
@@ -170,14 +182,16 @@ function Recommendations() {
             {/* Genres - horizontal dot-separated format */}
             {convertGenre && movie.genre_ids && (
               <div className="flex items-center">
-                {convertGenre(movie.genre_ids)?.slice(0, 3).map((genre, idx) => (
-                  <React.Fragment key={idx}>
-                    <span className="text-white/80 text-xs">{genre}</span>
-                    {idx < Math.min(convertGenre(movie.genre_ids).length, 3) - 1 && (
-                      <span className="text-white/60 mx-1">•</span>
-                    )}
-                  </React.Fragment>
-                ))}
+                {convertGenre(movie.genre_ids)
+                  ?.slice(0, 3)
+                  .map((genre, idx) => (
+                    <React.Fragment key={idx}>
+                      <span className="text-white/80 text-xs">{genre}</span>
+                      {idx <
+                        Math.min(convertGenre(movie.genre_ids).length, 3) -
+                          1 && <span className="text-white/60 mx-1">•</span>}
+                    </React.Fragment>
+                  ))}
               </div>
             )}
           </div>
@@ -187,10 +201,17 @@ function Recommendations() {
         <div className="hidden md:block bg-zinc-900 rounded-lg overflow-hidden mb-6 hover:bg-zinc-800 transition-colors duration-200">
           <div className="flex flex-row">
             {/* Movie poster/image - even smaller size */}
-            <div className="w-1/5 lg:w-1/6 relative cursor-pointer" onClick={() => handleMoviePopup(movie)}>
+            <div
+              className="w-1/5 lg:w-1/6 relative cursor-pointer"
+              onClick={() => handleMoviePopup(movie)}
+            >
               <img
                 className="w-full aspect-[2/3] object-cover"
-                src={movie.poster_path ? imageURL2 + movie.poster_path : "/placeholder.jpg"}
+                src={
+                  movie.poster_path
+                    ? imageURL2 + movie.poster_path
+                    : "/placeholder.jpg"
+                }
                 alt={movie.title || movie.name}
                 loading="lazy"
               />
@@ -204,20 +225,26 @@ function Recommendations() {
             </div>
 
             {/* Movie details - takes up even more width */}
-            <div className="w-4/5 lg:w-5/6 p-4 md:p-6 flex flex-col cursor-pointer" onClick={() => handleMoviePopup(movie)}>
-              <h2 className="text-white text-xl md:text-2xl font-bold mb-2">{movie.title || movie.name}</h2>
+            <div
+              className="w-4/5 lg:w-5/6 p-4 md:p-6 flex flex-col cursor-pointer"
+              onClick={() => handleMoviePopup(movie)}
+            >
+              <h2 className="text-white text-xl md:text-2xl font-bold mb-2">
+                {movie.title || movie.name}
+              </h2>
 
               {/* Date in its own row */}
               <div className="mb-2">
                 <span className="text-white/80 text-sm">
                   {movie.release_date || movie.first_air_date
-                    ? new Date(movie.release_date || movie.first_air_date).toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric'
-                    })
-                    : 'Release date unknown'
-                  }
+                    ? new Date(
+                        movie.release_date || movie.first_air_date
+                      ).toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      })
+                    : "Release date unknown"}
                 </span>
               </div>
 
@@ -230,7 +257,10 @@ function Recommendations() {
               {convertGenre && movie.genre_ids && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {convertGenre(movie.genre_ids)?.map((genre, idx) => (
-                    <span key={idx} className="bg-zinc-800 text-white/80 text-sm px-3 py-1 rounded-full">
+                    <span
+                      key={idx}
+                      className="bg-zinc-800 text-white/80 text-sm px-3 py-1 rounded-full"
+                    >
                       {genre}
                     </span>
                   ))}
@@ -293,7 +323,9 @@ function Recommendations() {
   return (
     <div className="min-h-screen bg-black">
       <div className="pt-24 pb-8 px-4 md:px-8">
-        <h1 className="text-white text-2xl md:text-4xl font-bold">Explore this curated list of must-watch movies, just for you.</h1>
+        <h1 className="text-white text-2xl md:text-4xl font-bold">
+          Explore this curated list of must-watch movies, just for you.
+        </h1>
       </div>
 
       {/* Movies list - full width container */}
@@ -322,4 +354,4 @@ function Recommendations() {
   );
 }
 
-export default Recommendations; 
+export default Recommendations;

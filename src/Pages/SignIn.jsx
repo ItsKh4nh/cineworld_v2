@@ -7,9 +7,9 @@ import { emailSignIn, googleSignIn } from "../controllers/auth.controller";
 import ForgotPasswordModal from "../components/Modals/ForgotPasswordModal";
 
 // Import SVGs as React Components
-import EyeOpenIcon from '../icons/eye-open-icon.svg?react';
-import EyeClosedIcon from '../icons/eye-closed-icon.svg?react';
-import ErrorIcon from '../icons/error-icon.svg?react';
+import EyeOpenIcon from "../assets/eye-open-icon.svg?react";
+import EyeClosedIcon from "../assets/eye-closed-icon.svg?react";
+import ErrorIcon from "../assets/error-icon.svg?react";
 
 function SignIn() {
   const { User } = useContext(AuthContext);
@@ -220,7 +220,9 @@ function SignIn() {
         </div>
       </div>
       {showForgotPasswordModal && (
-        <ForgotPasswordModal onClose={() => setShowForgotPasswordModal(false)} />
+        <ForgotPasswordModal
+          onClose={() => setShowForgotPasswordModal(false)}
+        />
       )}
     </section>
   );

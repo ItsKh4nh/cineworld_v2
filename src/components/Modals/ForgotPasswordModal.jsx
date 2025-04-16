@@ -3,7 +3,7 @@ import { resetPassword } from "../../controllers/auth.controller";
 import { ClipLoader } from "react-spinners";
 
 // Import SVGs as React Components
-import { ReactComponent as CloseIcon } from '/icons/close-icon.svg';
+import { ReactComponent as CloseIcon } from "/assets/close-icon.svg";
 
 function ForgotPasswordModal({ onClose }) {
   const [email, setEmail] = useState("");
@@ -39,21 +39,23 @@ function ForgotPasswordModal({ onClose }) {
       <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md mx-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-white">Reset Password</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
             <CloseIcon className="h-6 w-6" />
           </button>
         </div>
 
         {emailSent ? (
           <div>
-            <div className={`p-4 mb-4 rounded ${message.isError ? "bg-red-800" : "bg-green-800"}`}>
+            <div
+              className={`p-4 mb-4 rounded ${
+                message.isError ? "bg-red-800" : "bg-green-800"
+              }`}
+            >
               <p className="text-white">{message.text}</p>
             </div>
             <p className="text-gray-300 mb-4">
-              Please check your email inbox and follow the instructions to reset your password.
+              Please check your email inbox and follow the instructions to reset
+              your password.
             </p>
             <button
               onClick={onClose}
@@ -65,11 +67,16 @@ function ForgotPasswordModal({ onClose }) {
         ) : (
           <form onSubmit={handleSubmit}>
             <p className="text-gray-300 mb-4">
-              Enter your email address and we'll send you a link to reset your password.
+              Enter your email address and we'll send you a link to reset your
+              password.
             </p>
 
             {message.text && (
-              <div className={`p-4 mb-4 rounded ${message.isError ? "bg-red-800" : "bg-green-800"}`}>
+              <div
+                className={`p-4 mb-4 rounded ${
+                  message.isError ? "bg-red-800" : "bg-green-800"
+                }`}
+              >
                 <p className="text-white">{message.text}</p>
               </div>
             )}
@@ -116,4 +123,4 @@ function ForgotPasswordModal({ onClose }) {
   );
 }
 
-export default ForgotPasswordModal; 
+export default ForgotPasswordModal;

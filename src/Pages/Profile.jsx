@@ -18,22 +18,22 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 // Utilities
-import { 
-  signOutUser, 
-  updateUserName, 
-  updateProfilePicture, 
-  changeUserPassword, 
-  isGoogleAuthUser 
+import {
+  signOutUser,
+  updateUserName,
+  updateProfilePicture,
+  changeUserPassword,
+  isGoogleAuthUser,
 } from "../utils";
 import { showSuccessToast, showErrorToast } from "../utils";
 
 // Import SVGs as React Components
-import EditIcon from '../icons/edit-icon.svg?react';
-import LockIcon from '../icons/lock-icon.svg?react';
-import EyeOpenIcon from '../icons/eye-open-icon.svg?react';
-import EyeClosedIcon from '../icons/eye-closed-icon.svg?react';
-import HomeIcon from '../icons/home-icon.svg?react';
-import LogoutIcon from '../icons/logout-icon.svg?react';
+import EditIcon from "../assets/edit-icon.svg?react";
+import LockIcon from "../assets/lock-icon.svg?react";
+import EyeOpenIcon from "../assets/eye-open-icon.svg?react";
+import EyeClosedIcon from "../assets/eye-closed-icon.svg?react";
+import HomeIcon from "../assets/home-icon.svg?react";
+import LogoutIcon from "../assets/logout-icon.svg?react";
 
 function Profile() {
   const { User } = useContext(AuthContext);
@@ -45,9 +45,10 @@ function Profile() {
   const [userName, setUserName] = useState("");
   const [IsMyListUpdated, setIsMyListUpdated] = useState(false);
   const [changeUsernameLoading, setChangeUsernameLoading] = useState(false);
-  const [changeProfilePictureLoading, setChangeProfilePictureLoading] = useState(false);
+  const [changeProfilePictureLoading, setChangeProfilePictureLoading] =
+    useState(false);
   const [isGoogleAccount, setIsGoogleAccount] = useState(false);
-  
+
   // Password change state
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -67,18 +68,18 @@ function Profile() {
       if (!User.photoURL) {
         const avatarNum = Math.floor(Math.random() * 4) + 1;
         const randomAvatar = `/avatar${avatarNum}.png`;
-        
+
         // Set the profile pic locally
         setProfilePic(randomAvatar);
-        
+
         // Update the user's profile with the random avatar
-        updateProfilePicture(randomAvatar).catch(error => {
+        updateProfilePicture(randomAvatar).catch((error) => {
           console.error("Error setting default avatar:", error);
         });
       } else {
         setProfilePic(User.photoURL);
       }
-      
+
       // Check if user is signed in with Google
       setIsGoogleAccount(isGoogleAuthUser(User));
     }
@@ -147,7 +148,7 @@ function Profile() {
 
   const changePassword = async () => {
     setPasswordError("");
-    
+
     // Validate password fields
     if (!currentPassword) {
       setPasswordError("Current password is required");
@@ -170,7 +171,7 @@ function Profile() {
 
     try {
       const result = await changeUserPassword(currentPassword, newPassword);
-      
+
       if (result.success) {
         // Clear fields and show success
         setCurrentPassword("");
@@ -203,16 +204,16 @@ function Profile() {
             <h1 className="text-4xl text-white font-bold mb-6">
               Edit your Profile
             </h1>
-            
+
             <div className="flex flex-col md:flex-row gap-8 mb-6">
               <div className="relative flex flex-col items-center">
                 <div className="relative">
                   <img
                     className="h-28 w-28 rounded-full object-cover border-2 border-white"
-                    src={profilePic || '/avatar1.png'}
+                    src={profilePic || "/avatar1.png"}
                     alt="Profile"
                   />
-                  <button 
+                  <button
                     onClick={handleClick}
                     className="absolute bottom-0 right-0 bg-white text-black p-1.5 rounded-full hover:bg-yellow-400 transition-colors"
                     title="Change avatar"
@@ -220,19 +221,23 @@ function Profile() {
                     <EditIcon className="h-4 w-4" />
                   </button>
                 </div>
-                
-                  <input
-                    style={{ display: "none" }}
-                    ref={inputRef}
-                    type="file"
-                    onChange={handleFileChange}
+
+                <input
+                  style={{ display: "none" }}
+                  ref={inputRef}
+                  type="file"
+                  onChange={handleFileChange}
                   accept="image/*"
                 />
-                
+
                 {newProfilePicURL && (
                   <div className="mt-4 text-center">
                     <p className="text-white text-sm mb-2">New avatar:</p>
-                    <img className="h-20 w-20 rounded-full object-cover mx-auto" src={newProfilePicURL} alt="New profile" />
+                    <img
+                      className="h-20 w-20 rounded-full object-cover mx-auto"
+                      src={newProfilePicURL}
+                      alt="New profile"
+                    />
                     <div className="mt-2 flex gap-2 justify-center">
                       <button
                         onClick={changeProfilePicture}
@@ -251,7 +256,7 @@ function Profile() {
                   </div>
                 )}
               </div>
-              
+
               <div className="flex-1">
                 <div className="mb-4">
                   <label className="text-white text-lg font-medium mb-1 block">
@@ -312,9 +317,11 @@ function Profile() {
                       className="text-white hover:text-cineworldYellow flex items-center gap-2 transition-colors"
                     >
                       <LockIcon className="h-5 w-5" />
-                      {showPasswordFields ? "Hide Password Change" : "Change Password"}
+                      {showPasswordFields
+                        ? "Hide Password Change"
+                        : "Change Password"}
                     </button>
-                    
+
                     {showPasswordFields && (
                       <div className="mt-3 border border-gray-700 rounded-md p-4 bg-black/50">
                         {passwordError && (
@@ -322,7 +329,7 @@ function Profile() {
                             {passwordError}
                           </div>
                         )}
-                        
+
                         <div className="mb-3">
                           <label className="text-white text-sm mb-1 block">
                             Current Password
@@ -331,13 +338,17 @@ function Profile() {
                             <input
                               type={showCurrentPassword ? "text" : "password"}
                               value={currentPassword}
-                              onChange={(e) => setCurrentPassword(e.target.value)}
+                              onChange={(e) =>
+                                setCurrentPassword(e.target.value)
+                              }
                               className="w-full rounded-md bg-stone-900 text-white border-gray-700 border p-2 text-sm"
                             />
                             <button
                               type="button"
                               className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-white"
-                              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                              onClick={() =>
+                                setShowCurrentPassword(!showCurrentPassword)
+                              }
                             >
                               {showCurrentPassword ? (
                                 <EyeClosedIcon className="h-5 w-5" />
@@ -347,7 +358,7 @@ function Profile() {
                             </button>
                           </div>
                         </div>
-                        
+
                         <div className="mb-3">
                           <label className="text-white text-sm mb-1 block">
                             New Password
@@ -362,7 +373,9 @@ function Profile() {
                             <button
                               type="button"
                               className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-white"
-                              onClick={() => setShowNewPassword(!showNewPassword)}
+                              onClick={() =>
+                                setShowNewPassword(!showNewPassword)
+                              }
                             >
                               {showNewPassword ? (
                                 <EyeClosedIcon className="h-5 w-5" />
@@ -372,7 +385,7 @@ function Profile() {
                             </button>
                           </div>
                         </div>
-                        
+
                         <div className="mb-3">
                           <label className="text-white text-sm mb-1 block">
                             Confirm New Password
@@ -381,13 +394,17 @@ function Profile() {
                             <input
                               type={showConfirmPassword ? "text" : "password"}
                               value={confirmPassword}
-                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              onChange={(e) =>
+                                setConfirmPassword(e.target.value)
+                              }
                               className="w-full rounded-md bg-stone-900 text-white border-gray-700 border p-2 text-sm"
                             />
                             <button
                               type="button"
                               className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-white"
-                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              onClick={() =>
+                                setShowConfirmPassword(!showConfirmPassword)
+                              }
                             >
                               {showConfirmPassword ? (
                                 <EyeClosedIcon className="h-5 w-5" />
@@ -397,13 +414,15 @@ function Profile() {
                             </button>
                           </div>
                         </div>
-                        
+
                         <button
                           onClick={changePassword}
                           disabled={changePasswordLoading}
                           className="w-full mt-2 px-4 py-2 bg-cineworldYellow text-white rounded hover:bg-yellow-400 transition-colors text-sm"
                         >
-                          {changePasswordLoading ? "Updating Password..." : "Update Password"}
+                          {changePasswordLoading
+                            ? "Updating Password..."
+                            : "Update Password"}
                         </button>
                       </div>
                     )}
@@ -411,7 +430,7 @@ function Profile() {
                 )}
               </div>
             </div>
-            
+
             {/* Action buttons - reorganized */}
             <div className="flex justify-between mt-6">
               {/* Back to Home button on the left */}
@@ -422,15 +441,15 @@ function Profile() {
                 <HomeIcon className="w-5 h-5 mr-2" />
                 Back to Home
               </button>
-              
+
               {/* Logout button on the right */}
-                <button
+              <button
                 onClick={SignOut}
                 className="flex items-center bg-red-700 border-white text-white px-6 py-2 rounded hover:bg-white hover:text-red-700 transition-colors"
-                >
-                  <LogoutIcon className="w-5 h-5 mr-2" />
+              >
+                <LogoutIcon className="w-5 h-5 mr-2" />
                 Logout
-                </button>
+              </button>
             </div>
           </div>
         </Fade>

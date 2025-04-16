@@ -16,7 +16,7 @@ import MovieCard from "../components/Cards/MovieCard";
 import PersonCard from "../components/Cards/PersonCard";
 
 // Import SVGs as React Components
-import ClearIcon from '../icons/clear-icon.svg?react';
+import ClearIcon from "../assets/clear-icon.svg?react";
 
 function Search() {
   const { User } = useContext(AuthContext);
@@ -51,25 +51,25 @@ function Search() {
 
   const performSearch = async () => {
     if (!searchQuery.trim() || searchQuery.trim().length < 2) return;
-    
+
     setIsSearching(true);
     try {
       if (searchType === "movie") {
         const response = await axios.get(searchMovie(searchQuery));
-        
+
         // Filter out future releases and add myList status
         const currentDate = new Date();
         const filteredResults = response.data.results
-          .filter(movie => {
+          .filter((movie) => {
             if (!movie.release_date) return true;
             const releaseDate = new Date(movie.release_date);
             return releaseDate <= currentDate;
           })
-          .map(movie => ({
+          .map((movie) => ({
             ...movie,
-            isInMyList: myListMovies.some(m => m.id === movie.id)
+            isInMyList: myListMovies.some((m) => m.id === movie.id),
           }));
-        
+
         setSearchResults(filteredResults);
       } else {
         const response = await axios.get(searchPerson(searchQuery));
@@ -105,66 +105,66 @@ function Search() {
   useEffect(() => {
     const handleRatingModalClosed = (event) => {
       const { movieId, success, action } = event.detail;
-      
-      if (success && (action === 'add' || action === 'update')) {
+
+      if (success && (action === "add" || action === "update")) {
         // Update the searchResults to show that the movie is now in MyList
-        setSearchResults(prevResults => 
-          prevResults.map(movie => 
-            movie.id === movieId 
-              ? { ...movie, isInMyList: true } 
-              : movie
+        setSearchResults((prevResults) =>
+          prevResults.map((movie) =>
+            movie.id === movieId ? { ...movie, isInMyList: true } : movie
           )
         );
       }
     };
-    
+
     // Add event listener
-    window.addEventListener('ratingModalClosed', handleRatingModalClosed);
-    
+    window.addEventListener("ratingModalClosed", handleRatingModalClosed);
+
     // Clean up
     return () => {
-      window.removeEventListener('ratingModalClosed', handleRatingModalClosed);
+      window.removeEventListener("ratingModalClosed", handleRatingModalClosed);
     };
   }, []);
 
   // Create wrapped versions of list functions to update UI state
-  const handleAddToMyList = useCallback((movie) => {
-    const result = addToMyList(movie);
-    
-    // When the result resolves, update the UI
-    result.then(success => {
-      if (success) {
-        setSearchResults(prevResults => 
-          prevResults.map(m => 
-            m.id === movie.id 
-              ? { ...m, isInMyList: true } 
-              : m
-          )
-        );
-      }
-    });
-    
-    return result;
-  }, [addToMyList]);
+  const handleAddToMyList = useCallback(
+    (movie) => {
+      const result = addToMyList(movie);
 
-  const handleRemoveFromMyList = useCallback((movie) => {
-    const result = removeFromMyList(movie);
-    
-    // When the result resolves, update the UI
-    result.then(success => {
-      if (success) {
-        setSearchResults(prevResults => 
-          prevResults.map(m => 
-            m.id === movie.id 
-              ? { ...m, isInMyList: false } 
-              : m
-          )
-        );
-      }
-    });
-    
-    return result;
-  }, [removeFromMyList]);
+      // When the result resolves, update the UI
+      result.then((success) => {
+        if (success) {
+          setSearchResults((prevResults) =>
+            prevResults.map((m) =>
+              m.id === movie.id ? { ...m, isInMyList: true } : m
+            )
+          );
+        }
+      });
+
+      return result;
+    },
+    [addToMyList]
+  );
+
+  const handleRemoveFromMyList = useCallback(
+    (movie) => {
+      const result = removeFromMyList(movie);
+
+      // When the result resolves, update the UI
+      result.then((success) => {
+        if (success) {
+          setSearchResults((prevResults) =>
+            prevResults.map((m) =>
+              m.id === movie.id ? { ...m, isInMyList: false } : m
+            )
+          );
+        }
+      });
+
+      return result;
+    },
+    [removeFromMyList]
+  );
 
   return (
     <div className="min-h-screen bg-black">
@@ -180,14 +180,16 @@ function Search() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 type="text"
                 className="w-full bg-stone-700 text-white outline-none rounded focus:ring-red-600 focus:border-red-600 block p-2.5 placeholder:text-white/80"
-                placeholder={`Search for ${searchType === "movie" ? "movies" : "people"}... (min 2 characters)`}
+                placeholder={`Search for ${
+                  searchType === "movie" ? "movies" : "people"
+                }... (min 2 characters)`}
               />
               {isSearching ? (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 </div>
               ) : (
-                <button 
+                <button
                   onClick={clearSearchQuery}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-600 hover:text-red-500 focus:outline-none"
                 >
@@ -196,15 +198,15 @@ function Search() {
               )}
             </div>
           </div>
-          
+
           {/* Toggle switch */}
           <div className="flex justify-center">
             <div className="flex items-center space-x-2 bg-gray-800 p-1 rounded-lg">
               <button
                 onClick={() => toggleSearchType("movie")}
                 className={`px-4 py-2 rounded-md transition-all duration-200 ${
-                  searchType === "movie" 
-                    ? "bg-cineworldYellow text-white" 
+                  searchType === "movie"
+                    ? "bg-cineworldYellow text-white"
                     : "text-gray-300 hover:bg-gray-700"
                 }`}
               >
@@ -213,8 +215,8 @@ function Search() {
               <button
                 onClick={() => toggleSearchType("person")}
                 className={`px-4 py-2 rounded-md transition-all duration-200 ${
-                  searchType === "person" 
-                    ? "bg-cineworldYellow text-white" 
+                  searchType === "person"
+                    ? "bg-cineworldYellow text-white"
                     : "text-gray-300 hover:bg-gray-700"
                 }`}
               >
@@ -245,10 +247,14 @@ function Search() {
               <div className="col-span-full flex justify-center items-center h-64">
                 <p className="text-white text-lg">No movies found</p>
               </div>
-            ) : !isSearching && (
-              <div className="col-span-full flex justify-center items-center h-64">
-                <p className="text-white text-lg">Search for movies to display results</p>
-              </div>
+            ) : (
+              !isSearching && (
+                <div className="col-span-full flex justify-center items-center h-64">
+                  <p className="text-white text-lg">
+                    Search for movies to display results
+                  </p>
+                </div>
+              )
             )}
           </div>
         )}
@@ -268,10 +274,14 @@ function Search() {
               <div className="col-span-full flex justify-center items-center h-64">
                 <p className="text-white text-lg">No people found</p>
               </div>
-            ) : !isSearching && (
-              <div className="col-span-full flex justify-center items-center h-64">
-                <p className="text-white text-lg">Search for people to display results</p>
-              </div>
+            ) : (
+              !isSearching && (
+                <div className="col-span-full flex justify-center items-center h-64">
+                  <p className="text-white text-lg">
+                    Search for people to display results
+                  </p>
+                </div>
+              )
             )}
           </div>
         )}

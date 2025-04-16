@@ -2,17 +2,19 @@ import React, { useState, useEffect } from "react";
 import { imageURL2 } from "../../config/constants";
 
 // Import SVGs as React Components using ?react suffix
-import CloseIcon from '../../icons/close-icon.svg?react';
+import CloseIcon from "../../assets/close-icon.svg?react";
 
 function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
-  const [status, setStatus] = useState(movie.userRating?.status || "Plan to Watch");
+  const [status, setStatus] = useState(
+    movie.userRating?.status || "Plan to Watch"
+  );
   const [score, setScore] = useState(movie.userRating?.score || 5);
   const [note, setNote] = useState(movie.userRating?.note || "");
   const [isSaving, setIsSaving] = useState(false);
-  
+
   // Check if this is an update (movie already has a userRating)
   const isUpdating = Boolean(movie.userRating);
-  
+
   console.log("Movie in RatingModal:", movie);
   console.log("Movie genres in RatingModal:", movie.genres);
 
@@ -31,7 +33,7 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
   ];
 
   // Check if score should be shown based on status
-  const shouldShowScore = status === 'Completed' || status === 'Dropped';
+  const shouldShowScore = status === "Completed" || status === "Dropped";
 
   // Update score visibility when status changes
   useEffect(() => {
@@ -42,34 +44,34 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
 
   const handleSave = async () => {
     if (isSaving) return; // Prevent multiple submissions
-    
+
     setIsSaving(true);
-    
+
     // Preserve the original dateAdded if it exists
     const dateAdded = movie.userRating?.dateAdded || new Date().toISOString();
-    
+
     // Create the userRating object based on status
     const userRating = {
       status,
       note,
       dateAdded,
     };
-    
+
     // Only add score if status is Completed or Dropped
     if (shouldShowScore) {
       userRating.score = score;
     }
-    
+
     // Make sure we keep all the movie properties including genres
     const movieWithRating = {
       ...movie,
       userRating,
-      isInMyList: true // Explicitly mark as in MyList
+      isInMyList: true, // Explicitly mark as in MyList
     };
-    
+
     let success = false;
     let error = null;
-    
+
     try {
       // Save the movie and await the result
       const result = await onSave(movieWithRating);
@@ -81,19 +83,19 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
     } finally {
       // Always dispatch a custom event to notify listeners that a movie was added/updated
       window.dispatchEvent(
-        new CustomEvent('ratingModalClosed', {
+        new CustomEvent("ratingModalClosed", {
           detail: {
             movieId: movie.id,
             success,
-            action: isUpdating ? 'update' : 'add',
-            error
-          }
+            action: isUpdating ? "update" : "add",
+            error,
+          },
         })
       );
-      
+
       setIsSaving(false);
     }
-    
+
     // Return the success status
     return success;
   };
@@ -105,10 +107,7 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
           <h2 className="text-xl font-bold text-white">
             {isUpdating ? "Update Your Rating" : "Add to MyList"}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
             <CloseIcon className="h-6 w-6" />
           </button>
         </div>
@@ -126,8 +125,9 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
               {movie.title || movie.name}
             </h3>
             <p className="text-gray-400 text-sm">
-              {movie.release_date?.substring(0, 4) || 
-               movie.first_air_date?.substring(0, 4) || "N/A"}
+              {movie.release_date?.substring(0, 4) ||
+                movie.first_air_date?.substring(0, 4) ||
+                "N/A"}
             </p>
           </div>
         </div>
@@ -189,13 +189,15 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
           >
             Cancel
           </button>
-          
+
           <button
             onClick={handleSave}
-            className={`px-4 py-2 text-white ${isSaving ? 'bg-gray-500' : 'bg-red-700 hover:bg-red-600'} rounded transition-colors`}
+            className={`px-4 py-2 text-white ${
+              isSaving ? "bg-gray-500" : "bg-red-700 hover:bg-red-600"
+            } rounded transition-colors`}
             disabled={isSaving}
           >
-            {isSaving ? 'Saving...' : (isUpdating ? 'Save' : 'Add')}
+            {isSaving ? "Saving..." : isUpdating ? "Save" : "Add"}
           </button>
         </div>
       </div>
@@ -203,4 +205,4 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
   );
 }
 
-export default RatingModal; 
+export default RatingModal;

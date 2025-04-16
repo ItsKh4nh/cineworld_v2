@@ -7,7 +7,7 @@ import { searchMovie, searchPerson } from "../../config/URLs";
 import StarRating from "../StarRating/StarRating";
 
 // Import SVGs as React Components
-import CloseIcon from '../../icons/close-icon.svg?react';
+import CloseIcon from "../../assets/close-icon.svg?react";
 
 function UserPreferencesModal({ user, onClose }) {
   const [step, setStep] = useState(1);
@@ -43,7 +43,7 @@ function UserPreferencesModal({ user, onClose }) {
 
         // Then filter the results client-side to remove future releases
         const currentDate = new Date();
-        const filteredResults = searchResponse.data.results.filter(movie => {
+        const filteredResults = searchResponse.data.results.filter((movie) => {
           if (!movie.release_date) return true;
           const releaseDate = new Date(movie.release_date);
           return releaseDate <= currentDate;
@@ -64,8 +64,8 @@ function UserPreferencesModal({ user, onClose }) {
 
   // Handle selecting a movie
   const handleSelectMovie = (movie) => {
-    if (selectedMovies.some(m => m.id === movie.id)) {
-      setSelectedMovies(selectedMovies.filter(m => m.id !== movie.id));
+    if (selectedMovies.some((m) => m.id === movie.id)) {
+      setSelectedMovies(selectedMovies.filter((m) => m.id !== movie.id));
     } else {
       setSelectedMovies([...selectedMovies, movie]);
     }
@@ -73,8 +73,8 @@ function UserPreferencesModal({ user, onClose }) {
 
   // Handle selecting a person
   const handleSelectPerson = (person) => {
-    if (selectedPeople.some(p => p.id === person.id)) {
-      setSelectedPeople(selectedPeople.filter(p => p.id !== person.id));
+    if (selectedPeople.some((p) => p.id === person.id)) {
+      setSelectedPeople(selectedPeople.filter((p) => p.id !== person.id));
     } else {
       setSelectedPeople([...selectedPeople, person]);
     }
@@ -82,8 +82,8 @@ function UserPreferencesModal({ user, onClose }) {
 
   // Handle selecting a genre
   const handleSelectGenre = (genre) => {
-    if (selectedGenres.some(g => g.id === genre.id)) {
-      setSelectedGenres(selectedGenres.filter(g => g.id !== genre.id));
+    if (selectedGenres.some((g) => g.id === genre.id)) {
+      setSelectedGenres(selectedGenres.filter((g) => g.id !== genre.id));
     } else {
       setSelectedGenres([...selectedGenres, genre]);
     }
@@ -93,7 +93,7 @@ function UserPreferencesModal({ user, onClose }) {
   const handleRateMovie = (movie, score) => {
     setMovieRatings({
       ...movieRatings,
-      [movie.id]: score
+      [movie.id]: score,
     });
   };
 
@@ -121,10 +121,10 @@ function UserPreferencesModal({ user, onClose }) {
 
       // Add movies to MyList with ratings if provided
       const currentMovies = currentData.movies || [];
-      const moviesWithRatings = selectedMovies.map(movie => {
+      const moviesWithRatings = selectedMovies.map((movie) => {
         const userRating = {
           status: "Completed",
-          dateAdded: new Date().toISOString()
+          dateAdded: new Date().toISOString(),
         };
 
         // Use provided rating or default to 10
@@ -132,15 +132,15 @@ function UserPreferencesModal({ user, onClose }) {
 
         return {
           ...movie,
-          userRating
+          userRating,
         };
       });
 
       // Add people to MyList
       const currentPeople = currentData.people || [];
-      const peopleWithDateAdded = selectedPeople.map(person => ({
+      const peopleWithDateAdded = selectedPeople.map((person) => ({
         ...person,
-        dateAdded: new Date().toISOString()
+        dateAdded: new Date().toISOString(),
       }));
 
       // Update MyList with all preferences
@@ -149,7 +149,7 @@ function UserPreferencesModal({ user, onClose }) {
         movies: [...currentMovies, ...moviesWithRatings],
         people: [...currentPeople, ...peopleWithDateAdded],
         preferredGenres: selectedGenres,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       });
 
       // Add movies to InteractionList
@@ -162,22 +162,24 @@ function UserPreferencesModal({ user, onClose }) {
         const existingMovieIds = existingData.movie_ids || [];
 
         // Get IDs of newly selected movies
-        const newMovieIds = selectedMovies.map(movie => movie.id);
+        const newMovieIds = selectedMovies.map((movie) => movie.id);
 
         // Create a merged array of unique movie IDs
-        const uniqueMovieIds = Array.from(new Set([...existingMovieIds, ...newMovieIds]));
+        const uniqueMovieIds = Array.from(
+          new Set([...existingMovieIds, ...newMovieIds])
+        );
 
         // Update the InteractionList
         await updateDoc(interactionListRef, {
           movie_ids: uniqueMovieIds,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         });
       } else {
         // Create a new InteractionList document
-        const movieIds = selectedMovies.map(movie => movie.id);
+        const movieIds = selectedMovies.map((movie) => movie.id);
         await setDoc(interactionListRef, {
           movie_ids: movieIds,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         });
       }
 
@@ -196,8 +198,8 @@ function UserPreferencesModal({ user, onClose }) {
   const getCurrentDate = () => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
@@ -218,19 +220,37 @@ function UserPreferencesModal({ user, onClose }) {
 
         <div className="mb-4">
           <p className="text-gray-300 mb-4">
-            Let's personalize your experience! Tell us about your movie preferences to get recommendations tailored just for you.
+            Let's personalize your experience! Tell us about your movie
+            preferences to get recommendations tailored just for you.
           </p>
           <p className="text-gray-400 text-sm mb-6">
-            You can skip this step, but adding at least one preference will greatly improve your experience.
+            You can skip this step, but adding at least one preference will
+            greatly improve your experience.
           </p>
         </div>
 
         {/* Step indicators */}
         <div className="flex justify-center mb-6">
-          <div className={`w-3 h-3 rounded-full mx-1 ${step === 1 ? 'bg-cineworldYellow' : 'bg-gray-600'}`}></div>
-          <div className={`w-3 h-3 rounded-full mx-1 ${step === 2 ? 'bg-cineworldYellow' : 'bg-gray-600'}`}></div>
-          <div className={`w-3 h-3 rounded-full mx-1 ${step === 3 ? 'bg-cineworldYellow' : 'bg-gray-600'}`}></div>
-          <div className={`w-3 h-3 rounded-full mx-1 ${step === 4 ? 'bg-cineworldYellow' : 'bg-gray-600'}`}></div>
+          <div
+            className={`w-3 h-3 rounded-full mx-1 ${
+              step === 1 ? "bg-cineworldYellow" : "bg-gray-600"
+            }`}
+          ></div>
+          <div
+            className={`w-3 h-3 rounded-full mx-1 ${
+              step === 2 ? "bg-cineworldYellow" : "bg-gray-600"
+            }`}
+          ></div>
+          <div
+            className={`w-3 h-3 rounded-full mx-1 ${
+              step === 3 ? "bg-cineworldYellow" : "bg-gray-600"
+            }`}
+          ></div>
+          <div
+            className={`w-3 h-3 rounded-full mx-1 ${
+              step === 4 ? "bg-cineworldYellow" : "bg-gray-600"
+            }`}
+          ></div>
         </div>
 
         {/* Step 1: Introduction */}
@@ -244,11 +264,15 @@ function UserPreferencesModal({ user, onClose }) {
             </p>
             <ul className="list-disc list-inside text-gray-300 mb-6 space-y-2">
               <li>Add movies you've watched or enjoyed</li>
-              <li>Select your favorite actors, directors, or other film personalities</li>
+              <li>
+                Select your favorite actors, directors, or other film
+                personalities
+              </li>
               <li>Choose your preferred genres</li>
             </ul>
             <p className="text-gray-300 mb-4">
-              This will help us personalize your experience and provide better recommendations.
+              This will help us personalize your experience and provide better
+              recommendations.
             </p>
           </div>
         )}
@@ -281,13 +305,18 @@ function UserPreferencesModal({ user, onClose }) {
               <div className="md:w-2/3">
                 {searchResults.length > 0 ? (
                   <div>
-                    <h4 className="text-lg font-medium text-white mb-2">Search Results</h4>
+                    <h4 className="text-lg font-medium text-white mb-2">
+                      Search Results
+                    </h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto max-h-[50vh]">
                       {searchResults.map((movie) => (
                         <div
                           key={movie.id}
-                          className={`bg-gray-800 rounded p-2 cursor-pointer transition-all ${selectedMovies.some(m => m.id === movie.id) ? 'ring-2 ring-red-600' : ''
-                            }`}
+                          className={`bg-gray-800 rounded p-2 cursor-pointer transition-all ${
+                            selectedMovies.some((m) => m.id === movie.id)
+                              ? "ring-2 ring-red-600"
+                              : ""
+                          }`}
                           onClick={() => handleSelectMovie(movie)}
                         >
                           {movie.poster_path ? (
@@ -298,12 +327,18 @@ function UserPreferencesModal({ user, onClose }) {
                             />
                           ) : (
                             <div className="w-full h-36 bg-gray-700 rounded mb-2 flex items-center justify-center">
-                              <span className="text-gray-400 text-xs">No Image</span>
+                              <span className="text-gray-400 text-xs">
+                                No Image
+                              </span>
                             </div>
                           )}
-                          <h5 className="text-white text-sm font-medium truncate">{movie.title}</h5>
+                          <h5 className="text-white text-sm font-medium truncate">
+                            {movie.title}
+                          </h5>
                           <p className="text-gray-400 text-xs">
-                            {movie.release_date ? movie.release_date.substring(0, 4) : "N/A"}
+                            {movie.release_date
+                              ? movie.release_date.substring(0, 4)
+                              : "N/A"}
                           </p>
                           <div className="flex items-center mt-1">
                             <StarRating rating={movie.vote_average} />
@@ -318,8 +353,8 @@ function UserPreferencesModal({ user, onClose }) {
                       {searchQuery.length < 2
                         ? "Type at least 2 characters to search"
                         : isSearching
-                          ? "Searching..."
-                          : "No results found. Try a different search term."}
+                        ? "Searching..."
+                        : "No results found. Try a different search term."}
                     </p>
                   </div>
                 )}
@@ -337,14 +372,20 @@ function UserPreferencesModal({ user, onClose }) {
                 {selectedMovies.length === 0 ? (
                   <div className="text-center py-8 text-gray-400">
                     <p>No movies selected yet.</p>
-                    <p className="text-sm mt-2">Search and click on movies to add them here.</p>
+                    <p className="text-sm mt-2">
+                      Search and click on movies to add them here.
+                    </p>
                   </div>
                 ) : (
                   <div className="overflow-y-auto max-h-[45vh] space-y-3">
                     {selectedMovies.map((movie) => (
-                      <div key={movie.id} className="bg-gray-700 rounded p-2 relative flex">
-                        <button class="absolute top-1 right-1 bg-red-600 text-white text-sm rounded-full w-5 h-5 grid place-items-center leading-none">×</button>
-
+                      <div
+                        key={movie.id}
+                        className="bg-gray-700 rounded p-2 relative flex"
+                      >
+                        <button class="absolute top-1 right-1 bg-red-600 text-white text-sm rounded-full w-5 h-5 grid place-items-center leading-none">
+                          ×
+                        </button>
 
                         {movie.poster_path ? (
                           <img
@@ -354,14 +395,20 @@ function UserPreferencesModal({ user, onClose }) {
                           />
                         ) : (
                           <div className="w-16 h-24 bg-gray-600 rounded mr-2 flex items-center justify-center flex-shrink-0">
-                            <span className="text-gray-400 text-xs">No Image</span>
+                            <span className="text-gray-400 text-xs">
+                              No Image
+                            </span>
                           </div>
                         )}
 
                         <div className="flex-grow">
-                          <h5 className="text-white text-sm font-medium line-clamp-1">{movie.title}</h5>
+                          <h5 className="text-white text-sm font-medium line-clamp-1">
+                            {movie.title}
+                          </h5>
                           <p className="text-gray-400 text-xs mb-1">
-                            {movie.release_date ? movie.release_date.substring(0, 4) : "N/A"}
+                            {movie.release_date
+                              ? movie.release_date.substring(0, 4)
+                              : "N/A"}
                           </p>
 
                           <div className="mt-1">
@@ -370,7 +417,9 @@ function UserPreferencesModal({ user, onClose }) {
                             </label>
                             <select
                               value={movieRatings[movie.id] || 10}
-                              onChange={(e) => handleRateMovie(movie, Number(e.target.value))}
+                              onChange={(e) =>
+                                handleRateMovie(movie, Number(e.target.value))
+                              }
                               className="w-full bg-gray-600 text-white rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-red-600"
                             >
                               <option value="1">(1) Appalling</option>
@@ -426,13 +475,18 @@ function UserPreferencesModal({ user, onClose }) {
               <div className="md:w-2/3">
                 {searchResults.length > 0 ? (
                   <div>
-                    <h4 className="text-lg font-medium text-white mb-2">Search Results</h4>
+                    <h4 className="text-lg font-medium text-white mb-2">
+                      Search Results
+                    </h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto max-h-[50vh]">
                       {searchResults.map((person) => (
                         <div
                           key={person.id}
-                          className={`bg-gray-800 rounded p-2 cursor-pointer transition-all ${selectedPeople.some(p => p.id === person.id) ? 'ring-2 ring-red-600' : ''
-                            }`}
+                          className={`bg-gray-800 rounded p-2 cursor-pointer transition-all ${
+                            selectedPeople.some((p) => p.id === person.id)
+                              ? "ring-2 ring-red-600"
+                              : ""
+                          }`}
                           onClick={() => handleSelectPerson(person)}
                         >
                           {person.profile_path ? (
@@ -451,7 +505,9 @@ function UserPreferencesModal({ user, onClose }) {
                               />
                             </div>
                           )}
-                          <h5 className="text-white text-sm font-medium truncate">{person.name}</h5>
+                          <h5 className="text-white text-sm font-medium truncate">
+                            {person.name}
+                          </h5>
                           <p className="text-gray-400 text-xs truncate">
                             {person.known_for_department || "Actor/Actress"}
                           </p>
@@ -465,8 +521,8 @@ function UserPreferencesModal({ user, onClose }) {
                       {searchQuery.length < 2
                         ? "Type at least 2 characters to search"
                         : isSearching
-                          ? "Searching..."
-                          : "No results found. Try a different search term."}
+                        ? "Searching..."
+                        : "No results found. Try a different search term."}
                     </p>
                   </div>
                 )}
@@ -484,14 +540,20 @@ function UserPreferencesModal({ user, onClose }) {
                 {selectedPeople.length === 0 ? (
                   <div className="text-center py-8 text-gray-400">
                     <p>No people selected yet.</p>
-                    <p className="text-sm mt-2">Search and click on people to add them here.</p>
+                    <p className="text-sm mt-2">
+                      Search and click on people to add them here.
+                    </p>
                   </div>
                 ) : (
                   <div className="overflow-y-auto max-h-[45vh] space-y-3">
                     {selectedPeople.map((person) => (
-                      <div key={person.id} className="bg-gray-700 rounded p-2 relative flex">
-                        <button class="absolute top-1 right-1 bg-red-600 text-white text-sm rounded-full w-5 h-5 grid place-items-center leading-none">×</button>
-
+                      <div
+                        key={person.id}
+                        className="bg-gray-700 rounded p-2 relative flex"
+                      >
+                        <button class="absolute top-1 right-1 bg-red-600 text-white text-sm rounded-full w-5 h-5 grid place-items-center leading-none">
+                          ×
+                        </button>
 
                         {person.profile_path ? (
                           <img
@@ -511,13 +573,18 @@ function UserPreferencesModal({ user, onClose }) {
                         )}
 
                         <div className="flex-grow pt-2">
-                          <h5 className="text-white text-sm font-medium line-clamp-1">{person.name}</h5>
+                          <h5 className="text-white text-sm font-medium line-clamp-1">
+                            {person.name}
+                          </h5>
                           <p className="text-gray-400 text-xs">
                             {person.known_for_department || "Actor/Actress"}
                           </p>
                           {person.known_for && person.known_for.length > 0 && (
                             <p className="text-gray-400 text-xs mt-1">
-                              Known for: {person.known_for[0].title || person.known_for[0].name || ""}
+                              Known for:{" "}
+                              {person.known_for[0].title ||
+                                person.known_for[0].name ||
+                                ""}
                             </p>
                           )}
                         </div>
@@ -542,10 +609,11 @@ function UserPreferencesModal({ user, onClose }) {
                 <div
                   key={genre.id}
                   onClick={() => handleSelectGenre(genre)}
-                  className={`p-3 rounded cursor-pointer transition-all ${selectedGenres.some(g => g.id === genre.id)
-                      ? 'bg-cineworldYellow text-white'
-                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                    }`}
+                  className={`p-3 rounded cursor-pointer transition-all ${
+                    selectedGenres.some((g) => g.id === genre.id)
+                      ? "bg-cineworldYellow text-white"
+                      : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                  }`}
                 >
                   {genre.name}
                 </div>
@@ -555,10 +623,15 @@ function UserPreferencesModal({ user, onClose }) {
             {/* Selected Genres Summary */}
             {selectedGenres.length > 0 && (
               <div className="mb-4">
-                <h4 className="text-lg font-medium text-white mb-2">Your Selected Genres</h4>
+                <h4 className="text-lg font-medium text-white mb-2">
+                  Your Selected Genres
+                </h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedGenres.map((genre) => (
-                    <div key={genre.id} className="bg-cineworldYellow text-white px-3 py-1 rounded-full flex items-center">
+                    <div
+                      key={genre.id}
+                      className="bg-cineworldYellow text-white px-3 py-1 rounded-full flex items-center"
+                    >
                       {genre.name}
                       <button
                         className="ml-2 text-white"
@@ -613,4 +686,4 @@ function UserPreferencesModal({ user, onClose }) {
   );
 }
 
-export default UserPreferencesModal; 
+export default UserPreferencesModal;
