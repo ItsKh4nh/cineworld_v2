@@ -5,30 +5,44 @@ import { AuthContext } from "../contexts/UserContext";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Custom hook for managing people favorites list functionality
+ * Provides methods to check, add and remove people from user's list
+ */
 function usePeopleList() {
   const { User } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  /**
+   * Shows a toast prompting user to sign in
+   * Used when unauthenticated users try to modify their list
+   */
   const showSignInPrompt = () => {
     toast.error("Please login to add people to your list", {
       duration: 3000,
-      position: 'top-center',
-      onClick: () => navigate("/signin")
+      position: "top-center",
+      onClick: () => navigate("/signin"),
     });
   };
 
-  // Check if a person is in the user's list
+  /**
+   * Checks if a person is in the user's favorites list
+   * @param {number|string} personId - ID of the person to check
+   * @returns {Promise<boolean>} True if the person is in the list
+   */
   const isPersonInList = async (personId) => {
     try {
       if (!User || !User.uid) return false;
-      
+
       const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
-      
+
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const people = userData.people || [];
-        return people.some(person => person.id === parseInt(personId) || person.id === personId);
+        return people.some(
+          (person) => person.id === parseInt(personId) || person.id === personId
+        );
       }
       return false;
     } catch (error) {
@@ -37,7 +51,11 @@ function usePeopleList() {
     }
   };
 
-  // Add a person to the list
+  /**
+   * Adds a person to the user's favorites list
+   * @param {Object} person - Person object with details to add
+   * @returns {Promise<boolean>} True if successfully added
+   */
   const addPersonToList = async (person) => {
     try {
       if (!User) {
@@ -45,7 +63,7 @@ function usePeopleList() {
         return false;
       }
 
-      // Prepare person data
+      // Prepare person data with only necessary fields
       const personData = {
         id: person.id,
         name: person.name,
@@ -53,44 +71,48 @@ function usePeopleList() {
         known_for_department: person.known_for_department,
         popularity: person.popularity,
         gender: person.gender,
-        dateAdded: new Date().toISOString()
+        dateAdded: new Date().toISOString(),
       };
 
-      // Check if the person is already in the list
       const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
-      
+
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const people = userData.people || [];
-        
-        // Check if person already exists
-        if (people.some(p => p.id === personData.id)) {
-          // Return false but don't show toast - handleListAction will handle this
+
+        // Skip if person already exists
+        if (people.some((p) => p.id === personData.id)) {
           return false;
         }
-        
+
         // Add person to list
         const updatedPeople = [...people, personData];
-        await updateDoc(userDocRef, { people: updatedPeople });
+        await updateDoc(userDocRef, {
+          people: updatedPeople,
+          lastUpdated: new Date().toISOString(),
+        });
       } else {
-        // Create new document with person
-        await setDoc(userDocRef, { 
+        // Create new document if it doesn't exist yet
+        await setDoc(userDocRef, {
           people: [personData],
           movies: [],
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         });
       }
-      
+
       return true;
     } catch (error) {
       console.error("Error adding person to list:", error);
-      // Don't show toast here - let handleListAction handle errors
       return false;
     }
   };
 
-  // Remove a person from the list
+  /**
+   * Removes a person from the user's favorites list
+   * @param {Object} person - Person object with id to remove
+   * @returns {Promise<boolean>} True if successfully removed
+   */
   const removePersonFromList = async (person) => {
     try {
       if (!User) {
@@ -100,25 +122,24 @@ function usePeopleList() {
 
       const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
-      
+
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const people = userData.people || [];
-        
+
         // Filter out the person to remove
-        const updatedPeople = people.filter(p => p.id !== person.id);
-        await updateDoc(userDocRef, { 
+        const updatedPeople = people.filter((p) => p.id !== person.id);
+        await updateDoc(userDocRef, {
           people: updatedPeople,
-          lastUpdated: new Date().toISOString() 
+          lastUpdated: new Date().toISOString(),
         });
-        
+
         return true;
       }
-      
+
       return false;
     } catch (error) {
       console.error("Error removing person from list:", error);
-      // Don't show toast here - let handleListAction handle errors
       return false;
     }
   };
@@ -126,8 +147,8 @@ function usePeopleList() {
   return {
     isPersonInList,
     addPersonToList,
-    removePersonFromList
+    removePersonFromList,
   };
 }
 
-export default usePeopleList; 
+export default usePeopleList;

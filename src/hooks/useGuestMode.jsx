@@ -1,38 +1,44 @@
-import { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/UserContext';
-import toast from 'react-hot-toast';
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../contexts/UserContext";
+import toast from "react-hot-toast";
 
 /**
- * Custom hook for handling guest mode functionality
- * Provides utilities for checking if user is in guest mode and handling restricted actions
+ * Custom hook for managing authentication states and access control
+ *
+ * Provides utilities to:
+ * - Check authentication status
+ * - Verify access permissions
+ * - Handle restricted features by prompting for authentication when needed
  */
 function useGuestMode() {
   const { User, isGuestMode } = useContext(AuthContext);
   const navigate = useNavigate();
 
   /**
-   * Checks if user has full access (is authenticated)
-   * @returns {boolean} True if user is authenticated
+   * Determines if the user is fully authenticated
+   * Useful for features that should only be available to registered users
    */
   const isAuthenticated = () => !!User;
 
   /**
-   * Checks if user has at least guest access
-   * @returns {boolean} True if user is authenticated or in guest mode
+   * Determines if the user has sufficient access to view content
+   * Both authenticated users and guests in guest mode have basic viewing access
    */
   const hasAccess = () => !!User || isGuestMode;
 
   /**
-   * Prompts user to login if they're not authenticated
-   * Useful for features that require authentication
-   * @param {string} feature - The name of the feature requiring authentication
+   * Handles attempting to use features that require authentication
+   * Shows a toast notification with login prompt when access is denied
+   *
+   * @param {string} feature - Name of the restricted feature for the error message
+   * @returns {boolean} - Whether the user has permission to proceed
    */
-  const requireAuth = (feature = 'this feature') => {
+  const requireAuth = (feature = "this feature") => {
     if (!User) {
       toast.error(`Please login to use ${feature}`, {
         duration: 3000,
-        onClick: () => navigate('/signin')
+        onClick: () => navigate("/signin"),
       });
       return false;
     }
@@ -43,8 +49,8 @@ function useGuestMode() {
     isGuestMode,
     isAuthenticated,
     hasAccess,
-    requireAuth
+    requireAuth,
   };
 }
 
-export default useGuestMode; 
+export default useGuestMode;

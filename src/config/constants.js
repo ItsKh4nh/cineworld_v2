@@ -3,8 +3,8 @@ export const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 export const baseURL = "https://api.themoviedb.org/3";
 
 // Image URL constants for different resolution requirements
-export const imageURL = "https://image.tmdb.org/t/p/original"; // High-resolution images
-export const imageURL2 = "https://image.tmdb.org/t/p/w500";    // Medium-resolution images
+export const imageUrlOriginal = "https://image.tmdb.org/t/p/original"; // High-resolution images
+export const imageUrlBackup = "https://image.tmdb.org/t/p/w500"; // Medium-resolution images
 
 /**
  * Language code to display name mapping

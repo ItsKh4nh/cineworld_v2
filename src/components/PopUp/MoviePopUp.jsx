@@ -3,8 +3,8 @@ import { Fade } from "react-awesome-reveal";
 import YouTube from "react-youtube";
 import StarRating from "../StarRating/StarRating";
 
-import { imageURL, API_KEY } from "../../config/constants";
-import { PopUpContext } from "../../contexts/moviePopUpContext";
+import { imageUrlOriginal, API_KEY } from "../../config/constants";
+import { PopUpContext } from "../../contexts/MoviePopUpContext";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
@@ -141,7 +141,7 @@ function MoviePopUp() {
                       />
                     ) : movieInfo.backdrop_path ? (
                       <img
-                        src={`${imageURL + movieInfo.backdrop_path}`}
+                        src={`${imageUrlOriginal + movieInfo.backdrop_path}`}
                         alt={movieInfo.title || movieInfo.name}
                         className="w-full h-full object-cover"
                       />

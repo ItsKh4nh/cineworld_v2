@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { imageURL2 } from "../../config/constants";
+import { imageUrlBackup } from "../../config/constants";
 import StarRating from "../StarRating/StarRating";
 import { RatingModalContext } from "../../contexts/RatingModalContext";
 import { AuthContext } from "../../contexts/UserContext";
@@ -67,7 +67,7 @@ const MovieCard = ({ movie, handleMoviePopup, addToMyList, convertGenre }) => {
           className="w-full h-full object-cover"
           src={
             movie.backdrop_path
-              ? imageURL2 + movie.backdrop_path
+              ? imageUrlBackup + movie.backdrop_path
               : "/placeholder.jpg"
           }
           alt={movie.title || movie.name}

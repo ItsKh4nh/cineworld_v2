@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase/FirebaseConfig";
 import { AuthContext } from "../../contexts/UserContext";
-import { imageURL2, genresList } from "../../config/constants";
+import { imageUrlBackup, genresList } from "../../config/constants";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useMoviePopup from "../../hooks/useMoviePopup";
@@ -607,7 +607,7 @@ function MyListTable() {
                             <div className="flex items-center">
                               <img
                                 src={
-                                  imageURL2 +
+                                  imageUrlBackup +
                                   (movie.poster_path || movie.backdrop_path)
                                 }
                                 alt={movie.title || movie.name}
@@ -732,7 +732,7 @@ function MyListTable() {
                       <div className="w-16 flex-shrink-0 mr-3">
                         <img
                           src={
-                            imageURL2 +
+                            imageUrlBackup +
                             (movie.poster_path || movie.backdrop_path)
                           }
                           alt={movie.title || movie.name}
@@ -883,7 +883,7 @@ function MyListTable() {
                     <img
                       src={
                         person.profile_path
-                          ? `${imageURL2}${person.profile_path}`
+                          ? `${imageUrlBackup}${person.profile_path}`
                           : "/placeholder.jpg"
                       }
                       alt={person.name}

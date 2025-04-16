@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { imageURL2, statusOptions, scoreOptions } from "../../config/constants";
+import {
+  imageUrlBackup,
+  statusOptions,
+  scoreOptions,
+} from "../../config/constants";
 
 // Icons
 import CloseIcon from "../../assets/close-icon.svg?react";
@@ -101,7 +105,7 @@ function RatingModal({ movie, onClose, onSave }) {
         <div className="flex mb-4">
           {movie.backdrop_path && (
             <img
-              src={imageURL2 + movie.backdrop_path}
+              src={imageUrlBackup + movie.backdrop_path}
               alt={movie.title || movie.name}
               className="w-24 h-auto rounded mr-4"
             />

@@ -11,7 +11,7 @@ import {
   movieReviews,
   configurationLanguages,
 } from "../config";
-import { imageURL, imageURL2, languageList } from "../config";
+import { imageUrlOriginal, imageUrlBackup, languageList } from "../config";
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
 import usePlayMovie from "../hooks/usePlayMovie";
@@ -436,7 +436,7 @@ function Play() {
                 className="w-full h-full bg-cover bg-center flex items-end"
                 style={{
                   backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8)), url(${
-                    imageURL + movieDetails.backdrop_path
+                    imageUrlOriginal + movieDetails.backdrop_path
                   })`,
                 }}
               >
@@ -546,7 +546,7 @@ function Play() {
               {/* Left Column - Poster */}
               <div className="hidden lg:block">
                 <img
-                  src={`${imageURL2}${movieDetails.poster_path}`}
+                  src={`${imageUrlBackup}${movieDetails.poster_path}`}
                   alt={movieDetails.title}
                   className="w-full rounded-lg shadow-lg"
                 />
@@ -617,7 +617,7 @@ function Play() {
                     <div>
                       <div className="lg:hidden mb-6 flex justify-center">
                         <img
-                          src={`${imageURL2}${movieDetails.poster_path}`}
+                          src={`${imageUrlBackup}${movieDetails.poster_path}`}
                           alt={movieDetails.title}
                           className="w-1/2 rounded-lg shadow-lg"
                         />
@@ -862,7 +862,7 @@ function Play() {
                                     >
                                       {company.logo_path ? (
                                         <img
-                                          src={`${imageURL2}${company.logo_path}`}
+                                          src={`${imageUrlBackup}${company.logo_path}`}
                                           alt={company.name}
                                           className="h-12 mb-2 bg-white p-1 rounded"
                                         />
@@ -957,7 +957,7 @@ function Play() {
                                   <img
                                     src={
                                       person.profile_path
-                                        ? `${imageURL2}${person.profile_path}`
+                                        ? `${imageUrlBackup}${person.profile_path}`
                                         : "/placeholder.jpg"
                                     }
                                     alt={person.name}
@@ -1018,7 +1018,7 @@ function Play() {
                                       <img
                                         src={
                                           person.profile_path
-                                            ? `${imageURL2}${person.profile_path}`
+                                            ? `${imageUrlBackup}${person.profile_path}`
                                             : "/placeholder.jpg"
                                         }
                                         alt={person.name}
@@ -1072,7 +1072,7 @@ function Play() {
                                         !review.author_details.avatar_path.startsWith(
                                           "/https:"
                                         )
-                                          ? `${imageURL2}${review.author_details.avatar_path}`
+                                          ? `${imageUrlBackup}${review.author_details.avatar_path}`
                                           : review.author_details.avatar_path.replace(
                                               /^\//,
                                               ""
@@ -1168,7 +1168,7 @@ function Play() {
                       <div
                         className="w-full h-40 bg-cover bg-center rounded-lg mb-6"
                         style={{
-                          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url(${imageURL}${collectionInfo.backdrop_path})`,
+                          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url(${imageUrlOriginal}${collectionInfo.backdrop_path})`,
                         }}
                       >
                         <div className="h-full flex items-center p-6">
@@ -1203,7 +1203,7 @@ function Play() {
                                 className="w-full h-full object-cover"
                                 src={
                                   movie.backdrop_path
-                                    ? imageURL2 + movie.backdrop_path
+                                    ? imageUrlBackup + movie.backdrop_path
                                     : "/placeholder.jpg"
                                 }
                                 alt={movie.title || movie.name}
@@ -1320,7 +1320,7 @@ function Play() {
                           className="w-full h-full object-cover"
                           src={
                             movie.backdrop_path
-                              ? imageURL2 + movie.backdrop_path
+                              ? imageUrlBackup + movie.backdrop_path
                               : "/placeholder.jpg"
                           }
                           alt={movie.title || movie.name}

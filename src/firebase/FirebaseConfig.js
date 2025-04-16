@@ -1,8 +1,12 @@
 import { initializeApp } from "firebase/app";
-//import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
-import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
+import {
+  getAuth,
+  setPersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
 
+// Firebase configuration
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -13,14 +17,17 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
+// Initialize Firebase application instance
 export const FirebaseApp = initializeApp(firebaseConfig);
-export const db = getFirestore(FirebaseApp);
-//export const analytics = getAnalytics(FirebaseApp);
 
-// Set up persistent authentication
+// Initialize and export Firestore database for data storage
+export const db = getFirestore(FirebaseApp);
+
+// Initialize authentication service
 export const auth = getAuth(FirebaseApp);
-setPersistence(auth, browserLocalPersistence)
-  .catch((error) => {
-    console.error("Error setting auth persistence:", error);
-  });
+
+// Configure authentication to persist user sessions in browser local storage
+// This prevents users from having to log in again when they reload the page
+setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.error("Error setting auth persistence:", error);
+});

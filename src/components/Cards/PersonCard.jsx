@@ -1,5 +1,5 @@
 import React from "react";
-import { imageURL2 } from "../../config/constants";
+import { imageUrlBackup } from "../../config/constants";
 
 const PersonCard = ({ person, handlePersonClick }) => {
   // Determine display info for known works
@@ -15,7 +15,7 @@ const PersonCard = ({ person, handlePersonClick }) => {
       {/* Profile image with fallback for missing images */}
       {person.profile_path ? (
         <img
-          src={imageURL2 + person.profile_path}
+          src={imageUrlBackup + person.profile_path}
           alt={person.name}
           className="w-full h-48 object-cover"
           loading="lazy"

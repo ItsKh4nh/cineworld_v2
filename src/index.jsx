@@ -5,7 +5,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 
 import { FirebaseApp } from "./firebase/FirebaseConfig";
 import Context from "./contexts/UserContext";
-import Context2 from "./contexts/moviePopUpContext";
+import MoviePopUpProvider from "./contexts/MoviePopUpContext";
 
 import App from "./App";
 import "./index.css";
@@ -13,9 +13,9 @@ import "./index.css";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Router>
     <Context>
-      <Context2>
+      <MoviePopUpProvider>
         <App />
-      </Context2>
+      </MoviePopUpProvider>
     </Context>
   </Router>
 );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { doc, updateDoc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase/FirebaseConfig";
-import { imageURL2, genresList } from "../../config/constants";
+import { imageUrlBackup, genresList } from "../../config/constants";
 import axios from "../../axios";
 import { searchMovie, searchPerson } from "../../config/URLs";
 import StarRating from "../StarRating/StarRating";
@@ -310,7 +310,7 @@ function UserPreferencesModal({ user, onClose }) {
                         >
                           {movie.poster_path ? (
                             <img
-                              src={imageURL2 + movie.poster_path}
+                              src={imageUrlBackup + movie.poster_path}
                               alt={movie.title}
                               className="w-full h-36 object-cover rounded mb-2"
                             />
@@ -378,7 +378,7 @@ function UserPreferencesModal({ user, onClose }) {
 
                         {movie.poster_path ? (
                           <img
-                            src={imageURL2 + movie.poster_path}
+                            src={imageUrlBackup + movie.poster_path}
                             alt={movie.title}
                             className="w-16 h-24 object-cover rounded mr-2 flex-shrink-0"
                           />
@@ -480,7 +480,7 @@ function UserPreferencesModal({ user, onClose }) {
                         >
                           {person.profile_path ? (
                             <img
-                              src={imageURL2 + person.profile_path}
+                              src={imageUrlBackup + person.profile_path}
                               alt={person.name}
                               className="w-full h-36 object-cover rounded mb-2"
                             />
@@ -546,7 +546,7 @@ function UserPreferencesModal({ user, onClose }) {
 
                         {person.profile_path ? (
                           <img
-                            src={imageURL2 + person.profile_path}
+                            src={imageUrlBackup + person.profile_path}
                             alt={person.name}
                             className="w-16 h-24 object-cover rounded mr-2 flex-shrink-0"
                           />

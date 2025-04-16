@@ -4,6 +4,10 @@ import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "./UserContext";
 import UserPreferencesModal from "../components/Modals/UserPreferencesModal";
 
+/**
+ * Context for managing user preferences across the application
+ * Handles the preferences modal display and user preference state
+ */
 export const UserPreferencesContext = createContext();
 
 export const UserPreferencesProvider = ({ children }) => {
@@ -11,7 +15,10 @@ export const UserPreferencesProvider = ({ children }) => {
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
   const [isNewUser, setIsNewUser] = useState(false);
 
-  // Check if user is new (no preferences set)
+  /**
+   * Check if the user has set preferences when they log in
+   * Shows the preferences modal automatically for new users
+   */
   useEffect(() => {
     const checkUserPreferences = async () => {
       if (!User) return;
@@ -19,8 +26,8 @@ export const UserPreferencesProvider = ({ children }) => {
       try {
         // Check if user has preferences in MyList collection
         const myListDoc = await getDoc(doc(db, "MyList", User.uid));
-        
-        // If MyList doesn't exist or has no preferences, show the modal
+
+        // Show the modal for first-time users or those without preferences
         if (!myListDoc.exists() || !myListDoc.data().preferredGenres) {
           setIsNewUser(true);
           setShowPreferencesModal(true);
@@ -35,10 +42,16 @@ export const UserPreferencesProvider = ({ children }) => {
     checkUserPreferences();
   }, [User]);
 
+  /**
+   * Closes the preferences modal
+   */
   const closePreferencesModal = () => {
     setShowPreferencesModal(false);
   };
 
+  /**
+   * Opens the preferences modal for existing users
+   */
   const openPreferencesModal = () => {
     setShowPreferencesModal(true);
   };
@@ -48,16 +61,13 @@ export const UserPreferencesProvider = ({ children }) => {
       value={{
         isNewUser,
         openPreferencesModal,
-        closePreferencesModal
+        closePreferencesModal,
       }}
     >
       {children}
       {showPreferencesModal && User && (
-        <UserPreferencesModal 
-          user={User} 
-          onClose={closePreferencesModal} 
-        />
+        <UserPreferencesModal user={User} onClose={closePreferencesModal} />
       )}
     </UserPreferencesContext.Provider>
   );
-}; 
+};

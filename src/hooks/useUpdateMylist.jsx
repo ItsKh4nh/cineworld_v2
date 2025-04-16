@@ -1,197 +1,199 @@
-import React, { useContext } from "react";
-import { updateDoc, doc, arrayUnion, arrayRemove, getDoc, setDoc } from "firebase/firestore";
+import { useContext } from "react";
+import { updateDoc, doc, arrayUnion, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
 import { RatingModalContext } from "../contexts/RatingModalContext";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Custom hook for managing operations related to user's movie list
+ * Provides functions to add, remove, check, and update movies in user's list
+ */
 function useUpdateMyList() {
-  const { User, isGuestMode } = useContext(AuthContext);
-  const ratingModalContext = useContext(RatingModalContext) || {};
-  const { openRatingModal } = ratingModalContext;
+  const { User } = useContext(AuthContext);
+  const { openRatingModal } = useContext(RatingModalContext) || {};
   const navigate = useNavigate();
 
-  // Track a movie interaction directly (no circular dependency)
+  /**
+   * Records a movie interaction in user's history
+   * @param {number|string} movie_id - ID of the movie to track
+   * @returns {Promise<boolean>} Success status
+   */
   const trackMovieInteraction = async (movie_id) => {
     try {
       if (!User || !User.uid) return false;
-      
-      const movie_id_number = typeof movie_id === 'string' ? parseInt(movie_id) : movie_id;
-      
-      // Reference to the user's interaction list document
+
+      const movie_id_number =
+        typeof movie_id === "string" ? parseInt(movie_id) : movie_id;
       const interactionDocRef = doc(db, "InteractionList", User.uid);
       const docSnap = await getDoc(interactionDocRef);
-      
+
       if (docSnap.exists()) {
-        // Document exists, check if movie_id is already in the list
+        // Add to existing list if not already present
         const userData = docSnap.data();
         const movieIds = userData.movie_ids || [];
-        
-        // Only add if not already in the list
+
         if (!movieIds.includes(movie_id_number)) {
           await updateDoc(interactionDocRef, {
             movie_ids: arrayUnion(movie_id_number),
-            lastUpdated: new Date().toISOString()
+            lastUpdated: new Date().toISOString(),
           });
         }
       } else {
-        // Document doesn't exist, create it
+        // Create new document for first interaction
         await setDoc(interactionDocRef, {
           movie_ids: [movie_id_number],
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         });
       }
-      
+
       return true;
     } catch (error) {
       console.error("Error tracking movie interaction:", error);
       return false;
     }
   };
-  
-  function notify() {
-    toast.success("  Movie added to MyList  ");
-  }
-  
-  function alertError(message) {
-    toast.error(message);
-  }
 
+  /**
+   * Shows login prompt for unauthenticated users
+   */
   const showSignInPrompt = () => {
     toast.error("Please login to add movies to your list", {
       duration: 3000,
-      onClick: () => navigate("/signin")
+      onClick: () => navigate("/signin"),
     });
   };
 
+  /**
+   * Initiates adding a movie to user's list with rating
+   * Opens rating modal to collect user rating before adding
+   *
+   * @param {Object} movie - Movie object to be added
+   * @returns {Promise<boolean>} Promise that resolves when operation completes
+   */
   const addToMyList = (movie) => {
-    console.log("addToMyList called with:", movie);
-    
-    // If not authenticated, show login prompt
+    // Require authentication
     if (!User) {
       showSignInPrompt();
       return Promise.resolve(false);
     }
-    
+
     if (openRatingModal) {
-      // Return a promise that resolves when the modal is closed with a successful rating
       return new Promise((resolve) => {
-        // Store the original movie for reference
         const originalMovie = movie;
-        
-        // Set up a one-time event listener to capture the result of the rating modal
+
+        // Set up listener to capture rating modal result
         const handleModalResult = (event) => {
           if (event.detail && event.detail.movieId === originalMovie.id) {
-            // Remove the event listener
-            window.removeEventListener('ratingModalClosed', handleModalResult);
-            
-            // Resolve with the success status
+            window.removeEventListener("ratingModalClosed", handleModalResult);
             resolve(event.detail.success);
           }
         };
-        
-        // Add event listener for the custom event
-        window.addEventListener('ratingModalClosed', handleModalResult);
-        
-        // Open the rating modal
+
+        window.addEventListener("ratingModalClosed", handleModalResult);
         openRatingModal(movie, User);
-        
-        // Add a timeout to resolve the promise if the event isn't fired within 30 seconds
-        // This ensures the UI doesn't get stuck if something goes wrong
+
+        // Safety timeout to prevent promise from hanging
         setTimeout(() => {
-          window.removeEventListener('ratingModalClosed', handleModalResult);
-          console.log("RatingModal timeout - resolving promise as false");
+          window.removeEventListener("ratingModalClosed", handleModalResult);
           resolve(false);
         }, 30000);
       });
     } else {
-      console.error("openRatingModal is not available");
-      alertError("Rating feature is not available right now");
+      toast.error("Rating feature is not available right now");
       return Promise.resolve(false);
     }
   };
 
+  /**
+   * Adds a rated movie to user's MyList
+   * Called after user submits rating from modal
+   *
+   * @param {Object} ratedMovie - Movie with rating information
+   * @returns {Promise<boolean>} Success status
+   */
   const addRatedMovieToList = async (ratedMovie) => {
     try {
-      console.log("Adding rated movie to list in useUpdateMyList:", ratedMovie);
-      console.log("Genres in useUpdateMyList:", ratedMovie.genres);
-      
-      // Convert genres array to genre_ids if needed
+      if (!User) return false;
+
+      // Prepare movie data with consistent genre format
       let movieToSave = { ...ratedMovie };
-      
-      // If movie has genres array of objects but not genre_ids, convert it
-      if (movieToSave.genres && Array.isArray(movieToSave.genres) && !movieToSave.genre_ids) {
-        movieToSave.genre_ids = movieToSave.genres.map(genre => genre.id);
-        console.log("Converted genres to genre_ids:", movieToSave.genre_ids);
+
+      // Convert genres array to genre_ids if needed
+      if (
+        movieToSave.genres &&
+        Array.isArray(movieToSave.genres) &&
+        !movieToSave.genre_ids
+      ) {
+        movieToSave.genre_ids = movieToSave.genres.map((genre) => genre.id);
       }
-      
-      // Check if the movie already exists in the list
+
       const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
-      
+
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const movies = userData.movies || [];
-        const existingMovie = movies.find(m => m.id === movieToSave.id);
-        
+        const existingMovie = movies.find((m) => m.id === movieToSave.id);
+
         if (existingMovie) {
-          // Movie exists, update it instead of adding a duplicate
-          // First remove the existing movie
-          const filteredMovies = movies.filter(m => m.id !== movieToSave.id);
-          
-          // Then add the updated movie
+          // Update existing movie instead of adding duplicate
+          const filteredMovies = movies.filter((m) => m.id !== movieToSave.id);
           filteredMovies.push({
             ...movieToSave,
-            // Ensure these properties are copied if they exist
             genre_ids: movieToSave.genre_ids || existingMovie.genre_ids,
-            isInMyList: true // Explicitly mark as in MyList
+            isInMyList: true,
           });
-          
-          // Update the document with the new array
+
           await updateDoc(userDocRef, { movies: filteredMovies });
-          console.log("Movie rating updated successfully");
           toast.success("Rating updated successfully!");
-          return true; // Explicitly return true on successful update
         } else {
-          // Movie doesn't exist, add it to the list
-          // Using direct array update instead of arrayUnion to ensure all properties are preserved
-          const updatedMovies = [...movies, { ...movieToSave, isInMyList: true }];
+          // Add new movie to list
+          const updatedMovies = [
+            ...movies,
+            { ...movieToSave, isInMyList: true },
+          ];
           await updateDoc(userDocRef, { movies: updatedMovies });
-          console.log("Rated movie added to MyList");
           toast.success("Movie added to MyList");
-          return true; // Explicitly return true on successful add
         }
       } else {
-        // Document doesn't exist, create it with the movie
-        await setDoc(userDocRef, { movies: [{ ...movieToSave, isInMyList: true }] });
-        console.log("Rated movie added to MyList");
+        // Create new document with movie
+        await setDoc(userDocRef, {
+          movies: [{ ...movieToSave, isInMyList: true }],
+          lastUpdated: new Date().toISOString(),
+        });
         toast.success("Movie added to MyList");
-        return true; // Explicitly return true on successful creation
       }
-      
-      // Add movie to interaction list
+
+      // Track interaction for recommendation system
       trackMovieInteraction(movieToSave.id);
+      return true;
     } catch (error) {
-      console.log(error.code);
-      console.log(error.message);
-      alertError(error.message);
-      return false; // Return false on error
+      console.error("Error adding rated movie:", error);
+      toast.error(error.message);
+      return false;
     }
   };
 
-  // Check if a movie is in the user's list
+  /**
+   * Checks if a movie is in user's list
+   * @param {number|string} movie_id - ID of movie to check
+   * @returns {Promise<boolean>} True if movie is in user's list
+   */
   const checkIfInMyList = async (movie_id) => {
     try {
       if (!User || !User.uid) return false;
-      
+
       const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
-      
+
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const movies = userData.movies || [];
-        return movies.some(movie => movie.id === parseInt(movie_id) || movie.id === movie_id);
+        return movies.some(
+          (movie) => movie.id === parseInt(movie_id) || movie.id === movie_id
+        );
       }
       return false;
     } catch (error) {
@@ -200,122 +202,138 @@ function useUpdateMyList() {
     }
   };
 
-  // New function to properly update a movie's rating
+  /**
+   * Updates a movie's rating in user's list
+   * @param {Object} oldMovie - Original movie object
+   * @param {Object} updatedMovie - Movie with updated rating
+   * @returns {Promise<boolean>} Success status
+   */
   const updateRatedMovie = async (oldMovie, updatedMovie) => {
     try {
-      // Get the current list
+      if (!User) return false;
+
       const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
-      
+
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const currentMovies = userData.movies || [];
-        
-        // Remove the old movie
-        const filteredMovies = currentMovies.filter(movie => movie.id !== oldMovie.id);
-        
-        // Add the updated movie
+
+        // Replace movie with updated version
+        const filteredMovies = currentMovies.filter(
+          (movie) => movie.id !== oldMovie.id
+        );
         filteredMovies.push(updatedMovie);
-        
-        // Update the document with the new array
-        await updateDoc(userDocRef, { movies: filteredMovies });
-        
-        console.log("Movie rating updated successfully");
+
+        await updateDoc(userDocRef, {
+          movies: filteredMovies,
+          lastUpdated: new Date().toISOString(),
+        });
+
         toast.success("Rating updated successfully!");
         return true;
-      } else {
-        console.log("No such document!");
-        alertError("Failed to update rating");
-        return false;
       }
+
+      toast.error("Failed to update rating");
+      return false;
     } catch (error) {
       console.error("Error updating movie rating:", error);
-      alertError("Failed to update rating: " + error.message);
+      toast.error("Failed to update rating: " + error.message);
       return false;
     }
   };
 
+  /**
+   * Removes a movie from user's list
+   * @param {Object} movie - Movie to remove
+   * @returns {Promise<boolean>} Success status
+   */
   const removeFromMyList = async (movie) => {
     try {
-      // Get the current list
+      if (!User) return false;
+
       const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
-      
+
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const currentMovies = userData.movies || [];
-        
-        // Filter out the movie to remove by ID
-        const filteredMovies = currentMovies.filter(m => m.id !== movie.id);
-        
-        // Update the document with the filtered list
-        await updateDoc(userDocRef, { movies: filteredMovies });
-        
-        console.log("Movie removed from MyList successfully");
-        toast.success(" Movie removed from MyList  ");
+
+        // Filter out the movie to remove
+        const filteredMovies = currentMovies.filter((m) => m.id !== movie.id);
+
+        await updateDoc(userDocRef, {
+          movies: filteredMovies,
+          lastUpdated: new Date().toISOString(),
+        });
+
+        toast.success("Movie removed from MyList");
         return true;
-      } else {
-        console.log("No such document!");
-        return false;
       }
+      return false;
     } catch (error) {
-      console.log(error.code);
-      console.log(error.message);
-      alertError(error.message);
+      console.error("Error removing movie from list:", error);
+      toast.error(error.message);
       return false;
     }
   };
 
+  /**
+   * Updates a movie's personal note in user's list
+   * @param {Object} movie - Movie to update
+   * @param {string} newNote - New note content
+   * @returns {Promise<boolean>} Success status
+   */
   const updateMovieNote = async (movie, newNote) => {
     try {
-      // Get the current list
+      if (!User) return false;
+
       const userDocRef = doc(db, "MyList", User.uid);
       const docSnap = await getDoc(userDocRef);
-      
+
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const currentMovies = userData.movies || [];
-        
-        // Remove the old movie
-        const filteredMovies = currentMovies.filter(m => m.id !== movie.id);
-        
+
         // Create updated movie with new note
-        const updatedMovie = {
-          ...movie,
-          userRating: {
-            ...movie.userRating,
-            note: newNote
+        const updatedMovies = currentMovies.map((m) => {
+          if (m.id === movie.id) {
+            return {
+              ...m,
+              userRating: {
+                ...m.userRating,
+                note: newNote,
+              },
+            };
           }
-        };
-        
-        // Add the updated movie
-        filteredMovies.push(updatedMovie);
-        
-        // Update the document with the new array
-        await updateDoc(userDocRef, { movies: filteredMovies });
-        
-        console.log("Movie note updated successfully");
+          return m;
+        });
+
+        await updateDoc(userDocRef, {
+          movies: updatedMovies,
+          lastUpdated: new Date().toISOString(),
+        });
+
         toast.success("Note updated successfully");
         return true;
-      } else {
-        console.log("No such document!");
-        alertError("Failed to update note");
-        return false;
       }
+
+      toast.error("Failed to update note");
+      return false;
     } catch (error) {
       console.error("Error updating movie note:", error);
-      alertError("Failed to update note: " + error.message);
+      toast.error("Failed to update note: " + error.message);
       return false;
     }
   };
 
-  return { 
-    addToMyList, 
+  return {
+    addToMyList,
     addRatedMovieToList,
     updateRatedMovie,
-    removeFromMyList, 
+    removeFromMyList,
     updateMovieNote,
-    checkIfInMyList
+    checkIfInMyList,
   };
 }
 

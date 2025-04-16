@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Fade } from "react-awesome-reveal";
 import StarRating from "../StarRating/StarRating";
 import axios from "../../axios";
-import { imageURL } from "../../config/constants";
+import { imageUrlOriginal } from "../../config/constants";
 
 // Custom hooks
 import usePlayMovie from "../../hooks/usePlayMovie";
@@ -63,7 +63,7 @@ function Banner({ url }) {
   // Background gradient for better text visibility over movie backdrop
   const bannerBackgroundStyle = {
     backgroundImage: `linear-gradient(90deg, hsl(0deg 0% 7% / 91%) 0%, hsl(0deg 0% 0% / 0%) 35%, hsl(220deg 26% 44% / 0%) 100%), url(${
-      movie ? imageURL + movie.backdrop_path : ""
+      movie ? imageUrlOriginal + movie.backdrop_path : ""
     })`,
   };
 

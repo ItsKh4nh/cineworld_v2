@@ -7,7 +7,7 @@ import useMoviePopup from "../hooks/useMoviePopup";
 import useUpdateMyList from "../hooks/useUpdateMyList";
 import Footer from "../components/Footer/Footer";
 import StarRating from "../components/StarRating/StarRating";
-import { imageURL2 } from "../config/constants";
+import { imageUrlBackup } from "../config/constants";
 import { getPersonalizedRecommendations } from "../services/RecommendationsService";
 
 // Icons
@@ -109,7 +109,7 @@ function Recommendations() {
               className="w-full aspect-[16/9] object-cover"
               src={
                 movie.backdrop_path
-                  ? imageURL2 + movie.backdrop_path
+                  ? imageUrlBackup + movie.backdrop_path
                   : "/placeholder.jpg"
               }
               alt={movie.title || movie.name}
@@ -209,7 +209,7 @@ function Recommendations() {
                 className="w-full aspect-[2/3] object-cover"
                 src={
                   movie.poster_path
-                    ? imageURL2 + movie.poster_path
+                    ? imageUrlBackup + movie.poster_path
                     : "/placeholder.jpg"
                 }
                 alt={movie.title || movie.name}

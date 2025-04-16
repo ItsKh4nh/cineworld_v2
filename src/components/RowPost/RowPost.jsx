@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 
 import axios from "../../axios";
-import { imageURL, imageURL2 } from "../../config/constants";
+import { imageUrlOriginal, imageUrlBackup } from "../../config/constants";
 import { AuthContext } from "../../contexts/UserContext";
 import { RatingModalContext } from "../../contexts/RatingModalContext";
 
@@ -121,7 +121,7 @@ function RowPost(props) {
                     <>
                       <img
                         className="rounded-sm"
-                        src={`${imageURL + obj.poster_path}`}
+                        src={`${imageUrlOriginal + obj.poster_path}`}
                       />
                     </>
                   ) : (
@@ -131,7 +131,7 @@ function RowPost(props) {
                         className="rounded-sm"
                         src={
                           obj.backdrop_path
-                            ? `${imageURL2 + obj.backdrop_path}`
+                            ? `${imageUrlBackup + obj.backdrop_path}`
                             : "/placeholder.jpg"
                         }
                       />

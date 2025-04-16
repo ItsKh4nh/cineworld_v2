@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import axios from "../axios";
 import { searchMovie, searchPerson } from "../config/URLs";
-import { imageURL2 } from "../config/constants";
+import { imageUrlBackup } from "../config/constants";
 import { AuthContext } from "../contexts/UserContext";
 
 import StarRating from "../components/StarRating/StarRating";

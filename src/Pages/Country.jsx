@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "../axios";
 import { API_KEY } from "../config/constants";
-import { imageURL2 } from "../config/constants";
+import { imageUrlBackup } from "../config/constants";
 import { AuthContext } from "../contexts/UserContext";
 import Footer from "../components/Footer/Footer";
 import useGenresConverter from "../hooks/useGenresConverter";
