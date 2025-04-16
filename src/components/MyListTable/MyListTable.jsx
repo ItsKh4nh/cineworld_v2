@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
-import { doc, getDoc, updateDoc, arrayRemove } from "firebase/firestore";
+import React, { useState, useContext, useEffect } from "react";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase/FirebaseConfig";
 import { AuthContext } from "../../contexts/UserContext";
 import { imageURL2, genresList } from "../../config/constants";
@@ -17,52 +17,53 @@ import StarRating from "../StarRating/StarRating";
 import { FaMinus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-// Import SVGs as React Components
+// Icons
 import ClearIcon from "../../assets/clear-icon.svg?react";
 import StarPlaceholderIcon from "../../assets/star-placeholder-icon.svg?react";
 import EditIcon from "../../assets/edit-icon.svg?react";
 import RemoveIcon from "../../assets/remove-icon.svg?react";
 
 function MyListTable() {
+  const navigate = useNavigate();
   const { User } = useContext(AuthContext);
-  const {
-    removeFromMyList,
-    updateMovieNote,
-    PopupMessage,
-    addRatedMovieToList,
-    updateRatedMovie,
-  } = useUpdateMyList();
+  const { removeFromMyList, updateMovieNote, PopupMessage, updateRatedMovie } =
+    useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { handleMoviePopup } = useMoviePopup();
   const { convertGenre } = useGenresConverter();
 
+  // State for movies and people lists
   const [myMovies, setMyMovies] = useState([]);
   const [myPeople, setMyPeople] = useState([]);
+  const [allMovies, setAllMovies] = useState([]); // Store all movies for filtering
   const [loading, setLoading] = useState(true);
+
+  // State for UI tabs and responsive design
+  const [activeTab, setActiveTab] = useState("movies");
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1200);
+
+  // State for movie editing
   const [editingNote, setEditingNote] = useState(null);
   const [noteText, setNoteText] = useState("");
+  const [editingRating, setEditingRating] = useState(null);
+
+  // State for confirmation modal
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [movieToRemove, setMovieToRemove] = useState(null);
+
+  // State for filtering and searching
   const [sortConfig, setSortConfig] = useState({
     key: "dateAdded",
     direction: "desc",
   });
-  const [editingRating, setEditingRating] = useState(null);
-  const [activeTab, setActiveTab] = useState("movies");
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [movieToRemove, setMovieToRemove] = useState(null);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [availableGenres, setAvailableGenres] = useState([]);
-  const [allMovies, setAllMovies] = useState([]); // Store all movies for filtering
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [peopleSearchTerm, setPeopleSearchTerm] = useState("");
 
-  // Add states to track screen size
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1200);
-
-  const navigate = useNavigate();
-
-  // Update event listener for window resize
+  // Handle responsive design
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -73,17 +74,16 @@ function MyListTable() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Load initial data
   useEffect(() => {
     getMovies();
   }, []);
 
+  // Extract available genres for filtering when movies are loaded
   useEffect(() => {
     if (myMovies.length > 0) {
-      // Extract all genre IDs from movies
       const allGenreIds = myMovies.flatMap((movie) => movie.genre_ids || []);
-      // Get unique genre IDs
       const uniqueGenreIds = [...new Set(allGenreIds)];
-      // Map to genre names using the genresList from constants
       const genres = uniqueGenreIds
         .map((id) => {
           const genre = genresList.find((g) => g.id === id);
@@ -95,18 +95,17 @@ function MyListTable() {
     }
   }, [myMovies]);
 
+  // Fetch movies and people data from Firestore
   function getMovies() {
     setLoading(true);
 
-    // Get movies from MyList collection
     getDoc(doc(db, "MyList", User.uid))
       .then((result) => {
         const data = result.data();
         if (data && data.movies) {
-          // Get runtime for each movie
+          // Fetch additional details for each movie
           const moviesWithRuntime = data.movies.map(async (movie) => {
             try {
-              // Use the project's axios instance with baseURL already configured
               const response = await axios.get(
                 `https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=en-US`
               );
@@ -121,13 +120,12 @@ function MyListTable() {
             }
           });
 
-          // Wait for all promises to resolve
           Promise.all(moviesWithRuntime).then((updatedMovies) => {
             setMyMovies(updatedMovies);
-            setAllMovies(updatedMovies); // Store all movies for filtering
+            setAllMovies(updatedMovies);
           });
 
-          // Get people from the same MyList document
+          // Set people data if available
           if (data.people) {
             setMyPeople(data.people || []);
           } else {
@@ -149,6 +147,93 @@ function MyListTable() {
       });
   }
 
+  // Note editing handlers
+  const handleEditNote = (movie) => {
+    setEditingNote(movie.id);
+    setNoteText(movie.userRating?.note || "");
+  };
+
+  const handleSaveNote = async (movie) => {
+    const success = await updateMovieNote(movie, noteText);
+
+    if (success) {
+      setEditingNote(null);
+      setTimeout(() => {
+        getMovies();
+      }, 1000);
+    }
+  };
+
+  // Movie removal handlers
+  const handleRemoveMovie = (movie) => {
+    setMovieToRemove(movie);
+    setShowConfirmation(true);
+  };
+
+  const confirmRemove = async () => {
+    if (movieToRemove) {
+      const success = await removeFromMyList(movieToRemove);
+      setShowConfirmation(false);
+      setMovieToRemove(null);
+
+      if (success) {
+        setTimeout(() => {
+          getMovies();
+        }, 1000);
+      }
+    }
+  };
+
+  const cancelRemove = () => {
+    setShowConfirmation(false);
+    setMovieToRemove(null);
+  };
+
+  // Rating handlers
+  const handleEditRating = (movie) => {
+    setEditingRating(movie);
+  };
+
+  const handleSaveRating = async (updatedMovie) => {
+    const success = await updateRatedMovie(editingRating, updatedMovie);
+
+    if (success) {
+      setEditingRating(null);
+      setTimeout(() => {
+        getMovies();
+      }, 1000);
+    }
+  };
+
+  // Person removal handler
+  const handleRemovePerson = async (person) => {
+    try {
+      const userDocRef = doc(db, "MyList", User.uid);
+      const docSnap = await getDoc(userDocRef);
+
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        const people = userData.people || [];
+        const updatedPeople = people.filter((p) => p.id !== person.id);
+
+        await updateDoc(userDocRef, {
+          people: updatedPeople,
+          lastUpdated: new Date().toISOString(),
+        });
+
+        setMyPeople((prevPeople) =>
+          prevPeople.filter((p) => p.id !== person.id)
+        );
+
+        toast.success("Person removed from your list");
+      }
+    } catch (error) {
+      console.error("Error removing person:", error);
+      toast.error("Failed to remove person from your list");
+    }
+  };
+
+  // Filtering and sorting handlers
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -157,13 +242,71 @@ function MyListTable() {
     setSortConfig({ key, direction });
   };
 
+  const handleOpenFilterModal = () => {
+    setShowFilterModal(true);
+  };
+
+  const handleCloseFilterModal = () => {
+    setShowFilterModal(false);
+  };
+
+  const handleApplyStatusFilter = (status) => {
+    if (status === "All") {
+      setMyMovies(allMovies);
+    } else {
+      const filtered = allMovies.filter(
+        (movie) => movie.userRating?.status === status
+      );
+      setMyMovies(filtered);
+    }
+  };
+
+  const handleResetFilters = () => {
+    setSelectedGenres([]);
+    setMyMovies(allMovies);
+  };
+
+  // Utility formatting functions
+  const formatDate = (dateString) => {
+    if (!dateString) return "Unknown";
+
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Unknown";
+
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const formatRuntime = (minutes) => {
+    if (!minutes) return "Unknown";
+
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+
+    if (hours === 0) {
+      return `${mins}m`;
+    } else if (mins === 0) {
+      return `${hours}h`;
+    } else {
+      return `${hours}h ${mins}m`;
+    }
+  };
+
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) return null;
+    return sortConfig.direction === "asc" ? " ↑" : " ↓";
+  };
+
+  // Apply sorted movies with filters
   const sortedMovies = React.useMemo(() => {
     let sortableMovies = [...myMovies];
 
-    // First apply genre filter if any genres are selected
+    // Apply genre filter if any genres are selected
     if (selectedGenres.length > 0) {
       sortableMovies = sortableMovies.filter((movie) => {
-        // Check if movie has ALL of the selected genres (AND logic)
         return (
           movie.genre_ids &&
           selectedGenres.every((genreId) => movie.genre_ids.includes(genreId))
@@ -173,7 +316,7 @@ function MyListTable() {
 
     if (sortConfig.key) {
       sortableMovies.sort((a, b) => {
-        // Special handling for date fields
+        // Handle date fields
         if (
           sortConfig.key === "release_date_full" ||
           sortConfig.key === "release_date" ||
@@ -189,7 +332,7 @@ function MyListTable() {
           return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
         }
 
-        // Special handling for userRating.dateAdded
+        // Handle nested rating date property
         if (sortConfig.key === "userRating.dateAdded") {
           const dateA = a.userRating?.dateAdded
             ? new Date(a.userRating.dateAdded)
@@ -201,16 +344,15 @@ function MyListTable() {
           return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
         }
 
-        // Handle nested properties for userRating
+        // Handle nested rating properties
         if (sortConfig.key.includes(".")) {
           const [parent, child] = sortConfig.key.split(".");
 
-          // Handle the case where one or both movies don't have the parent property
           if (!a[parent] && !b[parent]) return 0;
           if (!a[parent]) return sortConfig.direction === "asc" ? -1 : 1;
           if (!b[parent]) return sortConfig.direction === "asc" ? 1 : -1;
 
-          // Handle the case where one or both movies don't have the child property
+          // Special handling for score property
           if (child === "score") {
             const scoreA =
               a[parent][child] !== undefined ? a[parent][child] : -1;
@@ -226,7 +368,7 @@ function MyListTable() {
             return 0;
           }
 
-          // For other properties
+          // Handle other nested properties
           if (a[parent][child] === undefined && b[parent][child] === undefined)
             return 0;
           if (a[parent][child] === undefined)
@@ -255,155 +397,6 @@ function MyListTable() {
     }
     return sortableMovies;
   }, [myMovies, sortConfig, selectedGenres]);
-
-  const handleEditNote = (movie) => {
-    setEditingNote(movie.id);
-    setNoteText(movie.userRating?.note || "");
-  };
-
-  const handleSaveNote = async (movie) => {
-    const success = await updateMovieNote(movie, noteText);
-
-    if (success) {
-      setEditingNote(null);
-
-      // Refresh the list after a short delay to show the updated data
-      setTimeout(() => {
-        getMovies();
-      }, 1000);
-    }
-  };
-
-  const handleRemoveMovie = (movie) => {
-    setMovieToRemove(movie);
-    setShowConfirmation(true);
-  };
-
-  const confirmRemove = async () => {
-    if (movieToRemove) {
-      const success = await removeFromMyList(movieToRemove);
-      setShowConfirmation(false);
-      setMovieToRemove(null);
-
-      if (success) {
-        // Refresh the list after a short delay to allow the update to complete
-        setTimeout(() => {
-          getMovies();
-        }, 1000);
-      }
-    }
-  };
-
-  const cancelRemove = () => {
-    setShowConfirmation(false);
-    setMovieToRemove(null);
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "Unknown";
-
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "Unknown";
-
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const getSortIcon = (key) => {
-    if (sortConfig.key !== key) return null;
-    return sortConfig.direction === "asc" ? " ↑" : " ↓";
-  };
-
-  const handleEditRating = (movie) => {
-    setEditingRating(movie);
-  };
-
-  const handleSaveRating = async (updatedMovie) => {
-    // Use the new updateRatedMovie function to properly update the movie
-    const success = await updateRatedMovie(editingRating, updatedMovie);
-
-    if (success) {
-      setEditingRating(null);
-
-      // Refresh the list after a short delay to show the updated data
-      setTimeout(() => {
-        getMovies();
-      }, 1000);
-    }
-  };
-
-  const handleRemovePerson = async (person) => {
-    try {
-      const userDocRef = doc(db, "MyList", User.uid);
-      const docSnap = await getDoc(userDocRef);
-
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-        const people = userData.people || [];
-
-        // Filter out the person to remove
-        const updatedPeople = people.filter((p) => p.id !== person.id);
-
-        // Update the document
-        await updateDoc(userDocRef, {
-          people: updatedPeople,
-          lastUpdated: new Date().toISOString(),
-        });
-
-        // Update local state
-        setMyPeople((prevPeople) =>
-          prevPeople.filter((p) => p.id !== person.id)
-        );
-
-        toast.success("Person removed from your list");
-      }
-    } catch (error) {
-      console.error("Error removing person:", error);
-      toast.error("Failed to remove person from your list");
-    }
-  };
-
-  const formatRuntime = (minutes) => {
-    if (!minutes) return "Unknown";
-
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-
-    if (hours === 0) {
-      return `${mins}m`;
-    } else if (mins === 0) {
-      return `${hours}h`;
-    } else {
-      return `${hours}h ${mins}m`;
-    }
-  };
-
-  const handleOpenFilterModal = () => {
-    setShowFilterModal(true);
-  };
-
-  const handleCloseFilterModal = () => {
-    setShowFilterModal(false);
-  };
-
-  const handleApplyStatusFilter = (status) => {
-    if (status === "All") {
-      setMyMovies(allMovies);
-    } else {
-      const filtered = allMovies.filter(
-        (movie) => movie.userRating?.status === status
-      );
-      setMyMovies(filtered);
-    }
-  };
-
-  const handleResetFilters = () => {
-    setSelectedGenres([]);
-    setMyMovies(allMovies);
-  };
 
   if (loading) {
     return (
@@ -494,7 +487,7 @@ function MyListTable() {
       {/* Movies Tab */}
       {activeTab === "movies" && (
         <>
-          {/* Add Search, Filter and Sort Controls */}
+          {/* Search, Filter and Sort Controls */}
           <div className="mb-6 flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <input

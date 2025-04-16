@@ -10,7 +10,7 @@ import {
   validateConfirmPassword,
 } from "../controllers/auth.controller";
 
-// Import SVGs as React Components
+// Icons
 import EyeOpenIcon from "../assets/eye-open-icon.svg?react";
 import EyeClosedIcon from "../assets/eye-closed-icon.svg?react";
 import ErrorIcon from "../assets/error-icon.svg?react";

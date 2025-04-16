@@ -5,43 +5,31 @@ import StarRating from "../StarRating/StarRating";
 import { RatingModalContext } from "../../contexts/RatingModalContext";
 import { AuthContext } from "../../contexts/UserContext";
 
-// Import SVGs as React Components
+// Icons
 import PlayIcon from "../../assets/play-icon.svg?react";
 import EditIcon from "../../assets/edit-icon.svg?react";
 import AddIcon from "../../assets/add-icon.svg?react";
 
-const MovieCard = ({
-  movie,
-  handleMoviePopup,
-  addToMyList,
-  removeFromMyList,
-  convertGenre,
-}) => {
+const MovieCard = ({ movie, handleMoviePopup, addToMyList, convertGenre }) => {
   const navigate = useNavigate();
   const { User } = useContext(AuthContext);
   const { openRatingModal } = useContext(RatingModalContext) || {};
   const [isInUserList, setIsInUserList] = useState(movie.isInMyList || false);
 
-  // Update local state when movie props change
+  // Sync local state with props when they change
   useEffect(() => {
     setIsInUserList(movie.isInMyList || false);
   }, [movie.isInMyList]);
 
+  // Event handlers with proper error handling
   const handleAddToMyList = async (e) => {
     e.stopPropagation();
 
     try {
-      // Show loading indicator or disable button here if needed
-
-      // Call addToMyList and await the result
       const result = await addToMyList(movie);
 
-      // Update local state based on the result
       if (result === true) {
-        console.log("Movie added to MyList, updating UI");
         setIsInUserList(true);
-      } else {
-        console.log("Failed to add movie to MyList or operation was cancelled");
       }
     } catch (error) {
       console.error("Error adding movie to list:", error);
@@ -51,32 +39,21 @@ const MovieCard = ({
   const handleEditRating = (e) => {
     e.stopPropagation();
     if (openRatingModal) {
-      // Pass the updated movie with isInMyList set to true to ensure correct state
+      // Ensure correct state is passed to modal
       openRatingModal({ ...movie, isInMyList: true }, User);
     } else {
       console.error("openRatingModal is not available");
     }
   };
 
-  const handleRemoveFromMyList = async (e) => {
-    e.stopPropagation();
+  const formatReleaseDate = (dateString) => {
+    if (!dateString) return "Release date unknown";
 
-    try {
-      // Show loading indicator or disable button here if needed
-
-      // Call removeFromMyList and await the result
-      const result = await removeFromMyList(movie);
-
-      // Update local state based on the result
-      if (result === true) {
-        console.log("Movie removed from MyList, updating UI");
-        setIsInUserList(false);
-      } else {
-        console.log("Failed to remove movie from MyList");
-      }
-    } catch (error) {
-      console.error("Error removing movie from list:", error);
-    }
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   return (
@@ -97,7 +74,7 @@ const MovieCard = ({
           loading="lazy"
         />
 
-        {/* Play and Add buttons - always visible at top left */}
+        {/* Action buttons overlay */}
         <div className="absolute top-2 left-2 flex space-x-2">
           <div
             onClick={(e) => {
@@ -127,31 +104,20 @@ const MovieCard = ({
         </div>
       </div>
 
+      {/* Movie details section */}
       <div className="p-3">
-        {/* Movie title */}
         <h2 className="text-white text-lg font-bold mb-1 line-clamp-1">
           {movie.title || movie.name}
         </h2>
 
-        {/* Release date */}
         <p className="text-white/80 text-sm mb-2">
-          {movie.release_date || movie.first_air_date
-            ? new Date(
-                movie.release_date || movie.first_air_date
-              ).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })
-            : "Release date unknown"}
+          {formatReleaseDate(movie.release_date || movie.first_air_date)}
         </p>
 
-        {/* Star rating with number */}
         <div className="flex items-center mb-3">
           <StarRating rating={movie.vote_average} />
         </div>
 
-        {/* Genres */}
         {convertGenre && movie.genre_ids && (
           <div className="flex flex-wrap gap-2">
             {convertGenre(movie.genre_ids)?.map((genre, idx) => (

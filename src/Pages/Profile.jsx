@@ -27,7 +27,7 @@ import {
 } from "../utils";
 import { showSuccessToast, showErrorToast } from "../utils";
 
-// Import SVGs as React Components
+// Icons
 import EditIcon from "../assets/edit-icon.svg?react";
 import LockIcon from "../assets/lock-icon.svg?react";
 import EyeOpenIcon from "../assets/eye-open-icon.svg?react";

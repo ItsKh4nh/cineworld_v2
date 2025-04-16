@@ -3,40 +3,38 @@ import { Fade } from "react-awesome-reveal";
 import YouTube from "react-youtube";
 import StarRating from "../StarRating/StarRating";
 
-import { imageURL } from "../../config/constants";
-import { API_KEY } from "../../config/constants";
+import { imageURL, API_KEY } from "../../config/constants";
 import { PopUpContext } from "../../contexts/moviePopUpContext";
-import { AuthContext } from "../../contexts/UserContext";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
 import useMoviePopup from "../../hooks/useMoviePopup";
 import useGuestMode from "../../hooks/useGuestMode";
-import { RatingModalContext } from "../../contexts/RatingModalContext";
 import axios from "../../axios";
 
-// Import SVGs as React Components
+// Icons
 import PlayCircleIcon from "../../assets/play-circle-icon.svg?react";
 import RemoveCircleIcon from "../../assets/remove-circle-icon.svg?react";
 import AddCircleIcon from "../../assets/add-circle-icon.svg?react";
 
 function MoviePopUp() {
-  const { User } = useContext(AuthContext);
+  // Context and custom hooks
   const { showModal, setShowModal, movieInfo, trailerUrl } =
     useContext(PopUpContext);
   const { addToMyList, removeFromMyList, PopupMessage } = useUpdateMyList();
-  const { openRatingModal } = useContext(RatingModalContext) || {};
   const { isAuthenticated } = useGuestMode();
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
   const { formatDate } = useMoviePopup();
+
+  // Component state
   const [cast, setCast] = useState([]);
   const [hasMoreCast, setHasMoreCast] = useState(false);
   const [director, setDirector] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [isInUserList, setIsInUserList] = useState(false);
 
-  // YouTube player options with autoplay enabled
+  // YouTube player configuration
   const opts = {
     height: "350",
     width: "100%",
@@ -45,11 +43,10 @@ function MoviePopUp() {
     },
   };
 
-  // Add body overflow control when modal is open
+  // Control body overflow when modal is open/closed
   useEffect(() => {
     if (showModal) {
       document.body.style.overflow = "hidden";
-      // Set visible immediately to prevent delay
       setIsVisible(true);
     } else {
       document.body.style.overflow = "auto";
@@ -68,9 +65,7 @@ function MoviePopUp() {
         .get(`/movie/${movieInfo.id}/credits?api_key=${API_KEY}`)
         .then((response) => {
           if (response.data.cast && response.data.cast.length > 0) {
-            // Check if there are more than 10 cast members
             setHasMoreCast(response.data.cast.length > 10);
-            // Get the first 10 cast members
             setCast(response.data.cast.slice(0, 10));
           }
 
@@ -87,18 +82,19 @@ function MoviePopUp() {
     }
   }, [movieInfo]);
 
-  // Update internal state when movieInfo changes
+  // Update MyList status when movie info changes
   useEffect(() => {
     if (movieInfo) {
       setIsInUserList(movieInfo.isInMyList || false);
     }
   }, [movieInfo]);
 
+  // Early return if no movie info is available
   if (!movieInfo || Object.keys(movieInfo).length === 0) {
     return null;
   }
 
-  // Handle adding to MyList
+  // Handler functions for MyList operations
   const handleAddToMyList = async () => {
     try {
       const result = await addToMyList(movieInfo);
@@ -110,7 +106,6 @@ function MoviePopUp() {
     }
   };
 
-  // Handle removing from MyList
   const handleRemoveFromMyList = async () => {
     try {
       const result = await removeFromMyList(movieInfo);

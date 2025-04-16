@@ -1,75 +1,69 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 
-import { Fade } from "react-awesome-reveal";
 import axios from "../../axios";
-import { API_KEY, imageURL, imageURL2 } from "../../config/constants";
+import { imageURL, imageURL2 } from "../../config/constants";
 import { AuthContext } from "../../contexts/UserContext";
+import { RatingModalContext } from "../../contexts/RatingModalContext";
 
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
 import useMoviePopup from "../../hooks/useMoviePopup";
-import { RatingModalContext } from "../../contexts/RatingModalContext";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
+import { Navigation } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/navigation";
-import "swiper/css/pagination";
 import "./RowPostStyles.scss";
 import StarRating from "../StarRating/StarRating";
 
-// Import SVGs as React Components
+// Icons
 import PlayIcon from "../../assets/play-icon.svg?react";
 import EditIcon from "../../assets/edit-icon.svg?react";
 import AddIcon from "../../assets/add-icon.svg?react";
 
 function RowPost(props) {
+  // Context hooks
   const { User } = useContext(AuthContext);
+  const { openRatingModal } = useContext(RatingModalContext) || {};
+
+  // Custom hooks
   const { addToMyList, PopupMessage } = useUpdateMyList();
   const { playMovie } = usePlayMovie();
   const { convertGenre } = useGenresConverter();
   const { handleMoviePopup, formatDate, myListMovies } = useMoviePopup();
-  const { openRatingModal } = useContext(RatingModalContext) || {};
 
+  // Component state
   const [movies, setMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
 
+  // Fetch movies when component mounts or when URL changes
   useEffect(() => {
-    // If movieData prop is provided, use that instead of fetching from URL
+    // Use provided movie data if available
     if (props.movieData) {
       setMovies(props.movieData);
-      setIsLoading(false);
       return;
     }
 
-    // Otherwise, fetch movies from the URL
+    // Otherwise fetch from API
     if (props.url) {
-      setIsLoading(true);
       axios
         .get(props.url)
         .then((response) => {
           if (response.data && response.data.results) {
             setMovies(response.data.results);
           } else {
-            // Handle case when results array is missing
             setMovies([]);
           }
         })
         .catch((error) => {
           console.error("Error fetching movies:", error);
-          setIsError(true);
-          setMovies([]); // Set movies to empty array on error
-        })
-        .finally(() => {
-          setIsLoading(false);
+          setMovies([]);
         });
     }
   }, [props.url, props.movieData]);
 
-  // Function to check if a movie is in the user's MyList
+  // Helper function to check if a movie is in the user's MyList
   const checkIfInMyList = (movie_id) => {
     if (!myListMovies || !Array.isArray(myListMovies)) {
       return false;
@@ -77,6 +71,7 @@ function RowPost(props) {
     return myListMovies.some((movie) => movie.id === movie_id);
   };
 
+  // Responsive configuration for Swiper
   const customSettings = {
     breakpoints: {
       1800: { slidesPerView: 6.1, slidesPerGroup: 5 },
@@ -88,19 +83,6 @@ function RowPost(props) {
       330: { slidesPerView: 2.1, slidesPerGroup: 2 },
       0: { slidesPerView: 2, slidesPerGroup: 2 },
     },
-  };
-
-  const opts = {
-    width: "100%",
-    height: "auto",
-    playerVars: {
-      autoplay: 1,
-      controls: 0,
-    },
-    modestbranding: 1,
-    rel: 0,
-    autohide: 1,
-    showinfo: 0,
   };
 
   return (
@@ -125,7 +107,7 @@ function RowPost(props) {
             spaceBetween={8}
             breakpoints={customSettings.breakpoints}
           >
-            {movies.map((obj, index) => {
+            {movies.map((obj) => {
               const converted = convertGenre(obj.genre_ids);
               // Check if this movie is in the user's MyList
               const isInMyList = checkIfInMyList(obj.id);

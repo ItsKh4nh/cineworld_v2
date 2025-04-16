@@ -11,7 +11,7 @@ import {
   movieReviews,
   configurationLanguages,
 } from "../config";
-import { imageURL, imageURL2, languageMap } from "../config";
+import { imageURL, imageURL2, languageList } from "../config";
 import Navbar from "../components/Header/Navbar";
 import Footer from "../components/Footer/Footer";
 import usePlayMovie from "../hooks/usePlayMovie";
@@ -35,7 +35,7 @@ import StarRating from "../components/StarRating/StarRating";
 import { AuthContext } from "../contexts/UserContext";
 import { formatDate, formatMoney, formatRuntime } from "../utils";
 
-// Import SVGs as React Components
+// Icons
 import StarIcon from "../assets/star-icon.svg?react";
 import EditIcon from "../assets/edit-icon.svg?react";
 import AddIcon from "../assets/add-icon.svg?react";
@@ -151,8 +151,8 @@ function Play() {
     }
 
     // Fall back to our predefined map
-    if (languageMap[languageCode]) {
-      return languageMap[languageCode];
+    if (languageList[languageCode]) {
+      return languageList[languageCode];
     }
 
     // If no match found, return the code in uppercase
@@ -685,13 +685,14 @@ function Play() {
                               <span>{formatMoney(movieDetails.revenue)}</span>
                             </div>
 
-                            {movieDetails.production_countries?.length > 0 && (
+                            {movieDetails.production_countriesList?.length >
+                              0 && (
                               <div className="flex">
                                 <span className="w-32 text-gray-400">
-                                  Production Countries:
+                                  Production countriesList:
                                 </span>
                                 <span>
-                                  {movieDetails.production_countries
+                                  {movieDetails.production_countriesList
                                     .map((country) => country.name)
                                     .join(", ")}
                                 </span>

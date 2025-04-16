@@ -1,40 +1,31 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { AuthContext } from "../../contexts/UserContext";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Transition } from "@headlessui/react";
 import { Fade } from "react-awesome-reveal";
-import { genresList } from "../../config/constants";
+import { genresList, countriesList } from "../../config/constants";
 
-// Import SVGs as React Components
+// Icons
 import ChevronDownIcon from "../../assets/chevron-down-icon.svg?react";
 import SearchIcon from "../../assets/search-icon.svg?react";
 import MenuIcon from "../../assets/menu-icon.svg?react";
 import CloseIcon from "../../assets/close-icon.svg?react";
 
 function NavbarWithoutUser() {
-  const { enableGuestMode } = useContext(AuthContext);
-  const navigate = useNavigate();
   const location = useLocation();
-  const [show, handleShow] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+
+  // State definitions
+  const [show, handleShow] = useState(false); // Controls navbar background
+  const [isOpen, setIsOpen] = useState(false); // Controls mobile menu visibility
   const [genreDropdownOpen, setGenreDropdownOpen] = useState(false);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
 
-  // Country list
-  const countries = [
-    { code: "US", name: "United States" },
-    { code: "GB", name: "United Kingdom" },
-    { code: "CA", name: "Canada" },
-    { code: "AU", name: "Australia" },
-    { code: "FR", name: "France" },
-    { code: "DE", name: "Germany" },
-    { code: "IT", name: "Italy" },
-    { code: "IN", name: "India" },
-    { code: "JP", name: "Japan" },
-    { code: "KR", name: "South Korea" },
-    { code: "HK", name: "Hong Kong" },
-    { code: "CN", name: "China" },
-  ];
+  // Add/remove scroll event listener for navbar background effect
+  useEffect(() => {
+    window.addEventListener("scroll", transitionNavBar);
+    return () => {
+      window.removeEventListener("scroll", transitionNavBar);
+    };
+  }, []);
 
   // Close mobile menu and dropdowns when location changes (user navigates)
   useEffect(() => {
@@ -43,6 +34,7 @@ function NavbarWithoutUser() {
     setCountryDropdownOpen(false);
   }, [location]);
 
+  // Change navbar background based on scroll position
   const transitionNavBar = () => {
     if (window.scrollY > 80) {
       handleShow(true);
@@ -51,24 +43,10 @@ function NavbarWithoutUser() {
     }
   };
 
-  useEffect(() => {
-    window.addEventListener("scroll", transitionNavBar);
-    return () => {
-      window.removeEventListener("scroll", transitionNavBar);
-    };
-  }, []);
-
-  const NavBlack = () => {
-    handleShow(true);
-  };
-
-  const NavTransparent = () => {
-    handleShow(false);
-  };
-
-  const handleGuestMode = () => {
-    enableGuestMode();
-    navigate("/");
+  // Helper functions for mobile menu
+  const toggleMobileMenu = (isVisible) => {
+    setIsOpen(isVisible);
+    handleShow(isVisible); // Ensure navbar has background when menu is open
   };
 
   return (
@@ -153,7 +131,7 @@ function NavbarWithoutUser() {
                         }`}
                       >
                         <div className="py-1 max-h-96 overflow-y-auto grid grid-cols-3 gap-2 px-2">
-                          {countries.map((country) => (
+                          {countriesList.map((country) => (
                             <Link
                               key={country.code}
                               to={`/country/${country.name
@@ -189,7 +167,7 @@ function NavbarWithoutUser() {
 
               <div className="flex pl-4 -mr-2 md:hidden">
                 <button
-                  onClick={() => setIsOpen(!isOpen)}
+                  onClick={() => toggleMobileMenu(!isOpen)}
                   type="button"
                   className="inline-flex items-center justify-center p-2 text-gray-400 bg-gray-900 rounded-md hover:text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
                   aria-controls="mobile-menu"
@@ -197,17 +175,9 @@ function NavbarWithoutUser() {
                 >
                   <span className="sr-only">Open main menu</span>
                   {!isOpen ? (
-                    <MenuIcon
-                      className="block w-6 h-6"
-                      aria-hidden="true"
-                      onClick={NavBlack}
-                    />
+                    <MenuIcon className="block w-6 h-6" aria-hidden="true" />
                   ) : (
-                    <CloseIcon
-                      className="block w-6 h-6"
-                      aria-hidden="true"
-                      onClick={NavTransparent}
-                    />
+                    <CloseIcon className="block w-6 h-6" aria-hidden="true" />
                   )}
                 </button>
               </div>
@@ -276,7 +246,7 @@ function NavbarWithoutUser() {
                     {countryDropdownOpen && (
                       <div className="pl-4 space-y-1">
                         <div className="grid grid-cols-2 gap-2 pr-2">
-                          {countries.map((country) => (
+                          {countriesList.map((country) => (
                             <Link
                               key={country.code}
                               to={`/country/${country.name

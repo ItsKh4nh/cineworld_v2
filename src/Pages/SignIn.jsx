@@ -6,7 +6,7 @@ import { AuthContext } from "../contexts/UserContext";
 import { emailSignIn, googleSignIn } from "../controllers/auth.controller";
 import ForgotPasswordModal from "../components/Modals/ForgotPasswordModal";
 
-// Import SVGs as React Components
+// Icons
 import EyeOpenIcon from "../assets/eye-open-icon.svg?react";
 import EyeClosedIcon from "../assets/eye-closed-icon.svg?react";
 import ErrorIcon from "../assets/error-icon.svg?react";

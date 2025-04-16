@@ -11,7 +11,7 @@ import { RatingModalContext } from "../contexts/RatingModalContext";
 import StarRating from "../components/StarRating/StarRating";
 import MovieCard from "../components/Cards/MovieCard";
 
-// Import SVGs as React Components
+// Icons
 import ChevronLeftIcon from "../assets/chevron-left-icon.svg?react";
 import ChevronRightIcon from "../assets/chevron-right-icon.svg?react";
 

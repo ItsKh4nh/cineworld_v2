@@ -10,7 +10,7 @@ import StarRating from "../components/StarRating/StarRating";
 import { imageURL2 } from "../config/constants";
 import { getPersonalizedRecommendations } from "../services/RecommendationsService";
 
-// Import SVGs as React Components
+// Icons
 import PlayIcon from "../assets/play-icon.svg?react";
 import EditIcon from "../assets/edit-icon.svg?react";
 import AddIcon from "../assets/add-icon.svg?react";

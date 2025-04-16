@@ -15,7 +15,7 @@ import { ClipLoader } from "react-spinners";
 import MovieCard from "../components/Cards/MovieCard";
 import PersonCard from "../components/Cards/PersonCard";
 
-// Import SVGs as React Components
+// Icons
 import ClearIcon from "../assets/clear-icon.svg?react";
 
 function Search() {

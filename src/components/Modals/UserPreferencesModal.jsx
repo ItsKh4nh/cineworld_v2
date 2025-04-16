@@ -6,42 +6,46 @@ import axios from "../../axios";
 import { searchMovie, searchPerson } from "../../config/URLs";
 import StarRating from "../StarRating/StarRating";
 
-// Import SVGs as React Components
+// Icons
 import CloseIcon from "../../assets/close-icon.svg?react";
 
 function UserPreferencesModal({ user, onClose }) {
+  // Modal step state
   const [step, setStep] = useState(1);
+
+  // Search state
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchType, setSearchType] = useState("movie");
+
+  // Selection state
   const [selectedMovies, setSelectedMovies] = useState([]);
   const [selectedPeople, setSelectedPeople] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [movieRatings, setMovieRatings] = useState({});
-  const [searchType, setSearchType] = useState("movie");
 
-  // Implement realtime search as user types
+  // Search as user types with debounce
   useEffect(() => {
     const delaySearch = setTimeout(() => {
       if (searchQuery.trim().length >= 2) {
-        handleSearch();
+        performSearch();
       }
-    }, 500); // 500ms delay to avoid too many API calls
+    }, 500); // 500ms delay to avoid excessive API calls
 
     return () => clearTimeout(delaySearch);
   }, [searchQuery, searchType]);
 
-  // Handle search for movies or people
-  const handleSearch = async () => {
+  // Search functions
+  const performSearch = async () => {
     if (!searchQuery.trim() || searchQuery.trim().length < 2) return;
 
     setIsSearching(true);
     try {
       if (searchType === "movie") {
-        // For movies, first search to get movie IDs
         const searchResponse = await axios.get(searchMovie(searchQuery));
 
-        // Then filter the results client-side to remove future releases
+        // Filter out future releases
         const currentDate = new Date();
         const filteredResults = searchResponse.data.results.filter((movie) => {
           if (!movie.release_date) return true;
@@ -51,7 +55,6 @@ function UserPreferencesModal({ user, onClose }) {
 
         setSearchResults(filteredResults);
       } else {
-        // For people, keep using the search/person endpoint
         const response = await axios.get(searchPerson(searchQuery));
         setSearchResults(response.data.results);
       }
@@ -62,7 +65,7 @@ function UserPreferencesModal({ user, onClose }) {
     }
   };
 
-  // Handle selecting a movie
+  // Selection handlers
   const handleSelectMovie = (movie) => {
     if (selectedMovies.some((m) => m.id === movie.id)) {
       setSelectedMovies(selectedMovies.filter((m) => m.id !== movie.id));
@@ -71,7 +74,6 @@ function UserPreferencesModal({ user, onClose }) {
     }
   };
 
-  // Handle selecting a person
   const handleSelectPerson = (person) => {
     if (selectedPeople.some((p) => p.id === person.id)) {
       setSelectedPeople(selectedPeople.filter((p) => p.id !== person.id));
@@ -80,7 +82,6 @@ function UserPreferencesModal({ user, onClose }) {
     }
   };
 
-  // Handle selecting a genre
   const handleSelectGenre = (genre) => {
     if (selectedGenres.some((g) => g.id === genre.id)) {
       setSelectedGenres(selectedGenres.filter((g) => g.id !== genre.id));
@@ -89,7 +90,6 @@ function UserPreferencesModal({ user, onClose }) {
     }
   };
 
-  // Handle rating a movie
   const handleRateMovie = (movie, score) => {
     setMovieRatings({
       ...movieRatings,
@@ -97,29 +97,32 @@ function UserPreferencesModal({ user, onClose }) {
     });
   };
 
-  // Handle next step
+  // Navigation handlers
   const handleNextStep = () => {
     setStep(step + 1);
     setSearchQuery("");
     setSearchResults([]);
   };
 
-  // Handle previous step
   const handlePrevStep = () => {
     setStep(step - 1);
     setSearchQuery("");
     setSearchResults([]);
   };
 
-  // Handle final submission
+  const handleSkip = () => {
+    onClose();
+  };
+
+  // Submission handler
   const handleSubmit = async () => {
     try {
-      // Initialize MyList document if not exists
+      // Initialize or update MyList document
       const myListRef = doc(db, "MyList", user.uid);
       const myListDoc = await getDoc(myListRef);
       const currentData = myListDoc.exists() ? myListDoc.data() : {};
 
-      // Add movies to MyList with ratings if provided
+      // Add movies to MyList with ratings
       const currentMovies = currentData.movies || [];
       const moviesWithRatings = selectedMovies.map((movie) => {
         const userRating = {
@@ -152,7 +155,7 @@ function UserPreferencesModal({ user, onClose }) {
         lastUpdated: new Date().toISOString(),
       });
 
-      // Add movies to InteractionList
+      // Add movies to InteractionList for recommendation system
       const interactionListRef = doc(db, "InteractionList", user.uid);
       const interactionDoc = await getDoc(interactionListRef);
 
@@ -187,20 +190,6 @@ function UserPreferencesModal({ user, onClose }) {
     } catch (error) {
       console.error("Error saving preferences:", error);
     }
-  };
-
-  // Skip the preferences setup
-  const handleSkip = () => {
-    onClose();
-  };
-
-  // In UserPreferencesModal.jsx, add a getCurrentDate function
-  const getCurrentDate = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
   };
 
   return (

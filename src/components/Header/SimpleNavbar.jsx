@@ -2,9 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
 
+/**
+ * SimpleNavbar component - A minimal navigation bar that changes background on scroll
+ * Used for non-authenticated routes with minimal navigation options
+ */
 function SimpleNavbar() {
+  // State to track whether navbar should show background
   const [show, handleShow] = useState(false);
-  
+
+  /**
+   * Toggle navbar background based on scroll position
+   * Shows background when user scrolls past threshold to improve readability
+   */
   const transitionNavBar = () => {
     if (window.scrollY > 100) {
       handleShow(true);
@@ -13,8 +22,10 @@ function SimpleNavbar() {
     }
   };
 
+  // Set up scroll event listener for navbar transition effect
   useEffect(() => {
     window.addEventListener("scroll", transitionNavBar);
+    // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("scroll", transitionNavBar);
     };
@@ -59,4 +70,4 @@ function SimpleNavbar() {
   );
 }
 
-export default SimpleNavbar; 
+export default SimpleNavbar;

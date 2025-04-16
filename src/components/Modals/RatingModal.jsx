@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { imageURL2 } from "../../config/constants";
+import { imageURL2, statusOptions, scoreOptions } from "../../config/constants";
 
-// Import SVGs as React Components using ?react suffix
+// Icons
 import CloseIcon from "../../assets/close-icon.svg?react";
 
-function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
+function RatingModal({ movie, onClose, onSave }) {
   const [status, setStatus] = useState(
     movie.userRating?.status || "Plan to Watch"
   );
@@ -17,20 +17,6 @@ function RatingModal({ movie, onClose, onSave, onGoToMyList }) {
 
   console.log("Movie in RatingModal:", movie);
   console.log("Movie genres in RatingModal:", movie.genres);
-
-  const statusOptions = ["Plan to Watch", "Completed", "Dropped"];
-  const scoreOptions = [
-    { value: 1, label: "(1) Appalling" },
-    { value: 2, label: "(2) Horrible" },
-    { value: 3, label: "(3) Very Bad" },
-    { value: 4, label: "(4) Bad" },
-    { value: 5, label: "(5) Average" },
-    { value: 6, label: "(6) Fine" },
-    { value: 7, label: "(7) Good" },
-    { value: 8, label: "(8) Very Good" },
-    { value: 9, label: "(9) Great" },
-    { value: 10, label: "(10) Masterpiece" },
-  ];
 
   // Check if score should be shown based on status
   const shouldShowScore = status === "Completed" || status === "Dropped";

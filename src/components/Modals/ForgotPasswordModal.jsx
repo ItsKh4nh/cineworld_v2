@@ -2,24 +2,38 @@ import React, { useState } from "react";
 import { resetPassword } from "../../controllers/auth.controller";
 import { ClipLoader } from "react-spinners";
 
-// Import SVGs as React Components
-import { ReactComponent as CloseIcon } from "/assets/close-icon.svg";
+// Icons
+import { ReactComponent as CloseIcon } from "../../assets/close-icon.svg";
 
+/**
+ * ForgotPasswordModal Component
+ *
+ * Provides a user interface for requesting password reset via email.
+ * Handles form submission, displays loading state, and shows appropriate
+ * success/error messages to guide the user through the process.
+ */
 function ForgotPasswordModal({ onClose }) {
+  // Form state
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", isError: false });
   const [emailSent, setEmailSent] = useState(false);
 
+  /**
+   * Handles the password reset request submission
+   * Communicates with auth controller and updates UI based on response
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ text: "", isError: false });
 
+    // Attempt to send reset password email
     const { success, error } = await resetPassword(email);
 
     if (success) {
       setEmailSent(true);
+      // Generic success message for security (doesn't confirm email existence)
       setMessage({
         text: "If an account exists with this email, a password reset link has been sent.",
         isError: false,
@@ -45,6 +59,7 @@ function ForgotPasswordModal({ onClose }) {
         </div>
 
         {emailSent ? (
+          // Success state - show confirmation and close button
           <div>
             <div
               className={`p-4 mb-4 rounded ${
@@ -65,6 +80,7 @@ function ForgotPasswordModal({ onClose }) {
             </button>
           </div>
         ) : (
+          // Initial state - show email input form
           <form onSubmit={handleSubmit}>
             <p className="text-gray-300 mb-4">
               Enter your email address and we'll send you a link to reset your
