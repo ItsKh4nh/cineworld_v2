@@ -25,7 +25,7 @@ A web application project focused on building a FREE movies streaming platform w
   - Firebase for backend services:
     - Authentication (email/password)
     - Firestore for database storage
-    - Firebase hosting for deployment
+    - Vercel for deployment
 - **APIs:**
   - TMDB (The Movie Database) API for movie and people data
   - Custom recommendation API (https://api-cineworld.onrender.com) for AI-based movie recommendations
