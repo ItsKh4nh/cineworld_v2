@@ -28,36 +28,36 @@
 }
 
 .swiper-button-prev {
-  color: white;
+  color: white !important;
   opacity: 1;
   transition: all 400ms ease-out 0s;
   background-color: rgba(0, 0, 0, 0.5);
-  width: 40px;
-  height: 40px;
+  width: 40px !important;
+  height: 40px !important;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   
   &:after {
-    font-size: 18px;
+    font-size: 18px !important;
   }
 }
 
 .swiper-button-next {
-  color: white;
+  color: white !important;
   opacity: 1;
   transition: all 400ms ease-out 0s;
   background-color: rgba(0, 0, 0, 0.5);
-  width: 40px;
-  height: 40px;
+  width: 40px !important;
+  height: 40px !important;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   
   &:after {
-    font-size: 18px;
+    font-size: 18px !important;
   }
 }
 
@@ -209,11 +209,11 @@
 @media only screen and (max-width: 1050px) {
   .swiper-button-prev,
   .swiper-button-next {
-    width: 30px;
-    height: 30px;
+    width: 30px !important;
+    height: 30px !important;
     
     &:after {
-      font-size: 12px;
+      font-size: 12px !important;
     }
   }
   
