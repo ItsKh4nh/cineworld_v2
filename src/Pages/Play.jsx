@@ -33,7 +33,7 @@ import { AuthContext } from "../contexts/UserContext";
 
 // Custom hooks
 import usePlayMovie from "../hooks/usePlayMovie";
-import useUpdateMyList from "../hooks/useUpdateMyLis";
+import useUpdateMyList from "../hooks/useUpdateMyList";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 

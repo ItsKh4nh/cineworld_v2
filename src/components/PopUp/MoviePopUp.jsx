@@ -7,7 +7,7 @@ import { imageUrlOriginal, API_KEY } from "../../config/constants";
 import { PopUpContext } from "../../contexts/MoviePopUpContext";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
-import useUpdateMyList from "../../hooks/useUpdateMyLis";
+import useUpdateMyList from "../../hooks/useUpdateMyList";
 import useMoviePopup from "../../hooks/useMoviePopup";
 import useGuestMode from "../../hooks/useGuestMode";
 import axios from "../../axios";

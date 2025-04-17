@@ -4,7 +4,7 @@ import axios from "../axios";
 import { searchMovie, searchPerson } from "../config/URLs";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
-import useUpdateMyList from "../hooks/useUpdateMyLis";
+import useUpdateMyList from "../hooks/useUpdateMyList";
 import MovieCard from "../components/Cards/MovieCard";
 import PersonCard from "../components/Cards/PersonCard";
 

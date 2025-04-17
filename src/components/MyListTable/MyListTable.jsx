@@ -3,7 +3,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase/FirebaseConfig";
 import { AuthContext } from "../../contexts/UserContext";
 import { imageUrlBackup, genresList } from "../../config/constants";
-import useUpdateMyList from "../../hooks/useUpdateMyLis";
+import useUpdateMyList from "../../hooks/useUpdateMyList";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useMoviePopup from "../../hooks/useMoviePopup";
 import RatingModal from "../Modals/RatingModal";

@@ -6,7 +6,7 @@ import { AuthContext } from "../contexts/UserContext";
 import Footer from "../components/Footer/Footer";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
-import useUpdateMyList from "../hooks/useUpdateMyLis";
+import useUpdateMyList from "../hooks/useUpdateMyList";
 import { RatingModalContext } from "../contexts/RatingModalContext";
 import MovieCard from "../components/Cards/MovieCard";
 
