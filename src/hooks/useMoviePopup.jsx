@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { PopUpContext } from "../contexts/MoviePopUpContext";
+import { PopUpContext } from "../contexts/MoviePopUpContex";
 import { AuthContext } from "../contexts/UserContext";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
