@@ -4,7 +4,7 @@ import YouTube from "react-youtube";
 import StarRating from "../StarRating/StarRating";
 
 import { imageUrlOriginal, API_KEY } from "../../config/constants";
-import { PopUpContext } from "../../contexts/MoviePopUpContex";
+import { PopUpContext } from "../../contexts/MoviePopUpContext";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
 import useUpdateMyList from "../../hooks/useUpdateMyList";
