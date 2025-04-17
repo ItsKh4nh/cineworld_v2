@@ -19,9 +19,9 @@ import {
   FaImdb,
   FaFacebook,
   FaInstagram,
-  FaTwitter,
   FaWikipediaW,
 } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 // Components
 import Navbar from "../components/Header/Navbar";
@@ -790,10 +790,10 @@ function Play() {
                                       href={`https://twitter.com/${externalIds.twitter_id}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="hover:opacity-80 transition-opacity"
-                                      title="Twitter"
+                                      className="hover:opacity-80"
+                                      title="X (Twitter)"
                                     >
-                                      <FaTwitter className="text-[#1DA1F2] text-3xl" />
+                                      <FaXTwitter className="text-black text-3xl" />
                                     </a>
                                   )}
 

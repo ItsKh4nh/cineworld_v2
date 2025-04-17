@@ -13,10 +13,10 @@ import {
   FaImdb,
   FaFacebook,
   FaInstagram,
-  FaTwitter,
   FaPlus,
   FaMinus,
 } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import StarRating from "../components/StarRating/StarRating";
 import useMoviePopup from "../hooks/useMoviePopup";
 import usePeopleList from "../hooks/usePeopleList";
@@ -288,10 +288,10 @@ function People() {
                               href={`https://twitter.com/${externalIds.twitter_id}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="hover:opacity-80 transition-opacity"
-                              title="Twitter"
+                              className="hover:opacity-80"
+                              title="X (Twitter)"
                             >
-                              <FaTwitter className="text-[#1DA1F2] text-3xl" />
+                              <FaXTwitter className="text-black text-3xl" />
                             </a>
                           )}
                         </div>
