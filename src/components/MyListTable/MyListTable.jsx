@@ -16,6 +16,7 @@ import { API_KEY } from "../../config/constants";
 import StarRating from "../StarRating/StarRating";
 import { FaMinus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { slugify } from "../../utils";
 
 // Icons
 import ClearIcon from "../../assets/clear-icon.svg?react";
@@ -878,7 +879,7 @@ function MyListTable() {
                 >
                   <div
                     className="relative cursor-pointer"
-                    onClick={() => navigate(`/people/${person.id}`)}
+                    onClick={() => navigate(`/people/${person.id}-${slugify(person.name)}`)}
                   >
                     <img
                       src={

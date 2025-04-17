@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "../axios";
 import {
   personDetails,
@@ -21,7 +21,7 @@ import StarRating from "../components/StarRating/StarRating";
 import useMoviePopup from "../hooks/useMoviePopup";
 import usePeopleList from "../hooks/usePeopleList";
 import ConfirmationModal from "../components/Modals/ConfirmationModal";
-import { formatDate, calculateAge, handleListAction } from "../utils";
+import { formatDate, calculateAge, handleListAction, slugify } from "../utils";
 
 function People() {
   // State management
@@ -35,7 +35,11 @@ function People() {
   const [confirmAction, setConfirmAction] = useState("");
 
   // Hooks
-  const { id } = useParams();
+  const { id: urlId } = useParams();
+  // Extract the numeric ID from the URL parameter (handles both formats: "123" and "123-person-name")
+  const id = urlId.split('-')[0];
+  
+  const navigate = useNavigate();
   const { handleMoviePopup } = useMoviePopup();
   const { isPersonInList, addPersonToList, removePersonFromList } =
     usePeopleList();
@@ -285,7 +289,7 @@ function People() {
 
                           {externalIds.twitter_id && (
                             <a
-                              href={`https://twitter.com/${externalIds.twitter_id}`}
+                              href={`https://x.com/${externalIds.twitter_id}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="hover:opacity-80"

@@ -4,6 +4,7 @@ import { imageUrlBackup } from "../../config/constants";
 import StarRating from "../StarRating/StarRating";
 import { RatingModalContext } from "../../contexts/RatingModalContext";
 import { AuthContext } from "../../contexts/UserContext";
+import { slugify } from "../../utils";
 
 // Icons
 import PlayIcon from "../../assets/play-icon.svg?react";
@@ -79,7 +80,8 @@ const MovieCard = ({ movie, handleMoviePopup, addToMyList, convertGenre }) => {
           <div
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/play/${movie.id}`);
+              const title = movie.title || movie.name || '';
+              navigate(`/play/${movie.id}-${slugify(title)}`);
             }}
             className="text-white w-8 h-8 border-2 rounded-full flex items-center justify-center backdrop-blur-sm shadow-md hover:text-black hover:bg-white transition-all duration-150"
           >

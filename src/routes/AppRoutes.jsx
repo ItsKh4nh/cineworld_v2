@@ -108,7 +108,29 @@ const AppRoutes = ({ authLoading, hasAccess, user, hasInteractions }) => {
           }
         />
         <Route
+          path="/play/:id-:slug"
+          element={
+            <PublicProtectedRoute
+              authLoading={authLoading}
+              hasAccess={hasAccess}
+            >
+              <Play />
+            </PublicProtectedRoute>
+          }
+        />
+        <Route
           path="/people/:id"
+          element={
+            <PublicProtectedRoute
+              authLoading={authLoading}
+              hasAccess={hasAccess}
+            >
+              <People />
+            </PublicProtectedRoute>
+          }
+        />
+        <Route
+          path="/people/:id-:slug"
           element={
             <PublicProtectedRoute
               authLoading={authLoading}

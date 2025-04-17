@@ -38,7 +38,7 @@ import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 
 // Utilities
-import { formatDate, formatMoney, formatRuntime } from "../utils";
+import { formatDate, formatMoney, formatRuntime, slugify } from "../utils";
 
 // Icons
 import StarIcon from "../assets/star-icon.svg?react";
@@ -53,11 +53,14 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 function Play() {
-  const { id } = useParams();
+  const { id: urlId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { User } = useContext(AuthContext);
   const videoRef = useRef(null);
+
+  // Extract the numeric ID from the URL parameter (handles both formats: "123" and "123-movie-title")
+  const id = urlId.split('-')[0];
 
   // Custom hooks
   const { playMovie } = usePlayMovie();
@@ -78,7 +81,7 @@ function Play() {
   const [movieSource, setMovieSource] = useState(null);
 
   // UI state
-  const [urlId, setUrlId] = useState("");
+  const [youtubeId, setYoutubeId] = useState("");
   const [activeVideo, setActiveVideo] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
@@ -139,10 +142,10 @@ function Play() {
         const sourceData = movieSourceDoc.data();
         if (sourceData.link_embed_1) {
           setMovieSource(sourceData.link_embed_1);
-          setUrlId(""); // If we have a direct source, don't load YouTube trailer
+          setYoutubeId(""); // If we have a direct source, don't load YouTube trailer
         } else if (sourceData.link_m3u8_1) {
           setMovieSource(sourceData.link_m3u8_1);
-          setUrlId("");
+          setYoutubeId("");
         }
       }
     } catch (error) {
@@ -203,7 +206,7 @@ function Play() {
   useEffect(() => {
     // Reset state and scroll to top when navigating to a new movie
     window.scrollTo(0, 0);
-    setUrlId("");
+    setYoutubeId("");
     setActiveVideo(null);
     setMovieDetails({});
     setTrailerVideos([]);
@@ -253,7 +256,7 @@ function Play() {
           );
           if (trailers.length > 0) {
             setActiveVideo(trailers[0]);
-            setUrlId(trailers[0].key);
+            setYoutubeId(trailers[0].key);
           }
           setTrailerVideos(response.data.results);
         }
@@ -418,12 +421,12 @@ function Play() {
                   className="w-full h-full"
                 ></iframe>
               </div>
-            ) : urlId ? (
+            ) : youtubeId ? (
               <div className="relative w-full h-full">
                 <iframe
                   width="100%"
                   height="100%"
-                  src={`//www.youtube.com/embed/${urlId}?modestbranding=1&autoplay=1`}
+                  src={`//www.youtube.com/embed/${youtubeId}?modestbranding=1&autoplay=1`}
                   frameBorder="0"
                   allow="autoplay; encrypted-media"
                   allowFullScreen
@@ -787,7 +790,7 @@ function Play() {
 
                                   {externalIds.twitter_id && (
                                     <a
-                                      href={`https://twitter.com/${externalIds.twitter_id}`}
+                                      href={`https://x.com/${externalIds.twitter_id}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="hover:opacity-80"
@@ -950,7 +953,7 @@ function Play() {
                               <div
                                 key={person.id}
                                 className="text-center cursor-pointer hover:opacity-80 transition-opacity"
-                                onClick={() => navigate(`/people/${person.id}`)}
+                                onClick={() => navigate(`/people/${person.id}-${slugify(person.name)}`)}
                               >
                                 <div className="aspect-square rounded-full overflow-hidden mb-2 mx-auto w-20 h-20">
                                   <img
@@ -1009,9 +1012,7 @@ function Play() {
                                   <div
                                     key={`${person.id}-${person.job}`}
                                     className="flex items-center mb-2 cursor-pointer hover:bg-gray-800 rounded p-1 transition-colors"
-                                    onClick={() =>
-                                      navigate(`/people/${person.id}`)
-                                    }
+                                    onClick={() => navigate(`/people/${person.id}-${slugify(person.name)}`)}
                                   >
                                     <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
                                       <img

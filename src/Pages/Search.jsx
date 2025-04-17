@@ -7,6 +7,7 @@ import useMoviePopup from "../hooks/useMoviePopup";
 import useUpdateMyList from "../hooks/useUpdateMyList";
 import MovieCard from "../components/Cards/MovieCard";
 import PersonCard from "../components/Cards/PersonCard";
+import { slugify } from "../utils";
 
 // Icons
 import ClearIcon from "../assets/clear-icon.svg?react";
@@ -114,7 +115,7 @@ function Search() {
 
   // Navigation functions
   const handlePersonClick = (person) => {
-    navigate(`/people/${person.id}`);
+    navigate(`/people/${person.id}-${slugify(person.name)}`);
   };
 
   // MyList management with UI state updates

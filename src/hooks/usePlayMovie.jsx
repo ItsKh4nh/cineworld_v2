@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { doc, getDoc, updateDoc, arrayUnion, setDoc } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
 import { AuthContext } from "../contexts/UserContext";
+import { slugify } from "../utils";
 
 /**
  * Custom hook for playing movies and tracking user interactions
@@ -71,8 +72,9 @@ function usePlayMovie() {
       }, 0);
     }
 
-    // Navigate to the player page
-    navigate(`/play/${movie.id}`, { replace: true, state: { From: from } });
+    // Navigate to the player page with slugified title
+    const title = movie.title || movie.name || '';
+    navigate(`/play/${movie.id}-${slugify(title)}`, { replace: true, state: { From: from } });
   };
 
   return { playMovie };

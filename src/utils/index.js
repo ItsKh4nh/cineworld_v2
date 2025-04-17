@@ -5,4 +5,7 @@ export * from './formatters';
 export * from './authUtils';
 
 // Toast utilities
-export * from './toastUtils'; 
+export * from './toastUtils';
+
+// URL utilities
+export * from './urlUtils';
