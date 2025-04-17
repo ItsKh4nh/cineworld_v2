@@ -5,7 +5,7 @@ import { API_KEY, countriesList } from "../config/constants";
 import Footer from "../components/Footer/Footer";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
-import useUpdateMyList from "../hooks/useUpdateMyList";
+import useUpdateMyList from "../hooks/useUpdateMyLis";
 import MovieCard from "../components/Cards/MovieCard";
 
 // Icons

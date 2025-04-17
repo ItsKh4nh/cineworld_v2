@@ -7,7 +7,7 @@ import { RatingModalContext } from "../../contexts/RatingModalContext";
 
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
-import useUpdateMyList from "../../hooks/useUpdateMyList";
+import useUpdateMyList from "../../hooks/useUpdateMyLis";
 import useMoviePopup from "../../hooks/useMoviePopup";
 
 import { Swiper, SwiperSlide } from "swiper/react";
