@@ -60,12 +60,13 @@ async function getAIRecommendations(userId) {
   try {
     console.log("User has 20+ movies - using recommendation API");
 
-    const demoUserId = 1; // Fixed ID for demonstration purposes
+    const demoUserId = 1; // Fixed userID for demonstration purposes
     const recommendationsCount = 10;
 
     // Fetch recommendations from ML-based API
     const response = await axios.get(
       `https://api-cineworld.onrender.com/recommendations?user_id=${demoUserId}&top_k=${recommendationsCount}`
+      // `https://api-cineworld.onrender.com/recommendations?user_id=${userId}&top_k=${recommendationsCount}`
     );
 
     const recommendationsFromAPI = response.data.recommendations;
