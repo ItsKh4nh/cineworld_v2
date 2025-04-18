@@ -796,7 +796,7 @@ function Play() {
                                       className="hover:opacity-80"
                                       title="X (Twitter)"
                                     >
-                                      <FaXTwitter className="text-black text-3xl" />
+                                      <FaXTwitter className="text-white text-3xl" />
                                     </a>
                                   )}
 
