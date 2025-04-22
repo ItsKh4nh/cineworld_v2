@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts/UserContext";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
 import axios from "../axios";
-import { API_KEY } from "../config/constants";
+import { movieVideos } from "../config/URLs";
 
 /**
  * Custom hook for managing movie popup functionality
@@ -65,7 +65,7 @@ function useMoviePopup() {
    */
   const fetchTrailer = (movieId) => {
     axios
-      .get(`/movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`)
+      .get(movieVideos(movieId))
       .then((response) => {
         if (response.data.results.length !== 0) {
           const trailerVideo =

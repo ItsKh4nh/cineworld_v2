@@ -19,6 +19,10 @@ export const getPeopleList = (peopleId) =>
 export const discoverByPeople = (peopleIds) =>
   `discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&include_adult=false&include_video=false&page=1&with_people=${peopleIds}&vote_count.gte=100`;
 
+// Country-based discovery
+export const discoverByCountry = (countryCode, page = 1) =>
+  `discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&vote_count.gte=1000&include_adult=false&include_video=false&page=${page}&with_origin_country=${countryCode}`;
+
 // ==============================================
 // Search functionality
 // ==============================================
@@ -32,10 +36,13 @@ export const searchPerson = (query) =>
 // Movie details and related content
 // ==============================================
 export const movieDetails = (movieId) =>
-  `movie/${movieId}?api_key=${API_KEY}&language=en-US&append_to_response=credits,images,watch/providers`;
+  `movie/${movieId}?api_key=${API_KEY}&language=en-US`;
 
 export const movieVideos = (movieId) =>
   `movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`;
+
+export const movieCredits = (movieId) =>
+  `movie/${movieId}/credits?api_key=${API_KEY}`;
 
 export const movieRecommendations = (movieId) =>
   `movie/${movieId}/recommendations?api_key=${API_KEY}&language=en-US&page=1`;

@@ -3,7 +3,7 @@ import { Fade } from "react-awesome-reveal";
 import YouTube from "react-youtube";
 import StarRating from "../StarRating/StarRating";
 
-import { imageUrlOriginal, API_KEY } from "../../config/constants";
+import { imageUrlOriginal } from "../../config/constants";
 import { PopUpContext } from "../../contexts/MoviePopUpContext";
 import useGenresConverter from "../../hooks/useGenresConverter";
 import usePlayMovie from "../../hooks/usePlayMovie";
@@ -11,6 +11,7 @@ import useUpdateMyList from "../../hooks/useUpdateMyList";
 import useMoviePopup from "../../hooks/useMoviePopup";
 import useGuestMode from "../../hooks/useGuestMode";
 import axios from "../../axios";
+import { movieCredits } from "../../config/URLs";
 
 // Icons
 import PlayCircleIcon from "../../assets/play-circle-icon.svg?react";
@@ -62,7 +63,7 @@ function MoviePopUp() {
   useEffect(() => {
     if (movieInfo && movieInfo.id) {
       axios
-        .get(`/movie/${movieInfo.id}/credits?api_key=${API_KEY}`)
+        .get(movieCredits(movieInfo.id))
         .then((response) => {
           if (response.data.cast && response.data.cast.length > 0) {
             setHasMoreCast(response.data.cast.length > 10);

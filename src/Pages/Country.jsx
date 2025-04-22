@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "../axios";
-import { API_KEY, countriesList } from "../config/constants";
+import { countriesList } from "../config/constants";
 import Footer from "../components/Footer/Footer";
 import useGenresConverter from "../hooks/useGenresConverter";
 import useMoviePopup from "../hooks/useMoviePopup";
 import useUpdateMyList from "../hooks/useUpdateMyList";
 import MovieCard from "../components/Cards/MovieCard";
+import { discoverByCountry } from "../config/URLs";
 
 // Icons
 import ChevronLeftIcon from "../assets/chevron-left-icon.svg?react";
@@ -66,10 +67,9 @@ function Country() {
   useEffect(() => {
     if (countryCode) {
       setLoading(true);
-      const url = `discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&vote_count.gte=1000&include_adult=false&include_video=false&page=${currentPage}&with_origin_country=${countryCode}`;
-
+      
       axios
-        .get(url)
+        .get(discoverByCountry(countryCode, currentPage))
         .then((response) => {
           // Attach myList status to each movie for UI display
           const moviesWithMyListStatus = response.data.results.map((movie) => ({

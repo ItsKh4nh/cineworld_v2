@@ -17,6 +17,7 @@ import StarRating from "../StarRating/StarRating";
 import { FaMinus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { slugify } from "../../utils";
+import { movieDetails } from "../../config/URLs";
 
 // Icons
 import ClearIcon from "../../assets/clear-icon.svg?react";
@@ -107,9 +108,7 @@ function MyListTable() {
           // Fetch additional details for each movie
           const moviesWithRuntime = data.movies.map(async (movie) => {
             try {
-              const response = await axios.get(
-                `https://api.themoviedb.org/3/movie/${movie.id}?api_key=${API_KEY}&language=en-US`
-              );
+              const response = await axios.get(movieDetails(movie.id));
               return {
                 ...movie,
                 runtime: response.data.runtime,
