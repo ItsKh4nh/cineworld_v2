@@ -34,6 +34,7 @@ function Profile() {
   const [newProfilePicURL, setNewProfilePicURL] = useState("");
   const [newProfilePic, setNewProfilePic] = useState("");
   const [isUserNameChanged, setIsUserNameChanged] = useState(false);
+  const [isEditingUserName, setIsEditingUserName] = useState(false);
   const [isGoogleAccount, setIsGoogleAccount] = useState(false);
 
   // Loading states
@@ -128,6 +129,8 @@ function Profile() {
     try {
       const success = await updateUserName(userName);
       if (success) {
+        setIsUserNameChanged(false);
+        setIsEditingUserName(false);
         toast.success("Username updated successfully");
       } else {
         toast.error("Failed to update username");
@@ -259,16 +262,26 @@ function Profile() {
                     Username
                   </label>
                   <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={userName}
-                      onChange={(e) => {
-                        setUserName(e.target.value);
-                        setIsUserNameChanged(true);
-                      }}
-                      className="flex-1 rounded-md bg-stone-900 text-white border-gray-700 border p-2 focus:border-cineworldYellow focus:ring-cineworldYellow"
-                      placeholder="Enter username"
-                    />
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        value={userName}
+                        onChange={(e) => {
+                          setUserName(e.target.value);
+                          setIsUserNameChanged(true);
+                        }}
+                        className="w-full rounded-md bg-stone-900 text-white border-gray-700 border p-2 focus:border-cineworldYellow focus:ring-cineworldYellow"
+                        placeholder="Enter username"
+                        disabled={!isEditingUserName}
+                      />
+                      <button
+                        onClick={() => setIsEditingUserName(true)}
+                        className="absolute inset-y-0 right-0 flex items-center px-3 text-cineworldYellow hover:text-yellow-400 transition-colors"
+                        title="Edit username"
+                      >
+                        <EditIcon className="h-5 w-5" />
+                      </button>
+                    </div>
                     {isUserNameChanged && (
                       <button
                         onClick={changeUsername}
