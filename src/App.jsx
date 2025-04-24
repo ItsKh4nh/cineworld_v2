@@ -46,8 +46,8 @@ function App() {
   
   // Determine which navbar to show
   const renderNavbar = () => {
-    // On Welcome page, show simplified navbar
-    if (location.pathname === '/welcome') {
+    // On Welcome, SignIn, or SignUp pages, show simplified navbar
+    if (location.pathname === '/welcome' || location.pathname === '/signin' || location.pathname === '/signup') {
       return <SimpleNavbar />;
     }
     
