@@ -10,6 +10,7 @@ import {
   movieKeywords,
   movieReviews,
   configurationLanguages,
+  movieCredits,
 } from "../config";
 import { imageUrlOriginal, imageUrlBackup, languageList } from "../config";
 import { ClipLoader } from "react-spinners";
@@ -270,6 +271,20 @@ function Play() {
       .get(getMovieDetails(id))
       .then((response) => {
         setMovieDetails(response.data);
+
+        // Fetch movie credits (cast and crew)
+        axios
+          .get(movieCredits(id))
+          .then((creditsResponse) => {
+            // Add credits data to the movieDetails state
+            setMovieDetails(prevDetails => ({
+              ...prevDetails,
+              credits: creditsResponse.data
+            }));
+          })
+          .catch((error) => {
+            console.error("Error fetching movie credits:", error);
+          });
 
         // Fetch collection details if movie belongs to a collection
         if (response.data.belongs_to_collection) {
