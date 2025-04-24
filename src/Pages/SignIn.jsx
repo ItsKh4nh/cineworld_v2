@@ -5,6 +5,7 @@ import { ClipLoader } from "react-spinners";
 import { AuthContext } from "../contexts/UserContext";
 import { emailSignIn, googleSignIn } from "../controllers/auth.controller";
 import ForgotPasswordModal from "../components/Modals/ForgotPasswordModal";
+import toast from "react-hot-toast";
 
 // Icons
 import EyeOpenIcon from "../assets/eye-open-icon.svg?react";
@@ -47,6 +48,10 @@ function SignIn() {
     }
 
     if (user) {
+      toast.success("Login successful!", {
+        position: "top-center",
+        duration: 3000,
+      });
       navigate("/");
     }
   };
@@ -65,6 +70,10 @@ function SignIn() {
     }
 
     if (user) {
+      toast.success("Login successful!", {
+        position: "top-center",
+        duration: 3000,
+      });
       navigate("/");
     }
   };

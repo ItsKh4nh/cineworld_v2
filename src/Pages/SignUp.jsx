@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Fade } from "react-awesome-reveal";
 import { ClipLoader } from "react-spinners";
 import { AuthContext } from "../contexts/UserContext";
+import toast from "react-hot-toast";
 import {
   emailSignUp,
   validateEmail,
@@ -246,6 +247,10 @@ function SignUp() {
       setUser({
         ...user,
         displayName: username.trim(),
+      });
+      toast.success("Account created successfully!", {
+        position: "top-center",
+        duration: 3000,
       });
       navigate("/");
     }
