@@ -14,6 +14,8 @@ import {
   query,
   where,
   getDocs,
+  increment,
+  runTransaction,
 } from "firebase/firestore";
 import { db, auth } from "../firebase/FirebaseConfig";
 
@@ -36,17 +38,48 @@ const createUserCollections = async (uid) => {
 };
 
 /**
- * Creates or updates user profile in Firestore
- * @param {string} uid - User ID
- * @param {Object} data - User profile data
+ * Gets next sequential user_id and increments counter
+ * @returns {Promise<number>} The next available user_id
  */
-const createUserProfile = async (uid, data) => {
+const getNextUserId = async () => {
+  const counterRef = doc(db, "Counters", "users");
+  
+  try {
+    return await runTransaction(db, async (transaction) => {
+      const counterDoc = await transaction.get(counterRef);
+      
+      let nextId = 1;
+      if (counterDoc.exists()) {
+        nextId = counterDoc.data().count + 1;
+      }
+      
+      transaction.set(counterRef, { count: nextId }, { merge: true });
+      return nextId;
+    });
+  } catch (error) {
+    console.error("Error getting next user_id:", error);
+    throw error;
+  }
+};
+
+/**
+ * Creates or updates user profile in Firestore
+ * @param {string} uid - Firebase User ID
+ * @param {Object} data - User profile data
+ * @param {number} [sequentialId] - Sequential user ID (for new users)
+ */
+const createUserProfile = async (uid, data, sequentialId = null) => {
+  const userData = {
+    ...data,
+  };
+  
+  if (sequentialId !== null) {
+    userData.user_id = sequentialId;
+  }
+  
   await setDoc(
     doc(db, "Users", uid),
-    {
-      ...data,
-      Uid: uid,
-    },
+    userData,
     { merge: true }
   );
 };
@@ -275,14 +308,21 @@ export const googleSignIn = async () => {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    await createUserProfile(user.uid, {
-      email: user.email,
-    });
-
     // Initialize collections if new user
     const myListDoc = await getDoc(doc(db, "MyList", user.uid));
-    if (!myListDoc.exists()) {
+    const isNewUser = !myListDoc.exists();
+    
+    if (isNewUser) {
+      const nextUserId = await getNextUserId();
+      await createUserProfile(user.uid, {
+        email: user.email,
+        user_id: nextUserId,
+      });
       await createUserCollections(user.uid);
+    } else {
+      await createUserProfile(user.uid, {
+        email: user.email,
+      });
     }
 
     return { user, error: null };
@@ -316,10 +356,13 @@ export const emailSignUp = async (email, password, username) => {
       displayName: username,
     });
 
+    const nextUserId = await getNextUserId();
+    
     await createUserProfile(user.uid, {
       email: email,
       username: username,
       displayName: username,
+      user_id: nextUserId,
     });
 
     await createUserCollections(user.uid);

@@ -52,6 +52,28 @@ async function getUserInteractions(userId) {
 }
 
 /**
+ * Gets the user's numeric ID from the Users collection in Firestore
+ * @param {string} userId - Firebase user ID
+ * @returns {Promise<number|null>} User's numeric ID or null if not found
+ */
+async function getNumericUserId(userId) {
+  try {
+    const userRef = doc(db, "Users", userId);
+    const userDoc = await getDoc(userRef);
+
+    if (!userDoc.exists()) {
+      console.log("User not found in Users collection");
+      return null;
+    }
+
+    return userDoc.data().user_id;
+  } catch (error) {
+    console.error("Error fetching user ID:", error);
+    return null;
+  }
+}
+
+/**
  * Attempts to get AI-powered recommendations from external recommendation API
  * @param {string} userId - User ID
  * @returns {Promise<Array>} Array of recommended movies from AI service
@@ -60,13 +82,19 @@ async function getAIRecommendations(userId) {
   try {
     console.log("User has 20+ movies - using recommendation API");
 
-    const demoUserId = 1; // Fixed userID for demonstration purposes
+    // Get user's numeric ID from Users collection
+    const numericUserId = await getNumericUserId(userId);
+    
+    if (!numericUserId) {
+      console.log("No numeric user ID found, cannot use AI recommendations");
+      return [];
+    }
+
     const recommendationsCount = 10;
 
-    // Fetch recommendations from ML-based API
+    // Fetch recommendations from ML-based API using actual user ID
     const response = await axios.get(
-      `https://api-cineworld.onrender.com/recommendations?user_id=${demoUserId}&top_k=${recommendationsCount}`
-      // `https://api-cineworld.onrender.com/recommendations?user_id=${userId}&top_k=${recommendationsCount}`
+      `https://api-cineworld.onrender.com/recommendations?user_id=${numericUserId}&top_k=${recommendationsCount}`
     );
 
     const recommendationsFromAPI = response.data.recommendations;

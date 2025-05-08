@@ -29,3 +29,5 @@ node_modules/
 *.sln
 *.sw?
 .cursorrules
+
+NCF_recommmendation_api.md
