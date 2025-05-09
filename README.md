@@ -10,8 +10,8 @@ A web application project focused on building a FREE movies streaming platform w
 - Search for movies or people.
 - Watch numerous movies with high quality and minimal delays.
 - List management for for archival purposes.
-- Profile management (for logged in users)
-- Get personalized movie recommendations for logged in users through external APIs
+- Profile management (for logged in users).
+- Get personalized movie recommendations for logged in users through external APIs.
 
 ## 🚀 Technology Stack
 
@@ -28,7 +28,7 @@ A web application project focused on building a FREE movies streaming platform w
     - Vercel for deployment
 - **APIs:**
   - TMDB (The Movie Database) API for movie and people data
-  - Custom recommendation API (https://api-cineworld.onrender.com) for AI-based movie recommendations
+  - Custom recommendation API (<https://api-cineworld.onrender.com>) for AI-based movie recommendations
 
 ## ⚙️ Getting Started
 
@@ -37,20 +37,24 @@ A web application project focused on building a FREE movies streaming platform w
 - Node.js (v18 or later recommended)
 - npm (Node Package Manager)
 - Firebase Project: You need to set up a Firebase project and obtain the configuration credentials.
-- TMDB API Key: Register at https://www.themoviedb.org/documentation/api to get your API key
+- TMDB API Key: Register at <https://www.themoviedb.org/documentation/api> to get your API key
 
 ### Installation
 
-1.  Clone the repository:
+1. Clone the repository:
+
     ```bash
     git clone https://github.com/ItsKh4nh/cineworld_v2
     cd cineworld
     ```
-2.  Install dependencies:
+
+2. Install dependencies:
+
     ```bash
     npm install
     ```
-3.  Set up environment variables:
+
+3. Set up environment variables:
 
     - Create a `.env` file in the root directory by copying `.env.sample`.
     - Fill in the necessary Firebase configuration values and any other required variables (e.g., API keys for movie data). Refer to `.env.sample` for the required variables.
