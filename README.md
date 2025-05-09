@@ -8,7 +8,7 @@ A web application project focused on building a FREE movies streaming platform w
 - Browse movies in many categories and criteria.
 - Also acts as a Encyclopedia with extensive information about movies and people.
 - Search for movies or people.
-- Watch numerous movies with high quality and no delays.
+- Watch numerous movies with high quality and minimal delays.
 - List management for for archival purposes.
 - Profile management (for logged in users)
 - Get personalized movie recommendations for logged in users through external APIs
