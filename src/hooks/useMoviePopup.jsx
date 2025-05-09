@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts/UserContext";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/FirebaseConfig";
 import axios from "../axios";
-import { movieVideos } from "../config/URLs";
+import { movieVideos, movieDetails } from "../config/URLs";
 
 /**
  * Custom hook for managing movie popup functionality
@@ -15,6 +15,7 @@ function useMoviePopup() {
     useContext(PopUpContext);
   const { User } = useContext(AuthContext);
   const [myListMovies, setMyListMovies] = useState([]);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
   // Subscribe to user's MyList with real-time updates
   useEffect(() => {
@@ -39,24 +40,44 @@ function useMoviePopup() {
 
   /**
    * Displays the movie popup with information and trailer
-   * @param {Object} movieInfo - Movie data to display in the popup
+   * @param {Object} basicMovieInfo - Basic movie data to display in the popup
    */
-  const handleMoviePopup = (movieInfo) => {
-    // Enrich movie info with MyList status
-    const isInMyList = myListMovies.some((movie) => movie.id === movieInfo.id);
-    const enrichedMovieInfo = {
-      ...movieInfo,
-      isInMyList,
-    };
-
-    // Update context state with small delay to ensure DOM updates properly
-    setTimeout(() => {
-      setMovieInfo(enrichedMovieInfo);
-      setShowModal(true);
-
-      // Fetch and set trailer if available
-      fetchTrailer(movieInfo.id);
-    }, 10);
+  const handleMoviePopup = (basicMovieInfo) => {
+    setIsLoadingDetails(true);
+    
+    // First determine if this movie is in the user's list
+    const isInMyList = myListMovies.some((movie) => movie.id === basicMovieInfo.id);
+    
+    // Get full movie details from TMDB API
+    axios.get(movieDetails(basicMovieInfo.id))
+      .then(response => {
+        // Combine API data with MyList status
+        const fullMovieDetails = {
+          ...response.data,
+          isInMyList
+        };
+        
+        // Update context with complete movie data
+        setMovieInfo(fullMovieDetails);
+        setShowModal(true);
+        
+        // Fetch and set trailer if available
+        fetchTrailer(basicMovieInfo.id);
+        setIsLoadingDetails(false);
+      })
+      .catch(error => {
+        console.error("Error fetching movie details:", error);
+        // Fallback to basic info if API call fails
+        setMovieInfo({
+          ...basicMovieInfo,
+          isInMyList
+        });
+        setShowModal(true);
+        setIsLoadingDetails(false);
+        
+        // Still try to fetch trailer
+        fetchTrailer(basicMovieInfo.id);
+      });
   };
 
   /**
@@ -102,6 +123,7 @@ function useMoviePopup() {
     handleMoviePopup,
     formatDate,
     myListMovies,
+    isLoadingDetails
   };
 }
 

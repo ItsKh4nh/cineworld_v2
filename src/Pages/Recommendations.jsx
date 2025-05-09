@@ -95,6 +95,90 @@ function Recommendations() {
     }
   };
 
+  // Skeleton loading components for the recommendations
+  const SkeletonMovieItem = () => {
+    return (
+      <>
+        {/* Mobile view skeleton (2 per row) */}
+        <div className="md:hidden bg-zinc-900 rounded-lg overflow-hidden h-full flex flex-col">
+          {/* Poster skeleton */}
+          <div className="w-full relative">
+            <div className="w-full aspect-[16/9] bg-zinc-800 animate-pulse"></div>
+            {/* Action buttons placeholder */}
+            <div className="absolute top-2 left-2 flex space-x-2">
+              <div className="bg-zinc-800 w-7 h-7 rounded-full animate-pulse"></div>
+              <div className="bg-zinc-800 w-7 h-7 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+
+          {/* Card content skeleton */}
+          <div className="p-2 flex-grow">
+            {/* Title skeleton */}
+            <div className="bg-zinc-800 h-5 w-4/5 rounded-md animate-pulse mb-1"></div>
+            {/* Date skeleton */}
+            <div className="bg-zinc-800 h-3 w-1/3 rounded-md animate-pulse mb-1"></div>
+            {/* Rating skeleton */}
+            <div className="flex mb-1">
+              <div className="bg-zinc-800 h-4 w-24 rounded-md animate-pulse"></div>
+            </div>
+            {/* Genres skeleton */}
+            <div className="flex items-center">
+              <div className="bg-zinc-800 h-3 w-16 rounded-md animate-pulse"></div>
+              <div className="mx-1 text-white/60">•</div>
+              <div className="bg-zinc-800 h-3 w-16 rounded-md animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop/Tablet view skeleton */}
+        <div className="hidden md:block bg-zinc-900 rounded-lg overflow-hidden mb-6">
+          <div className="flex flex-row">
+            {/* Movie poster skeleton */}
+            <div className="w-1/5 lg:w-1/6 relative">
+              <div className="w-full aspect-[2/3] bg-zinc-800 animate-pulse"></div>
+            </div>
+
+            {/* Movie details skeleton */}
+            <div className="w-4/5 lg:w-5/6 p-4 md:p-6 flex flex-col">
+              {/* Title skeleton */}
+              <div className="bg-zinc-800 h-8 w-3/4 rounded-md animate-pulse mb-2"></div>
+              
+              {/* Date skeleton */}
+              <div className="mb-2">
+                <div className="bg-zinc-800 h-5 w-1/3 rounded-md animate-pulse"></div>
+              </div>
+              
+              {/* Rating skeleton */}
+              <div className="mb-3">
+                <div className="bg-zinc-800 h-6 w-32 rounded-md animate-pulse"></div>
+              </div>
+              
+              {/* Genres skeleton */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                <div className="bg-zinc-800 h-8 w-20 rounded-full animate-pulse"></div>
+                <div className="bg-zinc-800 h-8 w-24 rounded-full animate-pulse"></div>
+                <div className="bg-zinc-800 h-8 w-16 rounded-full animate-pulse"></div>
+              </div>
+              
+              {/* Overview skeleton */}
+              <div className="mb-4">
+                <div className="bg-zinc-800 h-4 w-full rounded-md animate-pulse mb-1"></div>
+                <div className="bg-zinc-800 h-4 w-full rounded-md animate-pulse mb-1"></div>
+                <div className="bg-zinc-800 h-4 w-3/4 rounded-md animate-pulse"></div>
+              </div>
+              
+              {/* Buttons skeleton */}
+              <div className="flex mt-auto space-x-3">
+                <div className="bg-zinc-800 h-10 w-24 rounded-md animate-pulse"></div>
+                <div className="bg-zinc-800 h-10 w-36 rounded-md animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  };
+
   // Movie list item component for both mobile and desktop views
   const MovieListItem = ({ movie }) => {
     // Determine if movie is in user's list (either from context or just added locally)
@@ -335,8 +419,12 @@ function Recommendations() {
       {/* Content container with loading, results or error states */}
       <div className="px-4 md:px-8 pb-12 w-full">
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <p className="text-white text-lg">Loading recommendations...</p>
+          <div className="grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-0">
+            {[...Array(6)].map((_, index) => (
+              <div className="mb-0 md:mb-6" key={`skeleton-${index}`}>
+                <SkeletonMovieItem />
+              </div>
+            ))}
           </div>
         ) : movies.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-0">

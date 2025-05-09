@@ -5,7 +5,8 @@ import {
   reauthenticateWithCredential, 
   EmailAuthProvider 
 } from "firebase/auth";
-import { auth } from "../firebase/FirebaseConfig";
+import { auth, db } from "../firebase/FirebaseConfig";
+import { doc, updateDoc } from "firebase/firestore";
 
 /**
  * Sign out the current user and navigate to the specified path
@@ -31,7 +32,13 @@ export const signOutUser = async (navigate, path = "/") => {
  */
 export const updateUserName = async (displayName) => {
   try {
+    // Update Firebase Auth profile
     await updateProfile(auth.currentUser, { displayName });
+    
+    // Also update the user document in Firestore
+    const userDocRef = doc(db, "Users", auth.currentUser.uid);
+    await updateDoc(userDocRef, { displayName });
+    
     return true;
   } catch (error) {
     console.error("Error updating username:", error);
@@ -46,7 +53,13 @@ export const updateUserName = async (displayName) => {
  */
 export const updateProfilePicture = async (photoURL) => {
   try {
+    // Update Firebase Auth profile
     await updateProfile(auth.currentUser, { photoURL });
+    
+    // Also update the user document in Firestore
+    const userDocRef = doc(db, "Users", auth.currentUser.uid);
+    await updateDoc(userDocRef, { photoURL });
+    
     return true;
   } catch (error) {
     console.error("Error updating profile picture:", error);

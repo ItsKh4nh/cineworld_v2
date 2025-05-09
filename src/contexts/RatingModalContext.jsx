@@ -122,16 +122,33 @@ export const RatingModalProvider = ({ children }) => {
     }
 
     try {
-      // Prepare movie data with MyList flag
-      let movieToSave = { ...ratedMovie, isInMyList: true };
+      // Extract only the required fields for storage with null checks
+      let movieToSave = {
+        id: ratedMovie.id,
+        title: ratedMovie.title || "",
+        backdrop_path: ratedMovie.backdrop_path || null,
+        release_date: ratedMovie.release_date || null,
+        isInMyList: true,
+        userRating: ratedMovie.userRating || {}
+      };
+
+      // Only add runtime if it exists
+      if (ratedMovie.runtime !== undefined) {
+        movieToSave.runtime = ratedMovie.runtime;
+      }
 
       // Handle genre data format conversion for compatibility
       if (
-        movieToSave.genres &&
-        Array.isArray(movieToSave.genres) &&
-        !movieToSave.genre_ids
+        ratedMovie.genres &&
+        Array.isArray(ratedMovie.genres) &&
+        !ratedMovie.genre_ids
       ) {
-        movieToSave.genre_ids = movieToSave.genres.map((genre) => genre.id);
+        movieToSave.genre_ids = ratedMovie.genres.map((genre) => genre.id);
+      } else if (ratedMovie.genre_ids) {
+        movieToSave.genre_ids = ratedMovie.genre_ids;
+      } else {
+        // Default empty array if no genre information is available
+        movieToSave.genre_ids = [];
       }
 
       const userDocRef = doc(db, "MyList", user.uid);
@@ -147,8 +164,7 @@ export const RatingModalProvider = ({ children }) => {
           const filteredMovies = movies.filter((m) => m.id !== movieToSave.id);
           filteredMovies.push({
             ...movieToSave,
-            genre_ids: movieToSave.genre_ids || existingMovie.genre_ids,
-            isInMyList: true,
+            genre_ids: movieToSave.genre_ids || existingMovie.genre_ids || [],
           });
 
           await updateDoc(userDocRef, { movies: filteredMovies });

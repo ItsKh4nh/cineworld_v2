@@ -112,7 +112,6 @@ function MyListTable() {
               return {
                 ...movie,
                 runtime: response.data.runtime,
-                release_date_full: response.data.release_date,
               };
             } catch (error) {
               console.error("Error fetching movie details:", error);
@@ -214,6 +213,8 @@ function MyListTable() {
       if (docSnap.exists()) {
         const userData = docSnap.data();
         const people = userData.people || [];
+        
+        // Remove the person by filtering the array
         const updatedPeople = people.filter((p) => p.id !== person.id);
 
         await updateDoc(userDocRef, {
@@ -318,7 +319,6 @@ function MyListTable() {
       sortableMovies.sort((a, b) => {
         // Handle date fields
         if (
-          sortConfig.key === "release_date_full" ||
           sortConfig.key === "release_date" ||
           sortConfig.key === "first_air_date"
         ) {
@@ -567,9 +567,9 @@ function MyListTable() {
                         )}
                         <th
                           className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
-                          onClick={() => handleSort("release_date_full")}
+                          onClick={() => handleSort("release_date")}
                         >
-                          Release Date {getSortIcon("release_date_full")}
+                          Release Date {getSortIcon("release_date")}
                         </th>
                         <th
                           className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer"
@@ -634,9 +634,8 @@ function MyListTable() {
                           )}
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
                             {formatDate(
-                              movie.release_date_full ||
-                                movie.release_date ||
-                                movie.first_air_date
+                              movie.release_date ||
+                              movie.first_air_date
                             )}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -748,9 +747,8 @@ function MyListTable() {
                         </div>
                         <div className="text-sm text-gray-400 mt-1">
                           {formatDate(
-                            movie.release_date_full ||
-                              movie.release_date ||
-                              movie.first_air_date
+                            movie.release_date ||
+                            movie.first_air_date
                           )}
                         </div>
                         <div className="text-sm text-gray-300 mt-1">

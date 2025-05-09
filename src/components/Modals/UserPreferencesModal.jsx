@@ -125,24 +125,39 @@ function UserPreferencesModal({ user, onClose }) {
       // Add movies to MyList with ratings
       const currentMovies = currentData.movies || [];
       const moviesWithRatings = selectedMovies.map((movie) => {
+        // Create the userRating object
         const userRating = {
           status: "Completed",
           dateAdded: new Date().toISOString(),
+          score: movieRatings[movie.id] || 10
         };
 
-        // Use provided rating or default to 10
-        userRating.score = movieRatings[movie.id] || 10;
-
-        return {
-          ...movie,
-          userRating,
+        // Create movie object with only required fields and null checks
+        const movieObject = {
+          id: movie.id,
+          title: movie.title || "",
+          backdrop_path: movie.backdrop_path || null,
+          release_date: movie.release_date || null,
+          genre_ids: movie.genre_ids || [],
+          isInMyList: true,
+          userRating
         };
+
+        // Only add runtime if it exists
+        if (movie.runtime !== undefined) {
+          movieObject.runtime = movie.runtime;
+        }
+
+        return movieObject;
       });
 
       // Add people to MyList
       const currentPeople = currentData.people || [];
       const peopleWithDateAdded = selectedPeople.map((person) => ({
-        ...person,
+        id: person.id,
+        name: person.name || "",
+        profile_path: person.profile_path || null,
+        known_for_department: person.known_for_department || null,
         dateAdded: new Date().toISOString(),
       }));
 

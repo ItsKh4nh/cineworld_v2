@@ -63,14 +63,12 @@ function usePeopleList() {
         return false;
       }
 
-      // Prepare person data with only necessary fields
+      // Prepare person data with only required fields and null checks
       const personData = {
         id: person.id,
-        name: person.name,
-        profile_path: person.profile_path,
-        known_for_department: person.known_for_department,
-        popularity: person.popularity,
-        gender: person.gender,
+        name: person.name || "",
+        profile_path: person.profile_path || null,
+        known_for_department: person.known_for_department || null,
         dateAdded: new Date().toISOString(),
       };
 
