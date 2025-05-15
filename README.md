@@ -1,6 +1,10 @@
 # CineWorld – Movies at your fingertips🎬
 
-A web application project focused on building a FREE movies streaming platform with a clean and modern UI, integrated with a Neural Collaborative Filtering to gave out personalized movie recommendations. The project aims delivered a seamless and enjoyable experience for movie enjoyers.
+A web application project focused on building a FREE movies streaming platform with a clean and modern UI, integrated with a Hybrid Recommendation System to gave out personalized movie recommendations. The project aims delivered a seamless and enjoyable experience for movie enjoyers.
+
+## 📷 Screenshot
+
+![CineWorld Screenshot](./screenshot.png)
 
 ## ✨ Features
 
@@ -28,7 +32,7 @@ A web application project focused on building a FREE movies streaming platform w
     - Vercel for deployment
 - **APIs:**
   - TMDB (The Movie Database) API for movie and people data
-  - Custom recommendation API (<https://api-cineworld.up.railway.app/>) for AI-based movie recommendations
+  - Custom recommendation API (<https://api-cineworld.up.railway.app/>) for NCF-based movie recommendations
 
 ## ⚙️ Getting Started
 
