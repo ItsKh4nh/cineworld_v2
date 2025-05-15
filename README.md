@@ -28,7 +28,7 @@ A web application project focused on building a FREE movies streaming platform w
     - Vercel for deployment
 - **APIs:**
   - TMDB (The Movie Database) API for movie and people data
-  - Custom recommendation API (<https://api-cineworld.onrender.com>) for AI-based movie recommendations
+  - Custom recommendation API (<https://api-cineworld.up.railway.app/>) for AI-based movie recommendations
 
 ## ⚙️ Getting Started
 
