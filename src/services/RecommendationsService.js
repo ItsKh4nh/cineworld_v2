@@ -94,7 +94,7 @@ async function getAIRecommendations(userId) {
 
     // Fetch recommendations from ML-based API using actual user ID
     const response = await axios.get(
-      `https://api-cineworld.up.railway.app//recommendations?user_id=${numericUserId}&top_k=${recommendationsCount}`
+      `https://api-cineworld.onrender.com//recommendations?user_id=${numericUserId}&top_k=${recommendationsCount}`
     );
 
     const recommendationsFromAPI = response.data.recommendations;
