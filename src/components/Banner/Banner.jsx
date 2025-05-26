@@ -15,6 +15,7 @@ import PlayIcon from "../../assets/play-icon.svg?react";
 import MoreInfoIcon from "../../assets/more-info-icon.svg?react";
 import LoadingPlayIcon from "../../assets/loading-play-icon.svg?react";
 
+// Fetch a random movie and display it in the banner
 function Banner({ url }) {
   const [movie, setMovie] = useState([]);
   const [windowSize, setWindowSize] = useState(getWindowSize());
@@ -33,9 +34,7 @@ function Banner({ url }) {
   const fetchMovies = async () => {
     try {
       const response = await axios.get(url);
-      const randomMovie = response.data.results.sort(
-        () => 0.5 - Math.random()
-      )[0];
+      const randomMovie = response.data.results[Math.floor(Math.random() * response.data.results.length)];
 
       // Check if movie is in MyList
       const isInMyList = myListMovies.some((m) => m.id === randomMovie.id);

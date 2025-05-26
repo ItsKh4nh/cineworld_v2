@@ -22,7 +22,7 @@ module.exports = {
         "70rem": "70rem",
       },
       colors: {
-        cineworldYellow: "#a47504",
+        cineworldYellow: "#a47504", // CineWorld Yellow color definition
       },
     },
   },
