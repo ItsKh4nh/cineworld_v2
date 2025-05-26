@@ -17,7 +17,7 @@ import LoadingPlayIcon from "../../assets/loading-play-icon.svg?react";
 
 // Fetch a random movie and display it in the banner
 function Banner({ url }) {
-  const [movie, setMovie] = useState([]);
+  const [movie, setMovie] = useState({});
   const [windowSize, setWindowSize] = useState(getWindowSize());
 
   // Hooks
@@ -84,7 +84,7 @@ function Banner({ url }) {
             {movie.title || movie.name ? (
               <div className="flex flex-wrap items-center mb-5">
                 <div className="flex items-center">
-                  <h1 className="text-white text-3xl font-semibold text-center py-2 sm:text-left sm:text-5xl sm:border-l-8 pl-4 border-cineworldYellow md:text-6xl sm:font-bold drop-shadow-lg">
+                  <h1 className="text-white text-3xl font-semibold text-center py-2 sm:text-left sm:text-5xlborder-cineworldYellow md:text-6xl sm:font-bold drop-shadow-lg">
                     {movie.title || movie.name}
                   </h1>
                 </div>
